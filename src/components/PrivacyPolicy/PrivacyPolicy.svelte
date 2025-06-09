@@ -2,9 +2,9 @@
 
 </script>
 <!-- Privacy policy  -->
-<div id="privacyPolicy" class="mb-4 pl-56 pr-56 pt-2">
-    <h1 class="text-[40px] font-semibold text-center pt-16 pb-1">Privacy Policy</h1>
-    <div class="border-2 border-[#02066F] rounded-[20px] pl-4 pr-4 space-y-4"><br>
+<div id="privacyPolicy" class="mb-4 px-2 sm:px-6 md:px-12 lg:px-24 xl:px-56 pt-2">
+    <h1 class="text-4xl sm:text-4xl font-semibold text-center pt-16 pb-1">Privacy Policy</h1>
+    <div class="border-2 border-[#02066F] p-4 rounded-[20px] space-y-4 mt-2"><br>
         <p>Last updated:  October 1, 2024
         </p>
         <p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your
@@ -117,7 +117,7 @@
             <li class="flex gap-2 ">
                 
                 <span class="text-2xl leading-none">•</span><p><strong>Website</strong> refers to Tap-Time, accessible from 
-                    <a class="text-blue-600 hover:underline" href="https://tap-time.com"> https://tap-time.com</a></p>
+                    <a class="text-blue-600 hover:underline hover:text-blue-700" href="https://tap-time.com"> https://tap-time.com</a></p>
 
             </li>
             <li class="flex gap-2 ">
@@ -190,7 +190,7 @@
             personal computer or mobile device when You go offline, while Session Cookies are deleted as soon as You
             close Your web browser. Learn more about cookies on the <a
                 href="https://www.freeprivacypolicy.com/blog/sample-privacy-policy-template/#Use_Of_Cookies_And_Tracking"
-                target="_blank">Free Privacy Policy website</a> article.</p>
+                target="_blank" class="text-blue-500 hover:text-blue-700 hover:underline">Free Privacy Policy website</a> article.</p>
         <p>We use both Session and Persistent Cookies for the purposes set out below:</p>
         
         <ul  class="pl-6 space-y-4">
@@ -430,47 +430,46 @@
         <p>The Service Providers We use may have access to Your Personal Data. These third-party vendors collect,
             store, use, process and transfer information about Your activity on Our Service in accordance with their
             Privacy Policies.</p>
-        <h3 class="text-3xl font-semibold">Analytics</h3>
-        <p>We may use third-party Service providers to monitor and analyze the use of our Service.</p>
-        <ul class="pl-6">
-            <li class="flex gap-2">
+            
+            
+        <h3 class="text-2xl sm:text-3xl font-semibold">Analytics</h3>
+            <p class="mb-4">We may use third-party Service providers to monitor and analyze the use of our Service.</p>
+          
+            <ul class=" pl-2 sm:pl-6 p-2">
+              <!-- Google Analytics -->
+              <li class="flex items-start gap-2">
                 <span class="text-2xl leading-none">•</span>
-                <span class="flex flex-col gap-4">
-                <p><strong>Google Analytics</strong></p>
-                <p>Google Analytics is a web analytics service offered by Google that tracks and reports website
-                    traffic. Google uses the data collected to track and monitor the use of our Service. This data
-                    is shared with other Google services. Google may use the collected data to contextualize and
-                    personalize the ads of its own advertising network.</p>
-                <p>You can opt-out of having made your activity on the Service available to Google Analytics by
-                    installing the Google Analytics opt-out browser add-on. The add-on prevents the Google Analytics
-                    JavaScript (ga.js, analytics.js and dc.js) from sharing information with Google Analytics about
-                    visits activity.</p>
-                <p>For more information on the privacy practices of Google, please visit the Google Privacy &amp;
-                    Terms web page: <a href="https://policies.google.com/privacy" rel="external nofollow noopener"
-                        target="_blank" class="text-blue-500 hover:text-blue-700 hover:underline">https://policies.google.com/privacy</a></p>
-                    </span>
-            </li>
-
-            <li class="flex gap-2 pt-4">
-                <span class="text-2xl leading-none">•</span>
-                <span class="flex flex-col gap-4">
-                <p><strong>Firebase</strong></p>
-                <p>Firebase is an analytics service provided by Google Inc.</p>
-                <p>You may opt-out of certain Firebase features through your mobile device settings, such as your
-                    device advertising settings or by following the instructions provided by Google in their Privacy
-                    Policy: <a href="https://policies.google.com/privacy" rel="external nofollow noopener"
-                        target="_blank" class="text-blue-500 hover:text-blue-700 hover:underline">https://policies.google.com/privacy</a></p>
-                <p>We also encourage you to review the Google's policy for safeguarding your data: <a
-                        href="https://support.google.com/analytics/answer/6004245" rel="external nofollow noopener"
-                        target="_blank" class="text-blue-500 hover:text-blue-700 hover:underline">https://support.google.com/analytics/answer/6004245</a></p>
-                <p>For more information on what type of information Firebase collects, please visit the How Google
-                    uses data when you use our partners' sites or apps webpage: <a
-                        href="https://policies.google.com/technologies/partner-sites"
-                        rel="external nofollow noopener"
-                        target="_blank" class="text-blue-500 hover:text-blue-700 hover:underline">https://policies.google.com/technologies/partner-sites</a></p>
-                        </span>
-            </li>
-        </ul>
+                <div class="flex flex-col gap-4 text-justify">
+                  <p><strong>Google Analytics</strong></p>
+                  <p>Google Analytics is a web analytics service offered by Google that tracks and reports website traffic. Google uses the data collected to track and monitor the use of our Service. This data is shared with other Google services. Google may use the collected data to contextualize and personalize the ads of its own advertising network.</p>
+                  <p>You can opt-out of having made your activity on the Service available to Google Analytics by installing the Google Analytics opt-out browser add-on. The add-on prevents the Google Analytics JavaScript (ga.js, analytics.js and dc.js) from sharing information with Google Analytics about visits activity.</p>
+                  <p>For more information on the privacy practices of Google, please visit the Google Privacy &amp; Terms web page: 
+                    <a href="https://policies.google.com/privacy" target="_blank" rel="external nofollow noopener" class="text-blue-500 hover:text-blue-700 hover:underline">https://policies.google.com/privacy</a>
+                  </p>
+                </div>
+              </li>
+          
+              <!-- Firebase -->
+              <li class="flex flex-col sm:flex-row items-start gap-2 sm:gap-4 py-4">
+                  <span class="text-2xl leading-none">•</span>
+                  <div class="flex flex-col gap-5 text-justify w-full">
+                  <p class="text-base sm:text-[17px] font-semibold">Firebase</p>
+                  <p class="text-base sm:text-base">Firebase is an analytics service provided by Google Inc.</p>
+                  <p class="text-base sm:text-base">
+                    You may opt-out of certain Firebase features through your mobile device settings, such as your device advertising settings or by following the instructions provided by Google in their Privacy Policy:
+                    <a href="https://policies.google.com/privacy" target="_blank" rel="external nofollow noopener" class="text-blue-500 hover:text-blue-700 hover:underline block break-words">https://policies.google.com/privacy</a>
+                  </p>
+                  <p class="text-base sm:text-base">
+                    We also encourage you to review Google's policy for safeguarding your data:
+                    <a href="https://support.google.com/analytics/answer/6004245" target="_blank" rel="external nofollow noopener" class="text-blue-500 hover:text-blue-700 hover:underline block break-words">https://support.google.com/analytics/answer/6004245</a>
+                  </p>
+                  <p class="text-base sm:text-base">
+                    For more information on what type of information Firebase collects, please visit the How Google uses data when you use our partners' sites or apps webpage:
+                    <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="external nofollow noopener" class="text-blue-500 hover:text-blue-700 hover:underline block break-words">https://policies.google.com/technologies/partner-sites</a>
+                  </p>
+                </div>
+              </li>
+            </ul>
         
         <h3 class="text-3xl font-semibold">Advertising</h3>
        
@@ -1088,34 +1087,70 @@
         <p>Please note that any opt out is specific to the browser You use. You may need to opt out on every browser
             that You use.</p>
         
-        <h4 class="text-2xl font-semibold">Website</h4>
-        <p>If applicable, click &quot;Privacy Preferences&quot;, &quot;Update Privacy Preferences&quot; or &quot;Do
-            Not Sell My Personal Information&quot; buttons listed on the Service to review your privacy preferences
-            and opt out of cookies and other technologies that We may use. Please note that You will need to opt out
-            from each browser that You use to access the Service.</p>
-        <p>Additionally, You can opt out of receiving ads that are personalized as served by our Service Providers
-            by following our instructions presented on the Service:</p>
-        <ul class="pl-6">
-            <li class="flex gap-2">
-                <span class="text-2xl leading-none">•</span>
-                <span>The NAI's opt-out platform: <a href="http://www.networkadvertising.org/choices/"
-                    rel="external nofollow noopener" target="_blank" class="text-blue-500 hover:text-blue-700 hover:underline">http://www.networkadvertising.org/choices/</a>
-            </span>
-            </li>
-            <li class="flex gap-2">
-                <span class="text-2xl leading-none">•</span>
-                <span>The EDAA's opt-out platform: <a href="http://www.youronlinechoices.com/"
-                    rel="external nofollow noopener" target="_blank" class="text-blue-500 hover:text-blue-700 hover:underline">http://www.youronlinechoices.com/</a>
-                </span></li>
-            <li class="flex gap-2">
-                <span class="text-2xl leading-none">•</span>
-                <span>The DAA's opt-out platform: <a href="http://optout.aboutads.info/?c=2&amp;lang=EN"
-                    rel="external nofollow noopener"
-                    target="_blank" class="text-blue-500 hover:text-blue-700 hover:underline">http://optout.aboutads.info/?c=2&amp;lang=EN</a>
-                </span></li>
-        </ul>
-        <p>The opt out will place a cookie on Your computer that is unique to the browser You use to opt out. If you
-            change browsers or delete the cookies saved by your browser, You will need to opt out again.</p>
+            <div class="sm:pl-6 py-4 space-y-4">
+                <h4 class="text-2xl sm:text-3xl font-semibold">Website</h4>
+              
+                <p class="text-base sm:text-base">
+                  If applicable, click "Privacy Preferences", "Update Privacy Preferences" or "Do Not Sell My Personal Information" buttons listed on the Service to review your privacy preferences and opt out of cookies and other technologies that We may use. Please note that You will need to opt out from each browser that You use to access the Service.
+                </p>
+              
+                <p class="text-base sm:text-base">
+                  Additionally, You can opt out of receiving ads that are personalized as served by our Service Providers by following our instructions presented on the Service:
+                </p>
+              
+                
+
+                <ul class="pl-4 sm:pl-6">
+                    <li class="flex items-start gap-2 sm:gap-4">
+                        <span class="text-2xl leading-none">•</span>
+                        <div class="flex flex-col gap-5 text-justify w-full">
+                    <span class="text-base sm:text-base break-words">
+                      The NAI's opt-out platform:
+                      <a href="http://www.networkadvertising.org/choices/"
+                         rel="external nofollow noopener"
+                         target="_blank"
+                         class="text-blue-500 hover:text-blue-700 hover:underline block sm:inline">
+                         http://www.networkadvertising.org/choices/
+                      </a>
+                    </span>
+                    </div>
+                  </li>
+              
+                  <li class="flex items-start gap-2 sm:gap-4">
+                    <span class="text-2xl leading-none">•</span>
+                    <div class="flex flex-col gap-5 text-justify w-full">
+                    <span class="text-base sm:text-base break-words">
+                      The EDAA's opt-out platform:
+                      <a href="http://www.youronlinechoices.com/"
+                         rel="external nofollow noopener"
+                         target="_blank"
+                         class="text-blue-500 hover:text-blue-700 hover:underline block sm:inline">
+                         http://www.youronlinechoices.com/
+                      </a>
+                    </span>
+                    </div>
+                  </li>
+              
+                  <li class="flex items-start gap-2 sm:gap-4">
+                    <span class="text-2xl leading-none">•</span>
+                    <div class="flex flex-col gap-5 text-justify w-full">
+                    <span class="text-base sm:text-base break-words">
+                      The DAA's opt-out platform:
+                      <a href="http://optout.aboutads.info/?c=2&amp;lang=EN"
+                         rel="external nofollow noopener"
+                         target="_blank"
+                         class="text-blue-500 hover:text-blue-700 hover:underline block sm:inline">
+                         http://optout.aboutads.info/?c=2&amp;lang=EN
+                      </a>
+                    </span>
+                    </div>
+                  </li>
+                </ul>
+              
+                <p class="text-sm sm:text-base">
+                  The opt out will place a cookie on Your computer that is unique to the browser You use to opt out. If you change browsers or delete the cookies saved by your browser, You will need to opt out again.
+                </p>
+              </div>
         
         <h4 class="text-2xl font-semibold">Mobile Devices</h4>
         <p>Your mobile device may give You the ability to opt out of the use of information about the apps You use

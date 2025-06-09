@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
 
     let activePage = 'Home';
@@ -7,11 +8,26 @@
     const pages = ['Home', 'Login', 'Register', 'Contact Us', 'PrivacyPolicy'];
 
     const getPath = (page: string) => {
-        if(page === 'Contact Us')
-            return page='/#contact';
-
+        if (page === 'Contact Us') return '/#contact';
         return page === 'Home' ? '/' : '/' + page.toLowerCase().replace(/\s+/g, '-');
     };
+
+    const getPageFromPath = (path: string): string => {
+    if (path === '/' || path === '') return 'Home';
+    if (path.includes('#contact')) return 'Contact Us';
+    const formatted = path.replace('/', '').replace(/-/g, ' ');
+    if (formatted.includes('forget') || formatted.includes('forgot')) {
+        return 'Login';
+    }
+    const foundPage = pages.find(p => p.toLowerCase() === formatted);
+    return foundPage || 'Home';
+    };
+
+    // ✅ Set active page based on current path on initial load
+    onMount(() => {
+        const currentPath = window.location.pathname + window.location.hash;
+        activePage = getPageFromPath(currentPath);
+    });
 
     function navigate(page: string) {
         activePage = page;
@@ -19,17 +35,20 @@
     }
 </script>
 
+
 <!-- Header -->
 <header class="fixed top-0 left-0 right-0 z-50 bg-white">
     <div class="flex justify-between items-center px-2 py-0">
         <!-- Logo -->
         <div class="flex items-center p-2 pl-1">
+            <a href="/">
             <img class="w-19" src="/app-logo.png" alt="app-logo" />
+        </a>
         </div>
 
         <!-- Mobile Menu Button -->
         <button
-            class="md:hidden p-2 rounded-md hover:text-[#02066F] focus:outline-none"
+            class="lg:hidden p-2 rounded-md hover:text-[#02066F] focus:outline-none"
             on:click={() => mobileMenuOpen = true}
             aria-label="Open menu"
         >
@@ -39,7 +58,7 @@
         </button>
 
         <!-- Desktop Navigation -->
-        <nav class="hidden md:block">
+        <nav class="hidden lg:block">
             <ul class="flex space-x-12 pr-8 text-lg">
                 {#each pages as page}
                     <li>
@@ -59,7 +78,7 @@
 </header>
 
 <!-- Mobile Sidebar -->
-<div class="md:hidden">
+<div class="lg:hidden">
     <!-- Overlay -->
     <div
         class="fixed inset-0 bg-opacity-50 z-40 transition-opacity duration-300 {mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}"

@@ -1,24 +1,51 @@
 <script>
+  // let showOverlay = false;
+
+  // const validateForm = () => {
+  //   showOverlay = true;
+  //   setTimeout(() => {
+  //     showOverlay = false;
+  //     alert("Form submitted!");
+  //   }, 2000);
+  // };
+  
   let showOverlay = false;
 
-  const validateForm = () => {
-    showOverlay = true;
-    setTimeout(() => {
-      showOverlay = false;
-      alert("Form submitted!");
-    }, 2000);
-  };
-  
-
   // @ts-ignore
-  const formatPhoneNumber = (event) => {
-    const target = event.target.value;
-    let input = target.value.replace(/\D/g, '').slice(0, 10);
-    const match = input.match(/^(\d{3})(\d{3})(\d{4})$/);
-    if (match) {
-      target.value = `${match[1]}-${match[2]}-${match[3]}`;
+  const validateForm = (event) => {
+    const form = event.target;
+
+    if (form.checkValidity()) {
+      // Valid form — show overlay
+      showOverlay = true;
+
+      setTimeout(() => {
+        showOverlay = false;
+        alert("Form submitted!");
+        // You can manually submit the form here if needed: form.submit();
+      }, 2000);
+    } else {
+      // Invalid form — show default browser error messages
+      form.reportValidity();
     }
   };
+
+
+  // Phone number formatting
+  let phone = "";
+
+// @ts-ignore
+const formatPhoneNumber = (event) => {
+  let value = event.target.value.replace(/\D/g, '').slice(0, 10);
+
+  if (value.length > 6) {
+    phone = `${value.slice(0, 3)}-${value.slice(3, 6)}-${value.slice(6)}`;
+  } else if (value.length > 3) {
+    phone = `${value.slice(0, 3)}-${value.slice(3)}`;
+  } else {
+    phone = value;
+  }
+};
 
   const features = [
     {
@@ -115,7 +142,8 @@
         required
       />
       <input
-        type="number"
+        type="text"
+        bind:value={phone}
         placeholder="Phone"
         on:input={formatPhoneNumber}
         class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center"
@@ -168,5 +196,10 @@
       Submit
     </button>
   </form>
+  {#if showOverlay}
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white text-xl">
+    Processing...
+  </div>
+{/if}
 </div>
 </section>

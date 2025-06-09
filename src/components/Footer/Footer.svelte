@@ -45,7 +45,7 @@
     <div class="address text-sm sm:text-base w-full md:w-auto text-center md:text-left">
       <h4 class="text-lg sm:text-[16px] font-semibold mb-4">CONTACT INFORMATION</h4>
 
-      <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start mb-4">
+      <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start mb-3 gap-2">
         <img src="/location-pin.png" alt="Location" class="w-5 mt-1" />
         <p>
           Arjava Technologies,<br />
@@ -55,12 +55,12 @@
         </p>
       </div>
 
-      <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start mb-4">
+      <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start mb-2 gap-2">
         <img src="/phone-call.png" alt="Phone" class="w-4 h-4" />
         <a href="tel:+15413712950" class="hover:underline text-white">(541) 371-2950</a>
       </div>
 
-      <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start">
+      <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-2">
         <img src="/paper-plane.png" alt="Email" class="w-4 h-4" />
         <a href="mailto:contact@tap-time.com" class="hover:underline text-white">contact@tap-time.com</a>
       </div>
