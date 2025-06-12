@@ -19,6 +19,10 @@
     if (formatted.includes('forget') || formatted.includes('forgot')) {
         return 'Login';
     }
+    if (formatted.includes('register2')) {
+        return 'Register';
+        
+    }
     const foundPage = pages.find(p => p.toLowerCase() === formatted);
     return foundPage || 'Home';
     };

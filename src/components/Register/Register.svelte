@@ -1,38 +1,151 @@
-<script>
-// @ts-nocheck
-
-    import { onMount } from 'svelte';
-    let companyName = '';
-    let companyLogo = '';
-    let companyStreet = '';
-    let companyCity = '';
-    let companyState = '';
-    let companyZip = '';
-    let username = '';
-    let password = '';
-    let errorCompanyName = '';
-    let errorUsername = '';
-    let errorPassword = '';
-    let totalError = '';
-    let overlayVisible = false;
-    let fileName = '';
+<script lang="ts">
+  // @ts-nocheck
+  import { onMount } from 'svelte';
+  import { goto } from '$app/navigation'; // Use this if you're using SvelteKit
   
-    function validateCompanyName() {
-      errorCompanyName = companyName.trim() === '' ? 'Company Name is required' : '';
+  let companyName = '';
+  let companyLogo = '';
+  let companyStreet = '';
+  let companyCity = '';
+  let companyState = '';
+  let companyZip = '';
+  let username = '';
+  let password = '';
+  
+  let errorCompanyName = '';
+  let errorUsername = '';
+  let errorPassword = '';
+  let totalError = '';
+  let overlayVisible = false;
+  let fileName = '';
+  let fileInput: File | null = null;
+  
+  const isAlpha = /^[a-zA-Z\s]+$/;
+  
+  function validateCompanyName() {
+    if (companyName.trim() === '') {
+      errorCompanyName = 'Company Name is required';
+      return false;
+    } else if (!isAlpha.test(companyName)) {
+      errorCompanyName = "Only use letters, don't use digits";
+      return false;
     }
+    errorCompanyName = '';
+    return true;
+  }
   
-    function validateUsername() {
-      errorUsername = username.trim() === '' ? 'Username is required' : '';
+  function validateUsername() {
+    if (username.trim() === '') {
+      errorUsername = 'Username is required';
+      return false;
+    } else if (!isAlpha.test(username)) {
+      errorUsername = "Only use letters, don't use digits";
+      return false;
     }
+    errorUsername = '';
+    return true;
+  }
   
-    function validatePassword() {
-      errorPassword = password.trim() === '' ? 'Password is required' : '';
+  function validatePassword() {
+    if (password.trim() === '') {
+      errorPassword = 'Password is required';
+      return false;
+    } else if (password.length < 8) {
+      errorPassword = 'Password must be at least 8 characters';
+      return false;
     }
-
-    
+    errorPassword = '';
+    return true;
+  }
   
- 
+  function validateRequiredFields() {
+    let required = [companyName, companyStreet, companyCity, companyState, companyZip, username, password];
+    return required.every(val => val.trim() !== '');
+  }
+  
+  function handleFileInputChange(event) {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      fileInput = files[0];
+      fileName = fileInput.name;
+    }
+  }
+  
+  function validateForm(event: Event) {
+    event.preventDefault();
+  
+    overlayVisible = true;
+  
+    const isCompanyNameValid = validateCompanyName();
+    const isUsernameValid = validateUsername();
+    const isPasswordValid = validatePassword();
+    const isRequiredFieldsValid = validateRequiredFields();
+  
+    if (isCompanyNameValid && isUsernameValid && isPasswordValid && isRequiredFieldsValid) {
+      document.querySelector('.progress-bar')?.setAttribute('style', 'width: 50%');
+  
+      // Store address
+      localStorage.setItem('companyName', companyName);
+      localStorage.setItem('companyStreet', companyStreet);
+      localStorage.setItem('companyCity', companyCity);
+      localStorage.setItem('companyState', companyState);
+      localStorage.setItem('companyZip', companyZip);
+      localStorage.setItem('username', username);
+      localStorage.setItem('password', password);
+  
+      
+      
+      // Handle logo upload
+      if (fileInput) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          localStorage.setItem('companyLogo', reader.result as string);
+          // Redirect
+          setTimeout(() => {
+            overlayVisible = false;
+            // window.location.href = "signup2.html"; // for SPA
+            goto('/register2'); // if using SvelteKit
+          }, 100);
+        };
+        reader.readAsDataURL(fileInput);
+      } else {
+        // No logo, still proceed
+        setTimeout(() => {
+          overlayVisible = false;
+          goto('/register2'); // Redirect to next step
+        }, 100);
+      }
+    } else {
+      totalError = 'Please fix the errors';
+      overlayVisible = false;
+    }
+  }
+  
+  // Sidebar toggle
+  let sidebarOpen = false;
+  
+  function toggleSidebar() {
+    sidebarOpen = !sidebarOpen;
+  }
+  
+  function closeSidebarOnOutsideClick(event) {
+    const sidebar = document.getElementById('sidebar');
+    const toggler = document.querySelector('.navbar-toggler');
+  
+    if (
+      sidebar &&
+      !sidebar.contains(event.target as Node) &&
+      !(toggler && toggler.contains(event.target as Node))
+    ) {
+      sidebarOpen = false;
+    }
+  }
+  
+  onMount(() => {
+    document.addEventListener('click', closeSidebarOnOutsideClick);
+  });
   </script>
+  
   
   <div class="flex flex-col md:flex-row min-h-screen">
     <!-- Left Section -->
@@ -110,14 +223,14 @@
                 type="text"
                 bind:value={companyStreet}
                 placeholder="Company Street"
-                class="w-full border-2 border-[#02066F] rounded-lg p-2 xl:p-6 md:p-3 font-bold"
+                class="w-full border-2 border-[#02066F] rounded-lg p-2 xl:p-6 md:p-3 font-bold focus:outline-none"
                 required
               />
               <input
                 type="text"
                 bind:value={companyCity}
                 placeholder="Company City"
-                class="w-full border-2 border-[#02066F] rounded-lg p-2 xl:p-6 md:p-3 font-bold"
+                class="w-full border-2 border-[#02066F] rounded-lg p-2 xl:p-6 md:p-3 font-bold focus:outline-none"
                 required
               />
             </div>
@@ -126,14 +239,14 @@
                 type="text"
                 bind:value={companyState}
                 placeholder="Company State"
-                class="w-full border-2 border-[#02066F] rounded-lg p-2 xl:p-6 md:p-3 font-bold"
+                class="w-full border-2 border-[#02066F] rounded-lg p-2 xl:p-6 md:p-3 font-bold focus:outline-none"
                 required
               />
               <input
                 type="text"
                 bind:value={companyZip}
                 placeholder="Company Zip"
-                class="w-full border-2 border-[#02066F] rounded-lg p-2 xl:p-6 md:p-3 font-bold"
+                class="w-full border-2 border-[#02066F] rounded-lg p-2 xl:p-6 md:p-3 font-bold focus:outline-none"
                 required
               />
             </div>
@@ -172,7 +285,8 @@
           <!-- Submit Button -->
           <button
             type="submit"
-            class="w-full bg-[#02066F] text-white py-3 rounded-lg text-lg mt-4 hover:opacity-90"
+            on:click={validateForm}
+            class="w-full bg-[#02066F] text-white py-3 rounded-lg text-lg mt-4 cursor-pointer"
           >
             Next
           </button>

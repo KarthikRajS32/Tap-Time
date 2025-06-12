@@ -126,19 +126,19 @@ const formatPhoneNumber = (event) => {
       <input
         type="text"
         placeholder="First Name"
-        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center"
+        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
       <input
         type="text"
         placeholder="Last Name"
-        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center"
+        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
       <input
         type="email"
         placeholder="Email"
-        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center"
+        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
       <input
@@ -146,31 +146,31 @@ const formatPhoneNumber = (event) => {
         bind:value={phone}
         placeholder="Phone"
         on:input={formatPhoneNumber}
-        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center"
+        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
       <input
         type="text"
         placeholder="Street"
-        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center"
+        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
       <input
         type="text"
         placeholder="City"
-        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center"
+        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
       <input
         type="text"
         placeholder="Zip"
-        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center"
+        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
       <input
         type="text"
         placeholder="State"
-        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center"
+        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
     </div>
@@ -178,14 +178,14 @@ const formatPhoneNumber = (event) => {
     <input
       type="text"
       placeholder="Subject"
-      class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center"
+      class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
       required
     />
 
     <textarea
       placeholder="Message..."
       rows="4"
-      class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold resize-none text-center"
+      class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold resize-none text-center focus:outline-none"
       required
     ></textarea>
 

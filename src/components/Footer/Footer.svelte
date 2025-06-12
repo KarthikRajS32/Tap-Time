@@ -33,11 +33,11 @@
     padding-left: 25px;">
       <h4 class="text-lg sm:text-[16px] font-bold mb-6">QUICK EXPLORE</h4>
       <ul class="list-none space-y-2 text-sm sm:text-base">
-        <li><a href="#" class="hover:text-blue-400 transition-colors duration-200">Home</a></li>
-        <li><a href="#" class="hover:text-blue-400 transition-colors duration-200">Login</a></li>
-        <li><a href="#" class="hover:text-blue-400 transition-colors duration-200">Register</a></li>
-        <li><a href="#" class="hover:text-blue-400 transition-colors duration-200">Contact Us</a></li>
-        <li><a href="#" class="hover:text-blue-400 transition-colors duration-200">Privacy Policy</a></li>
+        <li><a href="/" class="hover:text-blue-400 transition-colors duration-200">Home</a></li>
+        <li><a href="/login" class="hover:text-blue-400 transition-colors duration-200">Login</a></li>
+        <li><a href="register" class="hover:text-blue-400 transition-colors duration-200">Register</a></li>
+        <li><a href="#contact" class="hover:text-blue-400 transition-colors duration-200">Contact Us</a></li>
+        <li><a href="privacypolicy" class="hover:text-blue-400 transition-colors duration-200">Privacy Policy</a></li>
       </ul>
     </div>
 
@@ -57,7 +57,7 @@
 
       <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start mb-2 gap-2">
         <img src="/phone-call.png" alt="Phone" class="w-4 h-4" />
-        <a href="tel:+15413712950" class="hover:underline text-white">(541) 371-2950</a>
+        <a href="tel:+14258181900" class="hover:underline text-white">(541) 371-2950</a>
       </div>
 
       <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-2">
