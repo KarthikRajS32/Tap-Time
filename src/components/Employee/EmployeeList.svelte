@@ -236,7 +236,7 @@
             Add Entry
           </button>
         </div>
-      </div>
+    </div>
 
 
     <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-400">

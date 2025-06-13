@@ -1,4 +1,5 @@
 <script lang="ts">
+  // @ts-nocheck
       import { onMount } from 'svelte';
       import { v4 as uuidv4 } from 'uuid';
       import intlTelInput from 'intl-tel-input';
@@ -164,25 +165,52 @@
     
       // Create customer
       async function createCustomer() {
-        const url = 'https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/customer/create';
-        const customerData = {
-          CustomerID: uuidv4(),
-          CID: cid,
-          FName: firstName,
-          LName: lastName,
-          Address: `${customerStreet} -- ${customerCity} -- ${customerState} -- ${customerZip}`,
-          PhoneNumber: phoneNumber,
-          Email: email,
-          IsActive: true,
-          LastModifiedBy: 'Admin'
-        };
-    
-        await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(customerData)
-        });
+    const customerId = uuidv4();
+    const apiUrl = 'https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/customer/create';
+
+    // Save to localStorage
+    localStorage.setItem('firstName', firstName);
+    localStorage.setItem('lastName', lastName);
+    localStorage.setItem('customerStreet', customerStreet);
+    localStorage.setItem('customerCity', customerCity);
+    localStorage.setItem('customerState', customerState);
+    localStorage.setItem('customerZip', customerZip);
+    localStorage.setItem('phone', phoneNumber);
+    localStorage.setItem('email', email);
+    localStorage.setItem('customerID', customerId);
+
+    // Create data object
+    const customerData = {
+      CustomerID: customerId,
+      CID: cid,
+      FName: firstName,
+      LName: lastName,
+      Address: `${customerStreet} -- ${customerCity} -- ${customerState} -- ${customerZip}`,
+      PhoneNumber: phoneNumber,
+      Email: email,
+      IsActive: true,
+      LastModifiedBy: 'Admin'
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(customerData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
       }
+
+      const data = await response.json();
+
+      // Redirect after success
+      window.location.href = '/login'; // Change path as needed
+    } catch (error) {
+      console.error('Failed to create customer:', error);
+    }
+  }
     
       // Final form validation and flow
       async function validateForm(e: Event) {

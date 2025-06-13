@@ -7,6 +7,7 @@ import { get } from 'svelte/store';
 let sidebarOpen = false;
 let dropdownOpen = false;
 let currentPath = '';
+let showHomeModal = false; // State for home modal
 
 onMount(() => {
 	currentPath = get(page).url.pathname;
@@ -45,6 +46,10 @@ function close() {
   showModal = false;
 }
 
+function HomePage() {
+  showHomeModal = true; 
+}
+
 function handleLogout() {
   localStorage.removeItem("username");
   localStorage.removeItem("companyID");
@@ -63,9 +68,7 @@ function handleLogout() {
 	<div class="flex justify-between items-center h-[70px] px-4">
 		<!-- Logo -->
 		<div class="flex items-center gap-2">
-			<a href="/">
-			<img src="/icode-logo.png" alt="icode-logo" class="w-20 cursor-pointer"/>
-		</a>
+			<img src="/icode-logo.png" alt="icode-logo" class="w-20 cursor-pointer" on:click={HomePage}/>
 		</div>
 
 		<!-- Desktop Nav -->
@@ -201,3 +204,31 @@ function handleLogout() {
 		</nav>
 	</aside>
 {/if}
+
+ <!-- Home Modal  -->
+{#if showHomeModal}
+      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-sm">
+          <div class="bg-[#02066F] text-white px-6 py-4 rounded-t-lg">
+            <h3 class="text-lg font-bold text-center">Home</h3>
+          </div>
+          <div class="p-6">
+            <p class="text-center font-bold mb-6">Are you sure you want to go home?</p>
+            <div class="flex justify-center space-x-4">
+              <button 
+                class="bg-[#02066F] text-white px-6 py-2 rounded font-bold cursor-pointer transition"
+                on:click={() => window.location.href = '/'}
+              >
+                Yes
+              </button>
+              <button 
+                class="border border-[#02066F] text-[#02066F] px-6 py-2 rounded font-bold hover:bg-gray-100 cursor-pointer transition"
+                on:click={() => showHomeModal = false}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {/if}
