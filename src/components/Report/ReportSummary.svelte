@@ -222,39 +222,20 @@
   
     <!-- Navigation -->
     <nav class="bg-white shadow">
-        <div class="max-w-8xl mx-auto px- sm:px- lg:px-8">
-          <div class="flex justify-between items-center h-16 justify-end">
-            
-            <!-- Desktop Links -->
-            <div class="hidden md:flex space-x-4 ">
-              <a href="/reportsummary" class="px-4 py-2 bg-[#02066F] text-white font-semibold rounded-full">Today's Report</a>
-              <a href="/daywisereport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full ">Day Wise Report</a>
-              <a href="/salariedreport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full ">Salaried Report</a>
-            </div>
-      
-            <!-- Mobile Hamburger Button -->
-            <div class="md:hidden justify-end p-2">
-              <button
-                type="button"
-                class="inline-flex items-center justify-center p-2 rounded-md text-[#02066F] focus:outline-none"
-                on:click={() => document.getElementById('mobile-menu')?.classList.toggle('hidden')}
-              >
-                <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-            </div>
+      <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-center h-auto md:h-16 py-4 md:py-0 justify-end">
+          
+          <!-- Menu Links - visible on all devices -->
+          <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 text-center w-auto md:w-auto">
+            <a href="/reportsummary" class="px-4 py-2 bg-[#02066F] text-white font-semibold rounded-full">Today's Report</a>
+            <a href="/daywisereport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full">Day Wise Report</a>
+            <a href="/salariedreport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full">Salaried Report</a>
           </div>
+    
         </div>
-      
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="md:hidden hidden px-4 py-4 space-y-2 text-center">
-          <a href="/reportsummary" class="block px-4 py-2  bg-[#02066F] text-white font-semibold rounded-full">Today's Report</a>
-          <a href="/daywisereport" class="block px-4 py-2 text-[#02066F] font-semibold rounded-full">Day Wise Report</a>
-          <a href="/salariedreport" class="block px-4 py-2 text-[#02066F] font-semibold rounded-full">Salaried Report</a>
-        </div>
+      </div>
     </nav>
+    
       
   
     <!-- Main Content -->

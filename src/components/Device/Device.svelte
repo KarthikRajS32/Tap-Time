@@ -8,12 +8,23 @@
     let showTable = false;
     let showNoDeviceMessage = false;
     let isLoading = false;
+    /** @type {{
+        TimeZone: string;
+        DeviceID: string;
+        CID: string;
+        DeviceName: string;
+        AccessKey: string;
+        AccessKeyGeneratedTime: string;
+        LastModifiedBy: string;
+    }[]} */
     let devices = [];
     let showHomeModal = false;
     let showLogoutModal = false;
     let showDeleteModal = false;
     let deviceToDelete = '';
     let sidebarOpen = false;
+
+    localStorage.setItem('companyID', '1234567890'); // Example company ID for testing
 
     // API configuration
     const apiUrlBase = "https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/device";
@@ -23,24 +34,14 @@
         viewDevices();
     });
 
-    // Navigation functions
-    function homePage() {
-        showHomeModal = true;
-    }
 
     function confirmHomeNavigation() {
         window.open('/', 'noopener, noreferrer');
     }
 
-    function toggleSidebar() {
-        sidebarOpen = !sidebarOpen;
-    }
-
-    function closeSidebar() {
-        sidebarOpen = false;
-    }
 
     // Device management functions
+    // @ts-ignore
     function maskString(input, visibleChars) {
         visibleChars = Math.min(visibleChars, input.length);
         const starsCount = input.length - visibleChars;
@@ -49,6 +50,7 @@
         return stars + visiblePart;
     }
 
+    // @ts-ignore
     function copyAccessKey(accessKeyValue) {
         navigator.clipboard.writeText(accessKeyValue).then(() => {
             alert('Copied to clipboard!');
@@ -57,33 +59,48 @@
         });
     }
 
-    async function viewDevices() {
-        isLoading = true;
-        const companyId = localStorage.getItem('companyID');
-        const apiUrl = `${apiUrlBase}/getAll/${companyId}`;
-        
-        try {
-            const response = await fetch(apiUrl);
-            if (!response.ok) {
-                throw new Error(`Error: ${response.status}`);
-            }
-            const data = await response.json();
-            
-            if (data.error === "No devices found !" || data.length === 0) {
-                showTable = false;
-                showNoDeviceMessage = true;
-            } else {
-                devices = data;
-                showTable = true;
-                showNoDeviceMessage = false;
-            }
-        } catch (error) {
-            console.error('Error fetching devices:', error);
-        } finally {
-            isLoading = false;
-        }
-    }
+    
 
+   async function viewDevices() {
+    isLoading = true;
+    const companyId = localStorage.getItem('companyID');
+
+    if (!companyId || companyId === 'your-valid-id') {
+    console.error("Invalid or missing Company ID in localStorage:", companyId);
+    showNoDeviceMessage = true;
+    isLoading = false;
+    return;
+}
+
+    const apiUrl = `${apiUrlBase}/getAll/${companyId}`;
+    console.log("Fetching devices from:", apiUrl);
+
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Response error text:", errorText);
+            throw new Error(`Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.error === "No devices found !" || data.length === 0) {
+            showTable = false;
+            showNoDeviceMessage = true;
+        } else {
+            devices = data;
+            showTable = true;
+            showNoDeviceMessage = false;
+        }
+    } catch (error) {
+        console.error('Error fetching devices:', error);
+    } finally {
+        isLoading = false;
+    }
+}
+
+
+    // @ts-ignore
     function accessKeyCreate(firstFourDigit, lastFourDigit) {
         const createUuidForAccessKey = uuidv4().replace(/-/g, '').substring(0, 6);
         return firstFourDigit + createUuidForAccessKey + lastFourDigit;
@@ -130,10 +147,12 @@
         }
     }
 
+    // @ts-ignore
     function confirmDelete(accessKey) {
         deviceToDelete = accessKey;
         showDeleteModal = true;
     }
+    
 
     async function deleteDevice() {
         const comId = localStorage.getItem('companyID');
@@ -162,20 +181,17 @@
         }
     }
 
-    function showLogoutConfirmation() {
-        showLogoutModal = true;
-    }
 </script>
 
 <div class="min-h-screen h-[100vh] bg-gray-100 flex flex-col">
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-8 md:pl-72">
         <!-- Loading Overlay -->
-        {#if isLoading}
+        <!-- {#if isLoading}
             <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-900"></div>
             </div>
-        {/if}
+        {/if} -->
 
         <!-- Device Table -->
         {#if showTable}

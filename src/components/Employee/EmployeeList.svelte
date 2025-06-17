@@ -217,11 +217,11 @@
   <div class="min-h-screen h-full bg-gray-100 pt-28">
 
     <!-- Loading Overlay -->
-    {#if loading}
+    <!-- {#if loading}
       <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
         <div class="animate-spin w-12 h-12 border-t-4 border-b-4 border-[#02066F] rounded-full"></div>
       </div>
-    {/if}
+    {/if} -->
   
     <!-- Employee Section -->
     <div class="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 mb-4">

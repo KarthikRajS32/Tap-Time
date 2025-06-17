@@ -87,7 +87,7 @@ function handleLogout() {
 			<!-- Dropdown -->
 			<div class="relative">
 				<button
-        class={isActive('/reportsummary') || isActive('/reportsetting')
+        class={isActive('/reportsummary') || isActive('/daywisereport') || isActive('/salariedreport') || isActive('/reportsetting')
         ? 'text-[#02066F] font-semibold underline decoration-2 underline-offset-12 underline-offset-4 cursor-pointer'
         : 'text-gray-500 underline-offset-4 hover:underline hover:decoration-2 hover:underline-offset-12 cursor-pointer focus:text-[#02066F] focus:underline focus:decoration-2 focus:underline-offset-12'}
         
