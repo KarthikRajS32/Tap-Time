@@ -160,7 +160,7 @@
 
       <button
         on:click={handleSubmit}
-        class="w-full bg-[#02066F] text-white text-lg sm:text-xl py-4 md:py-3 rounded-lg transition duration-300 mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full bg-[#02066F] text-white text-lg cursor-pointer sm:text-xl py-4 md:py-3 rounded-lg transition duration-300 mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
         disabled={loading}
       >
         {loading ? 'Logging in...' : 'Submit'}

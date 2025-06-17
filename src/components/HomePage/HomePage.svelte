@@ -1,13 +1,5 @@
 <script>
-  // let showOverlay = false;
 
-  // const validateForm = () => {
-  //   showOverlay = true;
-  //   setTimeout(() => {
-  //     showOverlay = false;
-  //     alert("Form submitted!");
-  //   }, 2000);
-  // };
   
   let showOverlay = false;
 
@@ -22,6 +14,7 @@
       setTimeout(() => {
         showOverlay = false;
         alert("Form submitted!");
+        form.reset();
         // You can manually submit the form here if needed: form.submit();
       }, 2000);
     } else {
@@ -79,6 +72,14 @@ const formatPhoneNumber = (event) => {
       desc: 'Admin features to update time entries.',
     }
   ];
+
+  let zip = '';
+  let isValid = true;
+
+  function validateZip() {
+    const regex = /^\d{5}(-\d{4})?$/;
+    isValid = regex.test(zip);
+  }
 </script>
 
 <!-- Loading Overlay -->
@@ -161,12 +162,22 @@ const formatPhoneNumber = (event) => {
         class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
-      <input
+      <!-- <input
         type="text"
         placeholder="Zip"
         class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
-      />
+      /> -->
+
+      <input
+      type="text"
+      bind:value={zip}
+      on:input={validateZip}
+      placeholder="Zip"
+      class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
+      required
+    />
+
       <input
         type="text"
         placeholder="State"
@@ -196,10 +207,10 @@ const formatPhoneNumber = (event) => {
       Submit
     </button>
   </form>
-  {#if showOverlay}
+  <!-- {#if showOverlay}
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white text-xl">
     Processing...
   </div>
-{/if}
+{/if} -->
 </div>
 </section>
