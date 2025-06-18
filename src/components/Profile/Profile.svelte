@@ -289,14 +289,14 @@
         <form on:submit|preventDefault={toggleEditMode} class="">
           <!-- Company Information Section -->
           <div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-14 space-y-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-6 md:p-14 space-y-2">
               <div>
                 <label class="block text-md font-bold text-gray-800 mb-1">Company Name:</label>
                 <input
                   bind:value={formData.companyName}
                   type="text"
                   placeholder="Company Name"
-                  class={`w-auto px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1  ${!editMode ? 'bg-gray-50' : ''}`}
+                  class={`w-full px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1  ${!editMode ? 'bg-gray-50' : ''}`}
                   disabled={!editMode}
                   required
                 />
@@ -307,7 +307,7 @@
                   bind:value={formData.username}
                   type="text"
                   placeholder="Username"
-                  class={`w-auto px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1  ${!editMode ? 'bg-gray-50' : ''}`}
+                  class={`w-full px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1  ${!editMode ? 'bg-gray-50' : ''}`}
                   disabled={!editMode}
                   required
                 />
@@ -318,7 +318,7 @@
                   bind:value={formData.companyStreet}
                   type="text"
                   placeholder="Company Street"
-                  class={`w-auto px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1  ${!editMode ? 'bg-gray-50' : ''}`}
+                  class={`w-full px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1  ${!editMode ? 'bg-gray-50' : ''}`}
                   disabled={!editMode}
                   required
                 />
@@ -329,7 +329,7 @@
                   bind:value={formData.companyCity}
                   type="text"
                   placeholder="Company City"
-                  class={`w-auto px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1  ${!editMode ? 'bg-gray-50' : ''}`}
+                  class={`w-full px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1  ${!editMode ? 'bg-gray-50' : ''}`}
                   disabled={!editMode}
                   required
                 />
@@ -340,7 +340,7 @@
                   bind:value={formData.companyState}
                   type="text"
                   placeholder="Company State"
-                  class={`w-auto px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1  ${!editMode ? 'bg-gray-50' : ''}`}
+                  class={`w-full px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1  ${!editMode ? 'bg-gray-50' : ''}`}
                   disabled={!editMode}
                   required
                 />
@@ -351,7 +351,7 @@
                   bind:value={formData.companyZip}
                   type="text"
                   placeholder="Company Zip"
-                  class={`w-auto px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
+                  class={`w-full px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
                   disabled={!editMode}
                   required
                 />
@@ -362,7 +362,7 @@
                   bind:value={formData.email}
                   type="email"
                   placeholder="Email"
-                  class={`w-auto px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
+                  class={`w-full px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
                   disabled={!editMode}
                   required
                 />
@@ -374,7 +374,7 @@
                   on:input={formatPhoneNumberInput}
                   type="tel"
                   placeholder="Phone Number"
-                  class={`w-auto px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
+                  class={`w-full px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
                   disabled={!editMode}
                   required
                 />
@@ -388,7 +388,7 @@
                   bind:value={formData.firstName}
                   type="text"
                   placeholder="First Name"
-                  class={`w-auto px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
+                  class={`w-full px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
                   disabled={!editMode}
                   required
                 />
@@ -399,7 +399,7 @@
                   bind:value={formData.lastName}
                   type="text"
                   placeholder="Last Name"
-                  class={`w-auto px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
+                  class={`w-full px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
                   disabled={!editMode}
                   required
                 />
@@ -410,7 +410,7 @@
                   bind:value={formData.customerStreet}
                   type="text"
                   placeholder="Customer Street"
-                  class={`w-auto px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
+                  class={`w-full px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
                   disabled={!editMode}
                   required
                 />
@@ -421,7 +421,7 @@
                   bind:value={formData.customerCity}
                   type="text"
                   placeholder="Customer City"
-                  class={`w-auto px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
+                  class={`w-full px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
                   disabled={!editMode}
                   required
                 />
@@ -432,7 +432,7 @@
                   bind:value={formData.customerState}
                   type="text"
                   placeholder="Customer State"
-                  class={`w-auto px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
+                  class={`w-full px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
                   disabled={!editMode}
                   required
                 />
@@ -443,7 +443,7 @@
                   bind:value={formData.customerZip}
                   type="text"
                   placeholder="Customer Zip"
-                  class={`w-auto px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
+                  class={`w-full px-4 py-3 rounded-lg border-1 border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 ${!editMode ? 'bg-gray-50' : ''}`}
                   disabled={!editMode}
                   required
                 />

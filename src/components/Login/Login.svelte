@@ -63,48 +63,50 @@
   }
 
   async function handleSubmit() {
-    errorMsg = '';
-    if (!username || !password) {
-      errorMsg = 'Please enter both username and password';
+  errorMsg = '';
+  if (!username || !password) {
+    errorMsg = 'Please enter both username and password';
+    return;
+  }
+
+  loading = true;
+
+  try {
+    const res = await fetch(`https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/company/getuser/${username}`);
+    if (!res.ok) throw new Error('User fetch failed');
+
+    const data = await res.json();
+    const decryptedPwd = await decrypt(data.Password, key1);
+
+    const isAuthenticated = data.UserName === username && decryptedPwd === password;
+
+    if (!isAuthenticated) {
+      errorMsg = 'Invalid username or password';
       return;
     }
 
-    loading = true;
+    // Set LocalStorage
+    localStorage.setItem('companyID', data.CID);
+    localStorage.setItem('companyName', data.CName);
+    localStorage.setItem('companyLogo', data.CLogo);
+    localStorage.setItem('companyAddress', data.CAddress);
+    localStorage.setItem('username', data.UserName);
+    localStorage.setItem('password', data.Password);
+    localStorage.setItem('reportType', data.ReportType);
 
-    try {
-      const res = await fetch(`https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/company/getuser/${username}`);
-      if (!res.ok) throw new Error('User fetch failed');
+    await Promise.all([
+      getCustomerData(data.CID),
+      getTimeZone(data.CID)
+    ]);
 
-      const data = await res.json();
-
-      const decryptedPwd = await decrypt(data.Password, key1);
-      if (decryptedPwd !== password) {
-        errorMsg = 'Invalid username or password';
-        return;
-      }
-
-      // Set LocalStorage
-      localStorage.setItem('companyID', data.CID);
-      localStorage.setItem('companyName', data.CName);
-      localStorage.setItem('companyLogo', data.CLogo);
-      localStorage.setItem('companyAddress', data.CAddress);
-      localStorage.setItem('username', data.UserName);
-      localStorage.setItem('password', data.Password);
-      localStorage.setItem('reportType', data.ReportType);
-
-      await Promise.all([
-        getCustomerData(data.CID),
-        getTimeZone(data.CID)
-      ]);
-
-      window.location.href = '/employeeList';
-    } catch (err) {
-      console.error(err);
-      errorMsg = 'An error occurred during login';
-    } finally {
-      loading = false;
-    }
+    window.location.href = '/employeeList';
+  } catch (err) {
+    console.error(err);
+    errorMsg = 'An error occurred during login';
+  } finally {
+    loading = false;
   }
+}
 </script>
 
 <!-- Page layout -->
