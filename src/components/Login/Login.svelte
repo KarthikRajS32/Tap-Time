@@ -64,7 +64,7 @@
 
   async function handleSubmit() {
   errorMsg = '';
-  if (!username || !password) {
+  if (!username.trim() || !password.trim()) {
     errorMsg = 'Please enter both username and password';
     return;
   }
@@ -76,6 +76,12 @@
     if (!res.ok) throw new Error('User fetch failed');
 
     const data = await res.json();
+
+    if (!data || !data.Password || !data.UserName) {
+        errorMsg = 'Invalid response from server';
+        return;
+      }
+
     const decryptedPwd = await decrypt(data.Password, key1);
 
     const isAuthenticated = data.UserName === username && decryptedPwd === password;
@@ -91,7 +97,7 @@
     localStorage.setItem('companyLogo', data.CLogo);
     localStorage.setItem('companyAddress', data.CAddress);
     localStorage.setItem('username', data.UserName);
-    localStorage.setItem('password', data.Password);
+    // localStorage.setItem('password', data.Password);
     localStorage.setItem('reportType', data.ReportType);
 
     await Promise.all([

@@ -445,7 +445,8 @@
     {#if showAddModal}
     <div 
         transition:fade
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+        class="fixed inset-0 flex items-center justify-center z-50 p-4"
+        style="background: rgba(0, 0, 0, 0.5)"
     >
         <div class="bg-white rounded-md max-w-sm w-full shadow-xl">
             <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center text-center">
@@ -520,7 +521,8 @@
     {#if showEditModal}
         <div 
             transition:fade
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            class="fixed inset-0 flex items-center justify-center z-50 p-4"
+            style="background: rgba(0, 0, 0, 0.5)"
         >
             <div class="bg-white rounded-md max-w-sm w-full shadow-xl">
                 <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center text-center">
@@ -595,7 +597,8 @@
     {#if showViewEditModal}
         <div 
             transition:fade
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            class="fixed inset-0  flex items-center justify-center z-50 p-4"
+            style="background: rgba(0, 0, 0, 0.5)"
         >
             <div class="bg-white rounded-xl max-w-xs w-full shadow-xl">
                 <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center text-center">
@@ -642,7 +645,8 @@
     {#if showDeleteModal}
         <div 
             transition:fade
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            class="fixed inset-0  flex items-center justify-center z-50 p-4"
+            style="background: rgba(0, 0, 0, 0.5)"
         >
             <div class="bg-white rounded-xl max-w-md w-full shadow-xl">
                 <div class="bg-blue-900 text-white p-4 rounded-t-xl">

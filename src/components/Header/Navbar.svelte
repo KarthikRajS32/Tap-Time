@@ -122,7 +122,8 @@ function handleLogout() {
   
   <!-- Logout Modal -->
   {#if showModal}
-	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-10 px-4">
+	<div class="fixed inset-0 z-50 flex items-center justify-center px-4"
+	style="background: rgba(0, 0, 0, 0.5)">
 	  <div class="bg-white rounded-lg w-auto max-w-md shadow-lg overflow-hidden">
 		<!-- Header -->
 		<div class="bg-[#02066F] text-white p-4 flex justify-between text-center items-center">
@@ -151,7 +152,8 @@ function handleLogout() {
 			</svg>
 			  <!-- Logout Modal -->
 			  {#if showModal}
-				<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-10 px-4">
+				<div class="fixed inset-0 z-50 flex items-center justify-center px-4"
+				style="background: rgba(0, 0, 0, 0.5)">
 				  <div class="bg-white rounded-lg w-auto max-w-md shadow-lg overflow-hidden">
 					<!-- Header -->
 					<div class="bg-[#02066F] text-white p-4 flex justify-between text-center items-center">
@@ -207,7 +209,8 @@ function handleLogout() {
 
  <!-- Home Modal  -->
 {#if showHomeModal}
-      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="fixed inset-0 flex items-center justify-center z-50"
+	  style="background: rgba(0, 0, 0, 0.5)">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-sm">
           <div class="bg-[#02066F] text-white px-6 py-4 rounded-t-lg">
             <h3 class="text-lg font-bold text-center">Home</h3>

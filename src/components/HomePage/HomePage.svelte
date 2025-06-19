@@ -1,31 +1,94 @@
-<script>
+<script lang="ts">
 
-  
+  let phone = "";
+  let zip = "";
+  let isValid = true;
   let showOverlay = false;
+  let show = false;
+ 
+
+ // Refs to access form input values
+  let firstNameInput: HTMLInputElement;
+  let lastNameInput: HTMLInputElement;
+  let emailInput: HTMLInputElement;
+  let subjectInput: HTMLInputElement;
+  let phoneInput: HTMLInputElement;
+  let streetInput: HTMLInputElement;
+  let cityInput: HTMLInputElement;
+  let stateInput: HTMLInputElement;
+  let zipInput: HTMLInputElement;
+  let messageInput: HTMLTextAreaElement;
 
   // @ts-ignore
-  const validateForm = (event) => {
-    const form = event.target;
+  // const validateForm = (event) => {
+  //   const form = event.target;
+
+  //   if (form.checkValidity()) {
+  //     // Valid form — show overlay
+  //     showOverlay = true;
+
+  //     setTimeout(() => {
+  //       showOverlay = false;
+  //       alert("Form submitted!");
+  //       form.reset();
+  //       // You can manually submit the form here if needed: form.submit();
+  //     }, 2000);
+  //   } else {
+  //     // Invalid form — show default browser error messages
+  //     form.reportValidity();
+  //   }
+  // };
+
+  const validateForm = async (event: Event) => {
+    event.preventDefault();
+    const form = event.target as HTMLFormElement;
 
     if (form.checkValidity()) {
-      // Valid form — show overlay
       showOverlay = true;
 
-      setTimeout(() => {
-        showOverlay = false;
-        alert("Form submitted!");
+      const userData = {
+        FirstName: firstNameInput.value,
+        LastName: lastNameInput.value,
+        Email: emailInput.value,
+        WhatsappNumber: null,
+        Subject: subjectInput.value,
+        PhoneNumber: phoneInput.value,
+        Address: `${streetInput.value}--${cityInput.value}--${stateInput.value}--${zipInput.value}`,
+        Message: messageInput.value,
+        LastModifiedBy: "Admin",
+      };
+
+      try {
+        const apiLink = `https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/web_contact_us/create`;
+
+        const response = await fetch(apiLink, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userData),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (!data.error) {
+          show = true;
+          form.reset();
+         
+        }
+      } catch (error) {
         form.reset();
-        // You can manually submit the form here if needed: form.submit();
-      }, 2000);
+        alert("Something went wrong. Please try again.");
+        console.error(error);
+      } finally {
+        showOverlay = false;
+      }
     } else {
-      // Invalid form — show default browser error messages
       form.reportValidity();
     }
   };
 
-
-  // Phone number formatting
-  let phone = "";
 
 // @ts-ignore
 const formatPhoneNumber = (event) => {
@@ -73,21 +136,31 @@ const formatPhoneNumber = (event) => {
     }
   ];
 
-  let zip = '';
-  let isValid = true;
-
   function validateZip() {
     const regex = /^\d{5}(-\d{4})?$/;
     isValid = regex.test(zip);
   }
+
+  
+  let onClose = () => {
+    show = false;
+  };
+
+  function handleBackgroundClick(event: MouseEvent) {
+    const modalContent = document.getElementById('modal-content');
+    if (modalContent && !modalContent.contains(event.target as Node)) {
+      onClose();
+    }
+  }
 </script>
 
+
 <!-- Loading Overlay -->
-{#if showOverlay}
+<!-- {#if showOverlay}
 <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-10">
   <div class="w-12 h-12 border-4 border-white border-t-blue-600 rounded-full animate-spin"></div>
 </div>
-{/if}
+{/if} -->
 
 <!-- Header -->
 <section class="max-w-7xl mx-auto px-4 pt-24 text-center">
@@ -127,18 +200,21 @@ const formatPhoneNumber = (event) => {
       <input
         type="text"
         placeholder="First Name"
+        bind:this={firstNameInput}
         class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
       <input
         type="text"
         placeholder="Last Name"
+        bind:this={lastNameInput}
         class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
       <input
         type="email"
         placeholder="Email"
+        bind:this={emailInput}
         class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
@@ -146,6 +222,7 @@ const formatPhoneNumber = (event) => {
         type="text"
         bind:value={phone}
         placeholder="Phone"
+        bind:this={phoneInput}
         on:input={formatPhoneNumber}
         class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
@@ -153,12 +230,14 @@ const formatPhoneNumber = (event) => {
       <input
         type="text"
         placeholder="Street"
+        bind:this={streetInput}
         class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
       <input
         type="text"
         placeholder="City"
+        bind:this={cityInput} 
         class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
@@ -171,9 +250,10 @@ const formatPhoneNumber = (event) => {
 
       <input
       type="text"
-      bind:value={zip}
-      on:input={validateZip}
       placeholder="Zip"
+      bind:value={zip}
+      bind:this={zipInput}
+      on:input={validateZip}
       class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
       required
     />
@@ -181,6 +261,7 @@ const formatPhoneNumber = (event) => {
       <input
         type="text"
         placeholder="State"
+        bind:this={stateInput}
         class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
@@ -189,6 +270,7 @@ const formatPhoneNumber = (event) => {
     <input
       type="text"
       placeholder="Subject"
+      bind:this={subjectInput}
       class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
       required
     />
@@ -196,6 +278,7 @@ const formatPhoneNumber = (event) => {
     <textarea
       placeholder="Message..."
       rows="4"
+      bind:this={messageInput}
       class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold resize-none text-center focus:outline-none"
       required
     ></textarea>
@@ -212,5 +295,30 @@ const formatPhoneNumber = (event) => {
     Processing...
   </div>
 {/if} -->
+{#if show}
+  <div
+    class="fixed inset-0 flex items-center justify-center z-50 " 
+    style="background: rgba(0, 0, 0, 0.5)"
+    on:click={handleBackgroundClick}
+  >
+    <div
+      id="modal-content"
+      class="bg-white rounded-lg shadow-lg max-w-lg w-full py-6  text-center"
+    >
+      <h2 class="text-xl text-gray-800 font-semibold mb-4">Thank You for Contacting Us!</h2> 
+      <hr class="text-gray-400 w-full mx-auto mb-6">
+      <p class="text-gray-800 font-semibold text-xl mb-6">
+        We have received your message and will get back to you shortly.
+      </p>
+      <div class="flex justify-center">
+        <img
+          src="https://www.shutterstock.com/image-vector/blue-check-mark-icon-tick-260nw-787016416.jpg"
+          alt="Checkmark"
+          class="w-24 h-24 object-contain"
+        />
+      </div>
+    </div>
+  </div>
+{/if}
 </div>
 </section>

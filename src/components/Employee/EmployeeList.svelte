@@ -353,7 +353,8 @@
     <!-- Employee Modal -->
     {#if showEmployeeModal}
         <div 
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            class="fixed inset-0 flex items-center justify-center z-50"
+            style="background: rgba(0, 0, 0, 0.5)"
             on:click={() => showEmployeeModal = false}
         >
             <div 
@@ -449,7 +450,8 @@
     <!-- Admin Modal -->
     {#if showAdminModal}
         <div 
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            class="fixed inset-0 flex items-center justify-center z-50"
+            style="background: rgba(0, 0, 0, 0.5)"
             on:click={() => showAdminModal = false}
         >
             <div 
@@ -547,7 +549,8 @@
     <!-- Delete Confirmation Modal -->
     {#if showDeleteModal}
         <div 
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            class="fixed inset-0 flex items-center justify-center z-50"
+            style="background: rgba(0, 0, 0, 0.5)"
             role="dialog"
             aria-modal="true"
             tabindex="-1"

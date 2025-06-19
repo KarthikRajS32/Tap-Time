@@ -157,7 +157,8 @@
     {#if showSuccessModal}
       <div
         transition:fade
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+        class="fixed inset-0 z-50 flex items-center justify-center "
+        style="background: rgba(0, 0, 0, 0.5)"
       >
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
           <div class="p-6">

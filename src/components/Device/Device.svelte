@@ -255,7 +255,8 @@
     <!-- Modals -->
     <!-- Home Page Confirmation Modal -->
     {#if showHomeModal}
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300">
+        <div class="fixed inset-0 flex items-center justify-center z-50 transition-opacity duration-300"
+        style="background: rgba(0, 0, 0, 0.5)">
             <div class="bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all duration-300">
                 <div class="bg-blue-900 text-white px-6 py-4 rounded-t-lg">
                     <h3 class="text-lg font-semibold text-center">Home</h3>
@@ -283,7 +284,8 @@
 
     <!-- Delete Device Confirmation Modal -->
     {#if showDeleteModal}
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300">
+        <div class="fixed inset-0 flex items-center justify-center z-50 transition-opacity duration-300"
+        style="background: rgba(0, 0, 0, 0.5)">
             <div class="bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all duration-300">
                 <div class="bg-red-600 text-white px-6 py-4 rounded-t-lg">
                     <h3 class="text-lg font-semibold text-center">Delete Device</h3>
