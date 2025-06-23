@@ -182,7 +182,8 @@
   </div>
 
   {#if loading}
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="fixed inset-0 flex items-center justify-center z-50"
+    style="background: rgba(0, 0, 0, 0.5)">
       <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#02066F]"></div>
     </div>
   {/if}

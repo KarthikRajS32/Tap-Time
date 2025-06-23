@@ -7,7 +7,7 @@
     let startDateHeader = '';
     let endDateHeader = '';
     let reportName = '';
-    let reportTypeHeading = '';
+    export let reportTypeHeading = '';
     // @ts-ignore
     let employees = [];
     let isLoading = true;

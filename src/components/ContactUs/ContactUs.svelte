@@ -1,24 +1,36 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { v4 as uuidv4 } from 'uuid';
+  import { fade } from 'svelte/transition';
 
+  // Form fields
   let cname = '';
   let cemail = '';
   let question = '';
   let phoneNumber = '';
   
+  // Error messages
   let errorName = '';
+  let errorEmail = ''; // Added missing email error
   let errorTextarea = '';
   let errorPhone = '';
   
+  // Modal states
   let showSuccessModal = false;
+  
+  
+  // Regular expressions
+  const isAlpha = /^[a-zA-Z\s]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^\([0-9]{3}\) [0-9]{3}-[0-9]{4}$/;
+  const maxMessageLength = 500;
 
-  // Validate name field
+
+
+  // Field validations
   const validCName = (): boolean => {
-    const isAlpha = /^[a-zA-Z\s]+$/;
-    
     if (cname.trim() === '') {
-      errorName = '';
+      errorName = 'Name is required';
       return false;
     } else if (!isAlpha.test(cname)) {
       errorName = 'Only use letters, don\'t use digits';
@@ -29,17 +41,26 @@
     }
   };
 
-  // Validate message field
-  const validCQueries = (): boolean => {
-    const maxLength = 500;
-    const currentLength = question.length;
-
-    if (question.trim() === '') {
-      errorTextarea = '';
+  const validCEmail = (): boolean => {
+    if (cemail.trim() === '') {
+      errorEmail = 'Email is required';
       return false;
-    } else if (currentLength >= maxLength) {
-      errorTextarea = 'Maximum character limit reached.';
-      question = question.substring(0, maxLength);
+    } else if (!emailRegex.test(cemail)) {
+      errorEmail = 'Please enter a valid email address';
+      return false;
+    } else {
+      errorEmail = '';
+      return true;
+    }
+  };
+
+  const validCQueries = (): boolean => {
+    if (question.trim() === '') {
+      errorTextarea = 'Message is required';
+      return false;
+    } else if (question.length >= maxMessageLength) {
+      errorTextarea = `Maximum ${maxMessageLength} characters allowed`;
+      question = question.substring(0, maxMessageLength);
       return false;
     } else {
       errorTextarea = '';
@@ -47,30 +68,29 @@
     }
   };
 
-  // Format phone number
   const formatPhoneNumber = () => {
-    let value = phoneNumber.replace(/\D/g, '');
-    
-    if (value.length > 3 && value.length <= 6) {
-      value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
-    } else if (value.length > 6) {
-      value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6, 10)}`;
-    } else if (value.length > 3) {
-      value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+    // Only format if not already formatted
+    if (!phoneRegex.test(phoneNumber)) {
+      let value = phoneNumber.replace(/\D/g, '');
+      
+      if (value.length > 3 && value.length <= 6) {
+        value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+      } else if (value.length > 6) {
+        value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6, 10)}`;
+      } else if (value.length > 3) {
+        value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+      }
+      
+      phoneNumber = value;
     }
-    
-    phoneNumber = value;
   };
 
-  // Validate phone number
   const validatePhoneNumber = (): boolean => {
-    const phoneRegex = /^\([0-9]{3}\) [0-9]{3}-[0-9]{4}$/;
-
     if (phoneNumber.trim() === '') {
-      errorPhone = '';
+      errorPhone = 'Phone number is required';
       return false;
     } else if (!phoneRegex.test(phoneNumber)) {
-      errorPhone = 'Invalid phone number.';
+      errorPhone = 'Please use format: (123) 456-7890';
       return false;
     } else {
       errorPhone = '';
@@ -82,34 +102,30 @@
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
     
+    // Validate all fields
     const isNameValid = validCName();
+    const isEmailValid = validCEmail();
     const isValidMessage = validCQueries();
     const isPhoneNumberValid = validatePhoneNumber();
     
-    if (!cname || !cemail || !question || !phoneNumber) {
-      // Basic required field validation
-      return;
-    }
-
-    if (isNameValid && isValidMessage && isPhoneNumberValid) {
-      await callContactUsCreateAPiData();
-      showSuccessModal = true;
-      
-      // Reset form
-      cname = '';
-      cemail = '';
-      question = '';
-      phoneNumber = '';
-      
-      // Hide modal after 2 seconds
-      setTimeout(() => {
-        showSuccessModal = false;
-      }, 2000);
+    if (isNameValid && isEmailValid && isValidMessage && isPhoneNumberValid) {
+      try {
+        await callContactUsCreateAPiData();
+        showSuccessModal = true;
+        
+        // Hide modal after 2 seconds
+        setTimeout(() => {
+          showSuccessModal = false;
+        }, 2000);
+      } catch (error) {
+        console.error('Form submission failed:', error);
+        // You might want to show an error message to the user here
+      }
     }
   };
 
   // API call
-  const callContactUsCreateAPiData = async () => {
+  const callContactUsCreateAPiData = async (): Promise<void> => {
     const apiLink = `https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/contact-us/create`;
     const requestID = uuidv4();
     const cid = localStorage.getItem('companyID') || '';
@@ -125,29 +141,30 @@
       LastModifiedBy: 'Admin'
     };
 
-    try {
-      const response = await fetch(apiLink, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(userData)
-      });
+    const response = await fetch(apiLink, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(userData)
+    });
 
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data.error) {
-        alert(data.error);
-      }
-    } catch (error) {
-      console.error('Error submitting form:', error);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  };
 
+    const data = await response.json();
+
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
+    // Reset form only after successful submission
+    cname = '';
+    cemail = '';
+    question = '';
+    phoneNumber = '';
+  };
 </script>
 
 <section class="min-h-full bg-gray-100 px-6 pt-28 pb-12">
@@ -177,10 +194,14 @@
           type="email"
           id="cemail"
           bind:value={cemail}
+          on:blur={validCEmail}
           placeholder="Email"
           class="w-full px-4 py-3 border-2 border-[#02066F] rounded-lg font-bold focus:outline-none bg-white"
           required
         />
+        {#if errorEmail}
+          <p class="text-red-500 text-sm mt-1">{errorEmail}</p>
+        {/if}
       </div>
       
       <!-- Message -->
@@ -190,7 +211,7 @@
           bind:value={question}
           on:blur={validCQueries}
           placeholder="Message/Queries"
-          class="w-full px-4 py-3 border-2 border-[#02066F] rounded-lg font-bold focus:outline-none bg-white min-h-[120px]"
+          class="w-full px-4 py-3 border-2 border-[#02066F] rounded-lg font-bold focus:outline-none bg-white min-h-[90px]"
           required
         ></textarea>
         {#if errorTextarea}

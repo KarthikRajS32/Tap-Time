@@ -1,210 +1,247 @@
-<script>
+<script lang="ts">
     import { onMount } from 'svelte';
     import { v4 as uuidv4 } from 'uuid';
-    // import * as bootstrap from 'bootstrap';
-    // import Modal from './Modal.svelte';
-
-    // State variables
+  
+    // Constants
+    const API_URL_BASE = "https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/device";
+    const LOCAL_STORAGE_KEYS = {
+      USERNAME: "username",
+      COMPANY_ID: "companyID",
+      CUSTOM_ID: "customId",
+      PASSWORD: "password"
+    } as const;
+  
+    // UI States
     let showTable = false;
     let showNoDeviceMessage = false;
     let isLoading = false;
-    /** @type {{
-        TimeZone: string;
-        DeviceID: string;
-        CID: string;
-        DeviceName: string;
-        AccessKey: string;
-        AccessKeyGeneratedTime: string;
-        LastModifiedBy: string;
-    }[]} */
-    let devices = [];
-    let showHomeModal = false;
-    let showLogoutModal = false;
+    
+    // Modal States
     let showDeleteModal = false;
+    let showCopyTooltip = false;
+    
+    // Data
+    let devices: Device[] = [];
     let deviceToDelete = '';
-    let sidebarOpen = false;
-
-    localStorage.setItem('companyID', '1234567890'); // Example company ID for testing
-
-    // API configuration
-    const apiUrlBase = "https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/device";
-
+    let copiedAccessKey = '';
+    let errorMessage = '';
+  
+    // Type Definitions
+    type Device = {
+      TimeZone: string;
+      DeviceID: string;
+      CID: string;
+      DeviceName: string;
+      AccessKey: string;
+      AccessKeyGeneratedTime: string;
+      LastModifiedBy: string;
+    };
+  
     // Initialize on component mount
     onMount(() => {
-        viewDevices();
+      // Handles clicks outside of modals or sidebars (currently a placeholder)
+      function handleOutsideClick(event: MouseEvent) {
+        // Implement logic if needed, or leave empty if not required
+      }
+
+      const init = async () => {
+        try {
+          await viewDevices();
+          document.addEventListener('click', handleOutsideClick);
+        } catch (error) {
+          console.error('Initialization error:', error);
+          errorMessage = 'Failed to initialize device data';
+        }
+      };
+      init();
+    
+      return () => {
+        document.removeEventListener('click', handleOutsideClick);
+      };
     });
-
-
-    function confirmHomeNavigation() {
-        window.open('/', 'noopener, noreferrer');
-    }
-
-
-    // Device management functions
-    // @ts-ignore
-    function maskString(input, visibleChars) {
-        visibleChars = Math.min(visibleChars, input.length);
-        const starsCount = input.length - visibleChars;
-        const stars = '*'.repeat(starsCount);
-        const visiblePart = input.slice(-visibleChars);
-        return stars + visiblePart;
-    }
-
-    // @ts-ignore
-    function copyAccessKey(accessKeyValue) {
-        navigator.clipboard.writeText(accessKeyValue).then(() => {
-            alert('Copied to clipboard!');
-        }).catch(err => {
-            console.error('Failed to copy:', err);
-        });
-    }
-
+  
     
-
-   async function viewDevices() {
-    isLoading = true;
-    const companyId = localStorage.getItem('companyID');
-
-    if (!companyId || companyId === 'your-valid-id') {
-    console.error("Invalid or missing Company ID in localStorage:", companyId);
-    showNoDeviceMessage = true;
-    isLoading = false;
-    return;
-}
-
-    const apiUrl = `${apiUrlBase}/getAll/${companyId}`;
-    console.log("Fetching devices from:", apiUrl);
-
-    try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Response error text:", errorText);
-            throw new Error(`Error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (data.error === "No devices found !" || data.length === 0) {
-            showTable = false;
-            showNoDeviceMessage = true;
-        } else {
-            devices = data;
-            showTable = true;
-            showNoDeviceMessage = false;
-        }
-    } catch (error) {
-        console.error('Error fetching devices:', error);
-    } finally {
+  
+    // Device Management Functions
+    const maskString = (input: string, visibleChars = 4): string => {
+      if (!input) return '';
+      visibleChars = Math.min(Math.max(visibleChars, 0), input.length);
+      return '*'.repeat(input.length - visibleChars) + input.slice(-visibleChars);
+    };
+  
+    const copyAccessKey = async (accessKey: string) => {
+      try {
+        await navigator.clipboard.writeText(accessKey);
+        copiedAccessKey = accessKey;
+        showCopyTooltip = true;
+        setTimeout(() => showCopyTooltip = false, 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+        errorMessage = 'Failed to copy access key';
+      }
+    };
+  
+    const viewDevices = async (): Promise<void> => {
+      isLoading = true;
+      errorMessage = '';
+      const companyId = localStorage.getItem(LOCAL_STORAGE_KEYS.COMPANY_ID);
+  
+      if (!companyId) {
+        errorMessage = "Company ID not found";
+        showNoDeviceMessage = true;
         isLoading = false;
-    }
-}
-
-
-    // @ts-ignore
-    function accessKeyCreate(firstFourDigit, lastFourDigit) {
-        const createUuidForAccessKey = uuidv4().replace(/-/g, '').substring(0, 6);
-        return firstFourDigit + createUuidForAccessKey + lastFourDigit;
-    }
-
-    async function addData() {
-        showNoDeviceMessage = false;
-        isLoading = true;
+        return;
+      }
+  
+      try {
+        const response = await fetch(`${API_URL_BASE}/getAll/${companyId}`);
         
-        const accesskeyvalFirstDigit = Math.random().toString(36).substring(2, 6);
-        const accesskeyvalLastDigit = Math.random().toString(36).substring(2, 6);
-        const accessKey = accessKeyCreate(accesskeyvalFirstDigit, accesskeyvalLastDigit);
-
-        const newDevice = {
-            TimeZone: "Not Registered",
-            DeviceID: "Not Registered",
-            CID: localStorage.getItem('companyID'),
-            DeviceName: "Not Registered",
-            AccessKey: accessKey,
-            AccessKeyGeneratedTime: new Date().toISOString(),
-            LastModifiedBy: 'Admin'
-        };
-
-        try {
-            const response = await fetch(`${apiUrlBase}/create`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(newDevice)
-            });
-
-            if (!response.ok) {
-                const text = await response.text();
-                throw new Error(`Error: ${response.status} - ${text}`);
-            }
-
-            await response.json();
-            viewDevices();
-        } catch (error) {
-            console.error('Error adding device:', error);
-        } finally {
-            isLoading = false;
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-    }
-
-    // @ts-ignore
-    function confirmDelete(accessKey) {
-        deviceToDelete = accessKey;
-        showDeleteModal = true;
-    }
-    
-
-    async function deleteDevice() {
-        const comId = localStorage.getItem('companyID');
-        const apiUrl = `${apiUrlBase}/delete/${deviceToDelete}/${comId}/Admin`;
-
-        try {
-            const response = await fetch(apiUrl, {
-                method: 'PUT'
-            });
-
-            if (!response.ok) {
-                throw new Error(`Error: ${response.status}`);
-            }
-
-            const data = await response.json();
-            if (data.error) {
-                alert(data.error);
-            } else {
-                viewDevices();
-            }
-        } catch (error) {
-            console.error('Error deleting device:', error);
-        } finally {
-            showDeleteModal = false;
-            deviceToDelete = '';
+  
+        const data = await response.json();
+        
+        if (data.error || data.length === 0) {
+          showTable = false;
+          showNoDeviceMessage = true;
+          if (data.error) errorMessage = data.error;
+        } else {
+          devices = Array.isArray(data) ? data : [data];
+          showTable = true;
+          showNoDeviceMessage = false;
         }
-    }
+      } catch (error) {
+        console.error('Error fetching devices:', error);
+        errorMessage = 'Failed to load devices';
+        showNoDeviceMessage = true;
+      } finally {
+        isLoading = false;
+      }
+    };
+  
+    const generateRandomString = (length = 4): string => {
+      return Math.random().toString(36).substring(2, 2 + length).padEnd(length, '0');
+    };
+  
+    const createAccessKey = (): string => {
+      return `${generateRandomString(4)}${uuidv4().replace(/-/g, '').substring(0, 6)}${generateRandomString(4)}`;
+    };
+  
+    const addDevice = async (): Promise<void> => {
+      isLoading = true;
+      errorMessage = '';
+      showNoDeviceMessage = false;
+      showTable=true;
+      
+      const companyId = localStorage.getItem(LOCAL_STORAGE_KEYS.COMPANY_ID);
+      if (!companyId) {
+        errorMessage = "Company ID not found";
+        isLoading = false;
+        return;
+      }
+  
+      const newDevice: Device = {
+        TimeZone: "Not Registered",
+        DeviceID: "Not Registered",
+        CID: companyId,
+        DeviceName: "Not Registered",
+        AccessKey: createAccessKey(),
+        AccessKeyGeneratedTime: new Date().toISOString(),
+        LastModifiedBy: 'Admin'
+      };
+  
+      try {
+        const response = await fetch(`${API_URL_BASE}/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(newDevice)
+        });
+  
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+  
+        await viewDevices();
+      } catch (error) {
+        console.error('Error adding device:', error);
+        errorMessage = error instanceof Error ? error.message : 'Failed to add device';
+      } finally {
+        isLoading = false;
+      }
+    };
+  
+    const confirmDelete = (accessKey: string) => {
+      deviceToDelete = accessKey;
+      showDeleteModal = true;
+    };
+  
+    const deleteDevice = async (): Promise<void> => {
+      if (!deviceToDelete) return;
+      
+      isLoading = true;
+      errorMessage = '';
+      const companyId = localStorage.getItem(LOCAL_STORAGE_KEYS.COMPANY_ID);
+      
+      if (!companyId) {
+        errorMessage = "Company ID not found";
+        isLoading = false;
+        return;
+      }
+  
+      try {
+        const response = await fetch(`${API_URL_BASE}/delete/${deviceToDelete}/${companyId}/Admin`, {
+          method: 'PUT',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+  
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+  
+        await viewDevices();
+      } catch (error) {
+        console.error('Error deleting device:', error);
+        errorMessage = error instanceof Error ? error.message : 'Failed to delete device';
+      } finally {
+        isLoading = false;
+        showDeleteModal = false;
+        deviceToDelete = '';
+      }
+    };
+  
 
-</script>
+  </script>
 
-<div class="min-h-screen h-[100vh] bg-gray-100 flex flex-col">
+<div class=" bg-gray-100 flex flex-col pt-28 pb-19 ">
     <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 py-8 md:pl-72">
+    <main class="flex-grow container mx-auto px-4 py-8 ">
         <!-- Loading Overlay -->
-        <!-- {#if isLoading}
+        {#if isLoading}
             <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-900"></div>
             </div>
-        {/if} -->
+        {/if}
 
         <!-- Device Table -->
         {#if showTable}
-            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+            <div class="max-w-5xl mx-auto bg-white rounded-xl  overflow-hidden mb-8 border-1 border-gray-300">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                    <table class="w-full divide-y divide-gray-200">
+                        <thead>
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Time zone</th>
-                                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Access Key</th>
-                                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Device Id</th>
-                                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Device Name</th>
-                                <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                <th scope="col" class="px-6 py-3 text-center text-base font-bold tracking-wider">Time zone</th>
+                                <th scope="col" class="px-6 py-3 text-center text-base font-bold tracking-wider">Access Key</th>
+                                <th scope="col" class="px-6 py-3 text-center text-base font-bold tracking-wider">Device Id</th>
+                                <th scope="col" class="px-6 py-3 text-center text-base font-bold tracking-wider">Device Name</th>
+                                <th scope="col" class="px-6 py-3 text-center text-base font-bold tracking-wider">Action</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -240,11 +277,11 @@
 
         <!-- No Devices Message -->
         {#if showNoDeviceMessage}
-            <div class="text-center py-16">
-                <p class="text-gray-600 mb-6">No device Added</p>
+            <div class="text-center ">
+                <p class="text-gray-600 mb-[17px]">No device Added</p>
                 <button 
-                    class="border border-blue-900 text-blue-900 bg-white px-6 py-2 rounded-md hover:bg-blue-900 hover:text-white transition-colors"
-                    on:click={addData}
+                    class="border border-[#02066F] text-[#02066F] bg-white px-6 py-2 rounded-md transition-colors cursor-pointer"
+                    on:click={addDevice}
                 >
                     Add device
                 </button>
@@ -253,34 +290,6 @@
     </main>
 
     <!-- Modals -->
-    <!-- Home Page Confirmation Modal -->
-    {#if showHomeModal}
-        <div class="fixed inset-0 flex items-center justify-center z-50 transition-opacity duration-300"
-        style="background: rgba(0, 0, 0, 0.5)">
-            <div class="bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all duration-300">
-                <div class="bg-blue-900 text-white px-6 py-4 rounded-t-lg">
-                    <h3 class="text-lg font-semibold text-center">Home</h3>
-                </div>
-                <div class="p-6">
-                    <h5 class="font-bold mb-6 text-center">Are you sure you want to go home?</h5>
-                    <div class="flex justify-center space-x-4">
-                        <button 
-                            class="bg-blue-900 text-white px-6 py-2 rounded-md hover:bg-blue-800 transition-colors"
-                            on:click={confirmHomeNavigation}
-                        >
-                            Yes
-                        </button>
-                        <button 
-                            class="border border-blue-900 text-blue-900 px-6 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                            on:click={() => showHomeModal = false}
-                        >
-                            No
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {/if}
 
     <!-- Delete Device Confirmation Modal -->
     {#if showDeleteModal}

@@ -1,4 +1,4 @@
-<footer class="bg-[#02066F] text-white w-full pt-10 pb-18 sm:pb-24">
+<footer class="bg-[#02066F] text-white w-full pt-18 pb-18 sm:pb-24">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 flex flex-col md:flex-row flex-wrap justify-between items-start gap-10 md:gap-12 text-center md:text-left">
 
       

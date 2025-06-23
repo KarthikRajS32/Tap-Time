@@ -526,7 +526,8 @@ async function createCheckoutSession(): Promise<void> {
       
         <div class="w-full md:w-1/2 xl:w-1/2 flex justify-center items-center p-6 pt-10 xl:pt-16 md:pt-16 ">
           {#if showOverlay}
-            <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div class="fixed inset-0  flex justify-center items-center z-50"
+            style="background: rgba(0, 0, 0, 0.5)">
               <div class="border-4 border-t-4 border-[#02066F] rounded-full w-10 h-10 animate-spin"></div>
             </div>
           {/if}
@@ -658,7 +659,8 @@ async function createCheckoutSession(): Promise<void> {
             </button>
             </form>
                 {#if showOverlay}
-                <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="fixed inset-0 flex items-center justify-center z-50"
+                style="background: rgba(0, 0, 0, 0.5)">
                 <div class="text-white text-xl font-semibold">Processing...</div>
                 </div>
             {/if}

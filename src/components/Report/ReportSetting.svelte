@@ -429,7 +429,7 @@
                                 {viewSetting}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-base text-gray-900">
-                                <button on:click={openViewEditModal} class="text-[#02066F] p- hover:text-[#02066F]">
+                                <button on:click={openViewEditModal} class="text-[#02066F]  hover:text-[#02066F]">
                                     <i class="fas fa-pencil-alt cursor-pointer"></i>
                                   </button>
                                 

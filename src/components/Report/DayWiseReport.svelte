@@ -1,6 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { fade } from 'svelte/transition';
+    // Use a string for the report type heading
+    let reportTypeHeading: string = 'Salaried Report';
 
     // State variables
     let selectedDate: string = '';
@@ -165,7 +167,7 @@
                 <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 text-center w-auto md:w-auto">
                   <a href="/reportsummary" class="px-4 py-2 text-[#02066F]  font-semibold rounded-full">Today's Report</a>
                   <a href="/daywisereport" class="px-4 py-2 bg-[#02066F] text-white font-semibold rounded-full">Day Wise Report</a>
-                  <a href="/salariedreport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full">Salaried Report</a>
+                  <a href="/salariedreport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full">{reportTypeHeading}</a>
                 </div>
           
               </div>
