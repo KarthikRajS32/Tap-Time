@@ -3,7 +3,7 @@
     import { v4 as uuidv4 } from 'uuid';
   
     // Constants
-    const API_URL_BASE = "https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/device";
+    const API_URL_BASE = "https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/device";
     const LOCAL_STORAGE_KEYS = {
       USERNAME: "username",
       COMPANY_ID: "companyID",
@@ -225,7 +225,8 @@
     <main class="flex-grow container mx-auto px-4 py-8 ">
         <!-- Loading Overlay -->
         {#if isLoading}
-            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="fixed inset-0 flex items-center justify-center z-50"
+            style="background: rgba(0, 0, 0, 0.5)">
                 <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-900"></div>
             </div>
         {/if}

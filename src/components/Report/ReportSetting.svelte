@@ -14,8 +14,8 @@
         LastModifiedBy: string;
     };
 
-    const apiUrlBase = 'https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/company-report-type';
-    const adminReportApi = 'https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/admin-report-type';
+    const apiUrlBase = 'https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/company-report-type';
+    const adminReportApi = 'https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/admin-report-type';
 
     let isLoading = false;
     let emailSettings: ReportSetting[] = [];

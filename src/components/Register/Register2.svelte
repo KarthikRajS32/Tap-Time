@@ -1,514 +1,380 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { v4 as uuidv4 } from 'uuid';
-  import intlTelInput from 'intl-tel-input';
-  import 'intl-tel-input/build/css/intlTelInput.css';
+    import { onMount } from 'svelte';
+    import { v4 as uuidv4 } from 'uuid';
+    import intlTelInput from 'intl-tel-input';
+    import 'intl-tel-input/build/css/intlTelInput.css';
+    import { loadStripe } from '@stripe/stripe-js';
 
-  // Constants
-  const isAlpha = /^[a-zA-Z\s]+$/;
-  const apiUrlBase = 'https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/customer';
-  const firstSignupPageapiUrlBase = 'https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/company';
-  const cid = uuidv4();
-  const key = new Uint8Array([16, 147, 220, 113, 166, 142, 22, 93, 241, 91, 13, 252, 112, 122, 119, 95]);
+    // Constants
+    const isAlpha = /^[a-zA-Z\s]+$/;
+    const apiUrlBase = 'https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/customer';
+    const firstSignupPageapiUrlBase = 'https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/company';
+    const cid = uuidv4();
+    const key = new Uint8Array([16, 147, 220, 113, 166, 142, 22, 93, 241, 91, 13, 252, 112, 122, 119, 95]);
+    const stripePromise = loadStripe('pk_test_51OB8JlIPoM7JHRT2DlaE8KmPRFkgeSXkqf4eQZxEahu0Lbno3vHzCTH5J4rDAfw53PjdWlLteNJNzPVdahkzTb8100DA6sqAp4');
 
-  // Form fields
-  let firstName = '';
-  let lastName = '';
-  let phoneNumber = '';
-  let email = '';
-  let customerStreet = '';
-  let customerCity = '';
-  let customerState = '';
-  let customerZip = '';
+    // Form fields
+    let firstName = '';
+    let lastName = '';
+    let phoneNumber = '';
+    let email = '';
+    let customerStreet = '';
+    let customerCity = '';
+    let customerState = '';
+    let customerZip = '';
 
-  // Error messages
-  let errorFirstName = '';
-  let errorLastName = '';
-  let errorPhone = '';
-  let errorEmail = '';
-  let totalError = '';
+    // Error messages
+    let errorFirstName = '';
+    let errorLastName = '';
+    let errorPhone = '';
+    let errorStreet = '';
+    let errorCity = '';
+    let errorState = '';
+    let errorZip = '';
+    let errorEmail = '';
+    let totalError = '';
 
-  // UI states
-  let showOverlay = false;
-  let iti: any;
-  // Validation functions (exact match to your HTML logic)
-  function validateFirstName(): boolean {
-      if (firstName.trim() === '') {
-          errorFirstName = '';
-          return false;
-      } else if (!isAlpha.test(firstName)) {
-          errorFirstName = 'Only use letters and spaces';
-          return false;
-      }
-      errorFirstName = '';
-      return true;
-  }
+    // UI states
+    let showOverlay = false;
+    let iti: any;
 
-  function validateEmail(): boolean {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (email.trim() === '') {
-          errorEmail = '';
-          return false;
-      } else if (!emailRegex.test(email)) {
-          errorEmail = 'Invalid email address.';
-          return false;
-      }
-      errorEmail = '';
-      return true;
-  }
-  
+    // Error map for phone validation
+    const errorMap = {
+        "-99": "Invalid number",
+        "-2": "Invalid country code",
+        "-1": "Invalid number",
+        "0": "Invalid number",
+        "1": "Invalid number length",
+        "2": "Invalid number"
+    };
 
-  function validateLastName(): boolean {
-      if (lastName.trim() === '') {
-          errorLastName = '';
-          return false;
-      } else if (!isAlpha.test(lastName)) {
-          errorLastName = 'Only use letters and spaces';
-          return false;
-      }
-      errorLastName = '';
-      return true;
-  }
+    // Validation functions
+    function validateFirstName(): boolean {
+        if (firstName.trim() === '') {
+            errorFirstName = '';
+            return false;
+        } else if (!isAlpha.test(firstName)) {
+            errorFirstName = 'Only use letters and spaces';
+            return false;
+        }
+        errorFirstName = '';
+        return true;
+    }
 
-  function validPhoneno(): boolean {
-      const phoneRegex = /^\([0-9]{3}\) [0-9]{3}-[0-9]{4}$/;
-      
-      if (phoneNumber === "") {
-          errorPhone = '';
-          return false;
-      } else if (!phoneRegex.test(phoneNumber)) {
-          errorPhone = 'Invalid phone number.';
-          return false;
-      } else {
-          errorPhone = '';
-          return true;
-      }
-  }
+    function validateLastName(): boolean {
+        if (lastName.trim() === '') {
+            errorLastName = '';
+            return false;
+        } else if (!isAlpha.test(lastName)) {
+            errorLastName = 'Only use letters and spaces';
+            return false;
+        }
+        errorLastName = '';
+        return true;
+    }
 
-  function formatPhoneNumber() {
-      let value = phoneNumber.replace(/\D/g, '');
-      if (value.length > 3 && value.length <= 6) {
-          value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
-      } else if (value.length > 6) {
-          value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6, 10)}`;
-      } else if (value.length > 3) {
-          value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
-      }
-      phoneNumber = value;
-  }
+    function validateEmail(): boolean {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (email.trim() === '') {
+            errorEmail = '';
+            return false;
+        } else if (!emailPattern.test(email)) {
+            errorEmail = 'Invalid email format';
+            return false;
+        }
+        errorEmail = '';
+        return true;
+    }
 
-  // Encryption (exact match to your HTML logic)
-  async function encrypt(data: string, key: Uint8Array): Promise<string> {
-      const dataBuffer = new TextEncoder().encode(data);
-      const algorithm = { name: 'AES-GCM', iv: generateRandomBytes(12) };
-      
-      const importedKey = await window.crypto.subtle.importKey(
-          'raw', key, algorithm, false, ['encrypt']
-      );
-
-      const encryptedData = await window.crypto.subtle.encrypt(
-          algorithm, importedKey, dataBuffer
-      );
-
-      const iv = algorithm.iv;
-      const encryptedDataWithIV = new Uint8Array(iv.byteLength + encryptedData.byteLength);
-      encryptedDataWithIV.set(iv);
-      encryptedDataWithIV.set(new Uint8Array(encryptedData), iv.byteLength);
-
-      return btoa(String.fromCharCode(...new Uint8Array(encryptedDataWithIV)));
-  }
-
-  function generateRandomBytes(length: number): Uint8Array {
-      const randomValues = new Uint8Array(length);
-      window.crypto.getRandomValues(randomValues);
-      return randomValues;
-  }
-
-  async function checkPassword(): Promise<string> {
-      const password = localStorage.getItem('password') || '';
-      try {
-          const encryptedPassword = await encrypt(password, key);
-          return encryptedPassword.toString();
-      } catch (error) {
-          console.error('Encryption error:', error);
-          return '';
-      }
-  }
-
-  // API functions (exact match to your HTML logic)
-//   async function createCheckoutSession(): Promise<void> {
-//     showOverlay = true;
-//     totalError = '';
-    
-//     try {
-//         // Get all required data from localStorage
-//         const email = localStorage.getItem('email') || '';
-//         const firstName = localStorage.getItem('firstName') || '';
-//         const lastName = localStorage.getItem('lastName') || '';
-//         const companyName = localStorage.getItem('companyName') || '';
-
-//         // Validate essential data
-//         if (!email || !firstName || !lastName) {
-//             throw new Error('Customer information is incomplete');
-//         }
-
-//         // Prepare customer metadata
-//         const metadata = {
-//             firstName,
-//             lastName,
-//             email,
-//             company: companyName,
-//             customerId: localStorage.getItem('customerID') || '',
-//             timestamp: new Date().toISOString()
-//         };
-
-//         // Create the request body
-//         const requestBody = {
-//             success_url: `${window.location.origin}/success`,
-//             cancel_url: `${window.location.origin}/cancel`,
-//             line_items: [{
-//                 price_data: {
-//                     currency: 'usd',
-//                     product_data: {
-//                         name: 'EMS Product',
-//                     },
-//                     unit_amount: 2000, // $20.00
-//                 },
-//                 quantity: 1,
-//             }],
-//             customer_email: email,
-//             metadata,
-//             mode: 'payment' // Required for one-time payments
-//         };
-
-//         // Make the API call
-//         const response = await fetch(
-//             'https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/create-checkout-session', 
-//             {
-//                 method: 'POST',
-//                 headers: { 
-//                     'Content-Type': 'application/json',
-//                     // Add any required authentication headers here
-//                 },
-//                 body: JSON.stringify(requestBody)
-//             }
-//         );
-
-//         // Handle response errors
-//         if (!response.ok) {
-//             const errorData = await response.json().catch(() => ({}));
-//             throw new Error(errorData.message || `Payment failed with status ${response.status}`);
-//         }
-
-//         // Get the session data
-//         const session = await response.json();
-
-//         // Initialize Stripe
-//         if (!(window as any).Stripe) {
-//             throw new Error('Stripe.js library not loaded');
-//         }
-
-//         const stripe = (window as any).Stripe('pk_test_51OB8JlIPoM7JHRT2DlaE8KmPRFkgeSXkqf4eQZxEahu0Lbno3vHzCTH5J4rDAfw53PjdWlLteNJNzPVdahkzTb8100DA6sqAp4');
-
-//         // Redirect to Stripe Checkout
-//         const { error } = await stripe.redirectToCheckout({
-//             sessionId: session.id
-//         });
-
-//         if (error) {
-//             throw error;
-//         }
-
-//     } catch (error) {
-//         console.error('Checkout error:', error);
-//         totalError = error instanceof Error 
-//             ? error.message 
-//             : 'Payment processing failed. Please try again.';
+    function validateAddress(): boolean {
+        let isValid = true;
         
-//         // Optional: Send error to analytics
-//         // trackError('checkout_error', error);
-//     } finally {
-//         showOverlay = false;
-//     }
-// }
-async function createCheckoutSession(): Promise<void> {
-    showOverlay = true;
-    totalError = '';
-    
-    try {
-        // 1. Validate and prepare data
-        const email = localStorage.getItem('email');
-        const firstName = localStorage.getItem('firstName');
-        const lastName = localStorage.getItem('lastName');
-        
-        if (!email || !firstName || !lastName) {
-            throw new Error('Please complete all required customer information');
+        if (customerStreet.trim() === '') {
+            errorStreet = 'Street is required';
+            isValid = false;
+        } else {
+            errorStreet = '';
         }
 
-        // 2. Create the request body
-        const requestBody = {
-            success_url: `${window.location.origin}/success`,
-            cancel_url: `${window.location.origin}/cancel`,
-            line_items: [{
-                price_data: {
-                    currency: 'usd',
-                    product_data: { name: 'EMS Product' },
-                    unit_amount: 2000,
-                },
-                quantity: 1,
-            }],
-            customer_email: email,
-            metadata: {
-                firstName,
-                lastName,
-                email,
-                company: localStorage.getItem('companyName') || '',
-                customerId: localStorage.getItem('customerID') || '',
-                timestamp: new Date().toISOString()
-            },
-            mode: 'payment'
-        };
+        if (customerCity.trim() === '') {
+            errorCity = 'City is required';
+            isValid = false;
+        } else {
+            errorCity = '';
+        }
 
-        console.log('Request payload:', requestBody);
+        if (customerState.trim() === '') {
+            errorState = 'State is required';
+            isValid = false;
+        } else {
+            errorState = '';
+        }
 
-        // 3. Make API call with error handling
-        const response = await fetch(
-            'https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/create-checkout-session', 
-            {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    
-                },
-                body: JSON.stringify(requestBody)
-            }
+        if (customerZip.trim() === '') {
+            errorZip = 'Zip code is required';
+            isValid = false;
+        } else {
+            errorZip = '';
+        }
+
+        return isValid;
+    }
+
+    function validPhoneno(): boolean {
+        const phoneRegex = /^\([0-9]{3}\) [0-9]{3}-[0-9]{4}$/;
+        
+        if (phoneNumber === "") {
+            errorPhone = '';
+            return false;
+        } else if (!phoneRegex.test(phoneNumber)) {
+            errorPhone = 'Invalid phone number.';
+            return false;
+        } else {
+            errorPhone = '';
+            return true;
+        }
+    }
+
+    function formatPhoneNumber() {
+        let value = phoneNumber.replace(/\D/g, '');
+        if (value.length > 3 && value.length <= 6) {
+            value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+        } else if (value.length > 6) {
+            value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6, 10)}`;
+        } else if (value.length > 3) {
+            value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+        }
+        phoneNumber = value;
+    }
+
+    // Encryption functions
+    async function encrypt(data: string, key: Uint8Array): Promise<string> {
+        const dataBuffer = new TextEncoder().encode(data);
+        const algorithm = { name: 'AES-GCM', iv: generateRandomBytes(12) };
+        
+        const importedKey = await window.crypto.subtle.importKey(
+            'raw', key, algorithm, false, ['encrypt']
         );
 
-        // 4. Handle response
-        if (!response.ok) {
-            let errorDetails;
-            try {
-                errorDetails = await response.json();
-            } catch {
-                errorDetails = await response.text();
-            }
-            
-            console.error('Backend Error Details:', {
-                status: response.status,
-                headers: Object.fromEntries(response.headers.entries()),
-                errorDetails
-            });
-            
-            throw new Error(
-                errorDetails?.message || 
-                `Payment service failed (HTTP ${response.status})`
-            );
-        }
+        const encryptedData = await window.crypto.subtle.encrypt(
+            algorithm, importedKey, dataBuffer
+        );
 
-        const session = await response.json();
-        
-        if (!session?.id) {
-            throw new Error('Invalid response from payment service');
-        }
+        const iv = algorithm.iv;
+        const encryptedDataWithIV = new Uint8Array(iv.byteLength + encryptedData.byteLength);
+        encryptedDataWithIV.set(iv);
+        encryptedDataWithIV.set(new Uint8Array(encryptedData), iv.byteLength);
 
-        // 5. Initialize Stripe
-        //@ts-ignore
-        if (typeof window.Stripe === 'undefined') {
-            throw new Error('Payment system not loaded. Please refresh the page.');
-        }
-        //@ts-ignore
-        const stripe = window.Stripe('pk_test_51OB8JlIPoM7JHRT2DlaE8KmPRFkgeSXkqf4eQZxEahu0Lbno3vHzCTH5J4rDAfw53PjdWlLteNJNzPVdahkzTb8100DA6sqAp4');
-        
-        const { error } = await stripe.redirectToCheckout({
-            sessionId: session.id
-        });
-
-        if (error) throw error;
-
-    } catch (error) {
-        console.error('Payment Error:', error);
-        totalError = (typeof error === 'object' && error !== null && 'message' in error)
-            ? (error as { message: string }).message
-            : 'We encountered an error processing your payment.';
-        
-        // For debugging - show more details in development
-        if (import.meta.env.DEV) {
-            if (typeof error === 'object' && error !== null && 'message' in error) {
-                totalError += ` (${(error as { message: string }).message})`;
-            }
-        }
-    } finally {
-        showOverlay = false;
+        return btoa(String.fromCharCode(...new Uint8Array(encryptedDataWithIV)));
     }
-}
-  async function craeteFirstPageSignupAPiData(): Promise<void> {
-      const firstSignupPageapiUrl = `${firstSignupPageapiUrlBase}/create`;
-      const cname = localStorage.getItem('companyName');
-      const clogo = localStorage.getItem('companyLogo');
-      const companyStreet = localStorage.getItem('companyStreet');
-      const companyCity = localStorage.getItem('companyCity');
-      const companyState = localStorage.getItem('companyState');
-      const companyZip = localStorage.getItem('companyZip');
-      const username = localStorage.getItem('username');
-      const passwordEncrypted = await checkPassword();
 
-      const userData = {
-          CID: cid,
-          CName: cname,
-          CLogo: clogo,
-          CAddress: `
-              ${companyStreet} -- 
-              ${companyCity} -- 
-              ${companyState} -- 
-              ${companyZip} -- 
-          `,
-          UserName: username,
-          Password: passwordEncrypted,
-          ReportType: "Weekly",
-          LastModifiedBy: 'Admin'
-      };
+    function generateRandomBytes(length: number): Uint8Array {
+        const randomValues = new Uint8Array(length);
+        window.crypto.getRandomValues(randomValues);
+        return randomValues;
+    }
 
-      try {
-          const response = await fetch(firstSignupPageapiUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(userData)
-          });
+    async function checkPassword(): Promise<string> {
+        const password = localStorage.getItem('password') || '';
+        try {
+            const encryptedPassword = await encrypt(password, key);
+            return encryptedPassword.toString();
+        } catch (error) {
+            console.error('Encryption error:', error);
+            return '';
+        }
+    }
 
-          if (!response.ok) {
-              throw new Error(`Error: ${response.status}`);
-          }
+    // API functions
+    async function createCheckoutSession(): Promise<void> {
+        showOverlay = true;
+        totalError = '';
+        
+        try {
+            const link = "http://127.0.0.1:5504";
+            const link2 = "https://tap-time.com";
+            const link3 = "https://arunkavitha1982.github.io/icode";
+            
+            const response = await fetch(
+                'https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/create-checkout-session', 
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        "url": link2,
+                        "productName": "EMS Product",
+                        "amount": 2000
+                    })
+                }
+            );
 
-          const data = await response.json();
-          if (!data.error) {
-              createApiData();
-          } else {
-              setTimeout(() => {
-                  window.location.href = "singup.html";
-                  showOverlay = true;
-              }, 100);
-          }
-      } catch (error) {
-          console.error('API error:', error);
-      }
-  }
+            if (!response.ok) {
+                const errorDetails = await response.json();
+                throw new Error(errorDetails.error);
+            }
 
-  function createApiData(): void {
-      const customerId = uuidv4();
-      const apiUrl = `${apiUrlBase}/create`;
+            const session = await response.json();
+            
+            // Initialize Stripe
+            const stripe = await stripePromise;
+            if (!stripe) {
+                throw new Error('Stripe failed to initialize');
+            }
+            
+            const { error } = await stripe.redirectToCheckout({ sessionId: session.id });
+            if (error) {
+                throw error;
+            }
 
-      localStorage.setItem('firstName', firstName);
-      localStorage.setItem('lastName', lastName);
-      localStorage.setItem('customerStreet', customerStreet);
-      localStorage.setItem('customerCity', customerCity);
-      localStorage.setItem('customerState', customerState);
-      localStorage.setItem('customerZip', customerZip);
-      localStorage.setItem('phone', phoneNumber);
-      localStorage.setItem('email', email);
-      localStorage.setItem('customerID', customerId);
+        } catch (error) {
+            console.error('Checkout error:', error);
+            totalError = error instanceof Error ? error.message : 'Payment processing failed';
+        } finally {
+            showOverlay = false;
+        }
+    }
 
-      const userData = {
-          CustomerID: customerId.toString(),
-          CID: cid,
-          FName: firstName,
-          LName: lastName,
-          Address: `
-              ${customerStreet} -- 
-              ${customerCity} -- 
-              ${customerState} -- 
-              ${customerZip} -- 
-          `,
-          PhoneNumber: phoneNumber,
-          Email: email,
-          IsActive: true,
-          LastModifiedBy: 'Admin'
-      };
+    async function craeteFirstPageSignupAPiData(): Promise<void> {
+        const firstSignupPageapiUrl = `${firstSignupPageapiUrlBase}/create`;
+        const cname = localStorage.getItem('companyName');
+        const clogo = localStorage.getItem('companyLogo');
+        const companyStreet = localStorage.getItem('companyStreet');
+        const companyCity = localStorage.getItem('companyCity');
+        const companyState = localStorage.getItem('companyState');
+        const companyZip = localStorage.getItem('companyZip');
+        const username = localStorage.getItem('username');
+        const passwordEncrypted = await checkPassword();
 
-      fetch(apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(userData)
-      })
-      .then(response => {
-          if (!response.ok) {
-              throw new Error(`Error: ${response.status}`);
-          }
-          return response.json();
-      })
-      .then(data => {
-          window.location.href = "login.html";
-      })
-      .catch(error => {
-          console.error('Customer creation error:', error);
-      });
-  }
+        const userData = {
+            CID: cid,
+            CName: cname,
+            CLogo: clogo,
+            CAddress: `${companyStreet} -- ${companyCity} -- ${companyState} -- ${companyZip}`,
+            UserName: username,
+            Password: passwordEncrypted,
+            ReportType: "Weekly",
+            LastModifiedBy: 'Admin'
+        };
 
-  // Form validation (exact match to your HTML logic)
-  async function validateForm(event: Event): Promise<void> {
-      event.preventDefault();
-      showOverlay = true;
-      
-      const isFirstNameValid = validateFirstName();
-      const isLastNameValid = validateLastName();
-      const isPhoneNumberValid = validPhoneno();
-      
-      // Check required fields
-      let isRequiredFieldsValid = true;
-      const requiredFields = [
-          { value: customerStreet, error: '' },
-          { value: customerCity, error: '' },
-          { value: customerState, error: '' },
-          { value: customerZip, error: '' }
-      ];
+        try {
+            const response = await fetch(firstSignupPageapiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
 
-      requiredFields.forEach(field => {
-          if (!field.value.trim()) {
-              isRequiredFieldsValid = false;
-          }
-      });
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
 
-      if (isFirstNameValid && isLastNameValid && isPhoneNumberValid && isRequiredFieldsValid) {
-          // Get company address from localStorage
-          const companyStreet = localStorage.getItem('companyStreet');
-          const companyCity = localStorage.getItem('companyCity');
-          const companyState = localStorage.getItem('companyState');
-          const companyZip = localStorage.getItem('companyZip');
+            const data = await response.json();
+            if (!data.error) {
+                createApiData();
+            } else {
+                setTimeout(() => {
+                    window.location.href = "/register";
+                    showOverlay = true;
+                }, 100);
+            }
+        } catch (error) {
+            console.error('API error:', error);
+        }
+    }
 
-          // Save to localStorage
-          localStorage.setItem('firstName', firstName);
-          localStorage.setItem('lastName', lastName);
-          localStorage.setItem('address', `${companyStreet}--${companyCity}--${companyState}--${companyZip}`);
-          localStorage.setItem('phone', phoneNumber);
-          localStorage.setItem('email', email);
+    function createApiData(): void {
+        const customerId = uuidv4();
+        const apiUrl = `${apiUrlBase}/create`;
 
-          // COMPANY API CALL
-          showOverlay = false;
-          const passwordEncrypted = await checkPassword();
-          localStorage.setItem("passwordEncrypted", passwordEncrypted);
-          await createCheckoutSession();
-      } else {
-          totalError = 'Please fix the errors';
-          showOverlay = false;
-      }
-  }
+        localStorage.setItem('firstName', firstName);
+        localStorage.setItem('lastName', lastName);
+        localStorage.setItem('customerStreet', customerStreet);
+        localStorage.setItem('customerCity', customerCity);
+        localStorage.setItem('customerState', customerState);
+        localStorage.setItem('customerZip', customerZip);
+        localStorage.setItem('phone', phoneNumber);
+        localStorage.setItem('email', email);
+        localStorage.setItem('customerID', customerId);
 
-  onMount(() => {
-      // Initialize phone input
-      const phoneInput = document.getElementById('phoneNumber') as HTMLInputElement | null;
-      if (phoneInput) {
-          iti = intlTelInput(phoneInput, {
-              initialCountry: 'us',
-              utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js'
-          } as any);
-      }
+        const userData = {
+            CustomerID: customerId.toString(),
+            CID: cid,
+            FName: firstName,
+            LName: lastName,
+            Address: `${customerStreet} -- ${customerCity} -- ${customerState} -- ${customerZip}`,
+            PhoneNumber: phoneNumber,
+            Email: email,
+            IsActive: true,
+            LastModifiedBy: 'Admin'
+        };
 
-      // Store encryption key
-      localStorage.setItem('key', JSON.stringify(Array.from(key)));
-  });
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            window.location.href = "/login";
+        })
+        .catch(error => {
+            console.error('Customer creation error:', error);
+        });
+    }
+
+    // Form validation
+    async function validateForm(event: Event): Promise<void> {
+        event.preventDefault();
+        showOverlay = true;
+        totalError = '';
+        
+        const isFirstNameValid = validateFirstName();
+        const isLastNameValid = validateLastName();
+        const isPhoneNumberValid = validPhoneno();
+        const isAddressValid = validateAddress();
+        const isEmailValid = validateEmail();
+
+        if (isFirstNameValid && isLastNameValid && isPhoneNumberValid && isAddressValid && isEmailValid) {
+            const companyStreet = localStorage.getItem('companyStreet');
+            const companyCity = localStorage.getItem('companyCity');
+            const companyState = localStorage.getItem('companyState');
+            const companyZip = localStorage.getItem('companyZip');
+
+            localStorage.setItem('firstName', firstName);
+            localStorage.setItem('lastName', lastName);
+            localStorage.setItem('address', `${companyStreet}--${companyCity}--${companyState}--${companyZip}`);
+            localStorage.setItem('phone', phoneNumber);
+            localStorage.setItem('email', email);
+
+            const passwordEncrypted = await checkPassword();
+            localStorage.setItem("passwordEncrypted", passwordEncrypted);
+            await createCheckoutSession();
+        } else {
+            totalError = 'Please fix the errors';
+            showOverlay = false;
+        }
+    }
+
+    onMount(() => {
+        // Initialize phone input
+        const phoneInput = document.getElementById('phoneNumber') as HTMLInputElement;
+        if (phoneInput) {
+            iti = intlTelInput(phoneInput, {
+                initialCountry: 'us',
+                utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js'
+            } as any);
+        }
+
+        // Store encryption key
+        localStorage.setItem('key', JSON.stringify(Array.from(key)));
+    });
 </script>
       
 
-    
     <div class="flex flex-col md:flex-row min-h-screen">
       <!-- Left Section -->
       <div class="hidden md:flex md:w-1/2 bg-blue-100 flex-col justify-center items-center p-5  ">

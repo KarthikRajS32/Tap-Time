@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { fade } from 'svelte/transition';
     // Use a string for the report type heading
-    let reportTypeHeading: string = 'Salaried Report';
+    let reportTypeHeading: string = '';
 
     // State variables
     let selectedDate: string = '';
@@ -15,7 +15,7 @@
     let sortColumn: string = '';
     let sortDirection: 'asc' | 'desc' = 'asc';
     
-    const apiUrlBase = 'https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/dailyreport/getdatebasedata';
+    const apiUrlBase = 'https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/dailyreport/getdatebasedata';
     let cid: string | null = localStorage.getItem('companyID');
     let sidebarOpen: boolean = false;
     let reportName: string = localStorage.getItem('reportType') || 'Salaried';
@@ -150,7 +150,12 @@
         };
     });
 
-    
+    onMount(() => {
+        const selectedValue = localStorage.getItem('reportType');
+        reportName = `${selectedValue} Report`;
+        reportTypeHeading = `${selectedValue} Report`;
+       
+    });
 </script>
 
 <div class="bg-gray-100">

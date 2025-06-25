@@ -6,8 +6,6 @@
     let isLoading = true;
     let editMode = false;
     let showSuccessModal = false;
-    let showLogoutModal = false;
-    let showHomeModal = false;
     let phoneError = '';
     
     // Form data structure
@@ -133,20 +131,6 @@
         return true;
       });
     }
-  
-    // Handle logout
-    function logout() {
-      localStorage.removeItem('username');
-      localStorage.removeItem('companyID');
-      localStorage.removeItem('customId');
-      localStorage.removeItem('password');
-      window.location.href = '/login.html';
-    }
-  
-    // Navigate to home
-    function goToHome() {
-      window.location.href = '/index.html';
-    }
   </script>
 
 
@@ -168,64 +152,6 @@
         </div>
       </div>
     {/if}
-  
-    <!-- Logout Confirmation Modal -->
-    <!-- {#if showLogoutModal}
-      <div
-        transition:fade
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-      >
-        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-          <div class="p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">Logout</h3>
-            <p class="text-gray-700 mb-6">Are you sure you want to log out?</p>
-            <div class="flex justify-center space-x-4">
-              <button
-                on:click={logout}
-                class="px-6 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors"
-              >
-                Yes
-              </button>
-              <button
-                on:click={() => showLogoutModal = false}
-                class="px-6 py-2 border border-blue-900 text-blue-900 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                No
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    {/if} -->
-  
-    <!-- Home Confirmation Modal -->
-    <!-- {#if showHomeModal}
-      <div
-        transition:fade
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-      >
-        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-          <div class="p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">Home</h3>
-            <p class="text-gray-700 mb-6">Are you sure you want to go home?</p>
-            <div class="flex justify-center space-x-4">
-              <button
-                on:click={goToHome}
-                class="px-6 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors"
-              >
-                Yes
-              </button>
-              <button
-                on:click={() => showHomeModal = false}
-                class="px-6 py-2 border border-blue-900 text-blue-900 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                No
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    {/if} -->
   
     <!-- Main Content -->
     <div class="max-w-5xl w-full mx-auto px-10 py-8 pt-24">

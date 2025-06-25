@@ -11,13 +11,12 @@
   
   // Error messages
   let errorName = '';
-  let errorEmail = ''; // Added missing email error
+  let errorEmail = '';
   let errorTextarea = '';
   let errorPhone = '';
   
   // Modal states
   let showSuccessModal = false;
-  
   
   // Regular expressions
   const isAlpha = /^[a-zA-Z\s]+$/;
@@ -26,11 +25,10 @@
   const maxMessageLength = 500;
 
 
-
   // Field validations
   const validCName = (): boolean => {
     if (cname.trim() === '') {
-      errorName = 'Name is required';
+      errorName = '';
       return false;
     } else if (!isAlpha.test(cname)) {
       errorName = 'Only use letters, don\'t use digits';
@@ -43,7 +41,7 @@
 
   const validCEmail = (): boolean => {
     if (cemail.trim() === '') {
-      errorEmail = 'Email is required';
+      errorEmail = '';
       return false;
     } else if (!emailRegex.test(cemail)) {
       errorEmail = 'Please enter a valid email address';
@@ -56,7 +54,7 @@
 
   const validCQueries = (): boolean => {
     if (question.trim() === '') {
-      errorTextarea = 'Message is required';
+      errorTextarea = '';
       return false;
     } else if (question.length >= maxMessageLength) {
       errorTextarea = `Maximum ${maxMessageLength} characters allowed`;
@@ -69,25 +67,22 @@
   };
 
   const formatPhoneNumber = () => {
-    // Only format if not already formatted
-    if (!phoneRegex.test(phoneNumber)) {
-      let value = phoneNumber.replace(/\D/g, '');
-      
-      if (value.length > 3 && value.length <= 6) {
-        value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
-      } else if (value.length > 6) {
-        value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6, 10)}`;
-      } else if (value.length > 3) {
-        value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
-      }
-      
-      phoneNumber = value;
+    let value = phoneNumber.replace(/\D/g, '');
+    
+    if (value.length > 3 && value.length <= 6) {
+      value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+    } else if (value.length > 6) {
+      value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6, 10)}`;
+    } else if (value.length > 3) {
+      value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
     }
+    
+    phoneNumber = value;
   };
 
   const validatePhoneNumber = (): boolean => {
     if (phoneNumber.trim() === '') {
-      errorPhone = 'Phone number is required';
+      errorPhone = '';
       return false;
     } else if (!phoneRegex.test(phoneNumber)) {
       errorPhone = 'Please use format: (123) 456-7890';
@@ -108,7 +103,10 @@
     const isValidMessage = validCQueries();
     const isPhoneNumberValid = validatePhoneNumber();
     
-    if (isNameValid && isEmailValid && isValidMessage && isPhoneNumberValid) {
+    // Check required fields (name, email, question)
+    const isRequiredFieldsValid = cname.trim() !== '' && cemail.trim() !== '' && question.trim() !== '';
+    
+    if (isNameValid && isEmailValid && isValidMessage && isPhoneNumberValid && isRequiredFieldsValid) {
       try {
         await callContactUsCreateAPiData();
         showSuccessModal = true;
@@ -119,14 +117,18 @@
         }, 2000);
       } catch (error) {
         console.error('Form submission failed:', error);
-        // You might want to show an error message to the user here
       }
+    } else {
+      // Trigger validation messages for required fields
+      if (cname.trim() === '') errorName = 'Name is required';
+      if (cemail.trim() === '') errorEmail = 'Email is required';
+      if (question.trim() === '') errorTextarea = 'Message is required';
     }
   };
 
   // API call
   const callContactUsCreateAPiData = async (): Promise<void> => {
-    const apiLink = `https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/contact-us/create`;
+    const apiLink = `https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/contact-us/create`;
     const requestID = uuidv4();
     const cid = localStorage.getItem('companyID') || '';
 

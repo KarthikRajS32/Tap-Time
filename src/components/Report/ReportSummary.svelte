@@ -49,7 +49,7 @@
       window.location.href = '/login';
     }
   
-    const BASE = 'https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev';
+    const BASE = 'https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test';
   
     onMount(async () => {
       const today = new Date().toISOString().substring(0, 10);
@@ -213,7 +213,13 @@
         console.error('Submit error:', e);
       }
     }
-  
+     let reportTypeHeading: string = '';
+    
+    onMount(() => {
+        const selectedValue = localStorage.getItem('reportType');
+        reportTypeHeading = `${selectedValue} Report`;
+        // Rest of your onMount code...
+    });
   </script>
 
 
@@ -229,7 +235,7 @@
           <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 text-center w-auto md:w-auto">
             <a href="/reportsummary" class="px-4 py-2 bg-[#02066F] text-white font-semibold rounded-full">Today's Report</a>
             <a href="/daywisereport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full">Day Wise Report</a>
-            <a href="/salariedreport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full">Salaried Report</a>
+            <a href="/salariedreport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full">{reportTypeHeading}</a>
           </div>
     
         </div>

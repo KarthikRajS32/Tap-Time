@@ -22,9 +22,10 @@
   
   const isAlpha = /^[a-zA-Z\s]+$/;
   
+  // Validation functions
   function validateCompanyName() {
     if (companyName.trim() === '') {
-      errorCompanyName = 'Company Name is required';
+      errorCompanyName = '';
       return false;
     } else if (!isAlpha.test(companyName)) {
       errorCompanyName = "Only use letters, don't use digits";
@@ -36,7 +37,7 @@
   
   function validateUsername() {
     if (username.trim() === '') {
-      errorUsername = 'Username is required';
+      errorUsername = '';
       return false;
     } else if (!isAlpha.test(username)) {
       errorUsername = "Only use letters, don't use digits";
@@ -48,7 +49,7 @@
   
   function validatePassword() {
     if (password.trim() === '') {
-      errorPassword = 'Password is required';
+      errorPassword = '';
       return false;
     } else if (password.length < 8) {
       errorPassword = 'Password must be at least 8 characters';
@@ -68,6 +69,8 @@
     if (files && files.length > 0) {
       fileInput = files[0];
       fileName = fileInput.name;
+      // Store the file for later use
+      companyLogo = URL.createObjectURL(fileInput);
     }
   }
   
@@ -75,6 +78,7 @@
     event.preventDefault();
   
     overlayVisible = true;
+    totalError = '';
   
     const isCompanyNameValid = validateCompanyName();
     const isUsernameValid = validateUsername();
@@ -82,7 +86,11 @@
     const isRequiredFieldsValid = validateRequiredFields();
   
     if (isCompanyNameValid && isUsernameValid && isPasswordValid && isRequiredFieldsValid) {
-      document.querySelector('.progress-bar')?.setAttribute('style', 'width: 50%');
+      // Update progress bar
+      const progressBar = document.querySelector('.progress-bar');
+      if (progressBar) {
+        progressBar.style.width = '50%';
+      }
   
       // Store address
       localStorage.setItem('companyName', companyName);
@@ -93,8 +101,6 @@
       localStorage.setItem('username', username);
       localStorage.setItem('password', password);
   
-      
-      
       // Handle logo upload
       if (fileInput) {
         const reader = new FileReader();
@@ -103,7 +109,6 @@
           // Redirect
           setTimeout(() => {
             overlayVisible = false;
-            // window.location.href = "signup2.html"; // for SPA
             goto('/register2'); // if using SvelteKit
           }, 100);
         };
@@ -120,31 +125,7 @@
       overlayVisible = false;
     }
   }
-  
-  // Sidebar toggle
-  let sidebarOpen = false;
-  
-  function toggleSidebar() {
-    sidebarOpen = !sidebarOpen;
-  }
-  
-  function closeSidebarOnOutsideClick(event) {
-    const sidebar = document.getElementById('sidebar');
-    const toggler = document.querySelector('.navbar-toggler');
-  
-    if (
-      sidebar &&
-      !sidebar.contains(event.target as Node) &&
-      !(toggler && toggler.contains(event.target as Node))
-    ) {
-      sidebarOpen = false;
-    }
-  }
-  
-  onMount(() => {
-    document.addEventListener('click', closeSidebarOnOutsideClick);
-  });
-  </script>
+</script>
   
   
   <div class="flex flex-col md:flex-row min-h-screen">

@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte';
 
-    const apiUrlBase = 'https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/report/dateRangeReportGet';
+    const apiUrlBase = 'https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/report/dateRangeReportGet';
 
     // State
     let startDateHeader = '';

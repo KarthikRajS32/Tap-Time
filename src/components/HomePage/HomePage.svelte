@@ -1,13 +1,17 @@
 <script lang="ts">
-
   let phone = "";
   let zip = "";
   let isValid = true;
   let showOverlay = false;
   let show = false;
- 
+  
+  // Error states
+  let errorFName = "";
+  let errorLName = "";
+  let errorPhone = "";
+  let errorZip = "";
 
- // Refs to access form input values
+  // Refs to access form input values
   let firstNameInput: HTMLInputElement;
   let lastNameInput: HTMLInputElement;
   let emailInput: HTMLInputElement;
@@ -19,31 +23,92 @@
   let zipInput: HTMLInputElement;
   let messageInput: HTMLTextAreaElement;
 
-  // @ts-ignore
-  // const validateForm = (event) => {
-  //   const form = event.target;
+  // Regular expressions
+  const isAlpha = /^[a-zA-Z\s]+$/;
+  const zipPattern = /^\d{5}(?:[-\s]\d{4})?$/;
+  const phoneRegex = /^\([0-9]{3}\) [0-9]{3}-[0-9]{4}$/;
 
-  //   if (form.checkValidity()) {
-  //     // Valid form — show overlay
-  //     showOverlay = true;
+  // Validate names
+  const validateName = (value: string, isFirstName: boolean): boolean => {
+    if (value.trim() === '') {
+      if (isFirstName) errorFName = '';
+      else errorLName = '';
+      return false;
+    } else if (!isAlpha.test(value)) {
+      if (isFirstName) errorFName = 'Only use letters, don\'t use digits';
+      else errorLName = 'Only use letters, don\'t use digits';
+      return false;
+    } else {
+      if (isFirstName) errorFName = '';
+      else errorLName = '';
+      return true;
+    }
+  };
 
-  //     setTimeout(() => {
-  //       showOverlay = false;
-  //       alert("Form submitted!");
-  //       form.reset();
-  //       // You can manually submit the form here if needed: form.submit();
-  //     }, 2000);
-  //   } else {
-  //     // Invalid form — show default browser error messages
-  //     form.reportValidity();
-  //   }
-  // };
+  // Validate zip code
+  function validateZip() {
+    const regex = /^\d{5}(-\d{4})?$/;
+    isValid = regex.test(zip);
+    if (!isValid && zip.trim() !== '') {
+      errorZip = "Invalid ZIP Code";
+    } else {
+      errorZip = "";
+    }
+  }
+
+  // Format and validate phone number
+  const formatPhoneNumber = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    let value = target.value.replace(/\D/g, '');
+    
+    if (value.length > 3 && value.length <= 6) {
+      value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+    } else if (value.length > 6) {
+      value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6, 10)}`;
+    } else if (value.length > 3) {
+      value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+    }
+    
+    phone = value;
+    validatePhoneNumber();
+  };
+
+  // Validate phone number format
+  const validatePhoneNumber = (): boolean => {
+    if (phone === "") {
+      errorPhone = '';
+      return false;
+    } else if (!phoneRegex.test(phone)) {
+      errorPhone = 'Invalid phone number format';
+      return false;
+    } else {
+      errorPhone = '';
+      return true;
+    }
+  };
 
   const validateForm = async (event: Event) => {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
 
-    if (form.checkValidity()) {
+    // Validate all fields
+    const isFirstNameValid = validateName(firstNameInput.value, true);
+    const isLastNameValid = validateName(lastNameInput.value, false);
+    const isZipValid = isValid || zip.trim() === '';
+    const isPhoneValid = validatePhoneNumber();
+    
+    // Check required fields
+    const isRequiredFieldsValid = firstNameInput.value.trim() !== '' && 
+                               lastNameInput.value.trim() !== '' && 
+                               emailInput.value.trim() !== '' && 
+                               phoneInput.value.trim() !== '' && 
+                               streetInput.value.trim() !== '' && 
+                               cityInput.value.trim() !== '' && 
+                               stateInput.value.trim() !== '' && 
+                               zipInput.value.trim() !== '' && 
+                               messageInput.value.trim() !== '';
+
+    if (isFirstNameValid && isLastNameValid && isZipValid && isPhoneValid && isRequiredFieldsValid) {
       showOverlay = true;
 
       const userData = {
@@ -59,7 +124,7 @@
       };
 
       try {
-        const apiLink = `https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/web_contact_us/create`;
+        const apiLink = `https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/web_contact_us/create`;
 
         const response = await fetch(apiLink, {
           method: "POST",
@@ -75,7 +140,8 @@
         if (!data.error) {
           show = true;
           form.reset();
-         
+          phone = "";
+          zip = "";
         }
       } catch (error) {
         form.reset();
@@ -85,23 +151,14 @@
         showOverlay = false;
       }
     } else {
+      // Show errors for required fields
+      if (firstNameInput.value.trim() === '') errorFName = 'First name is required';
+      if (lastNameInput.value.trim() === '') errorLName = 'Last name is required';
+      if (phoneInput.value.trim() === '') errorPhone = 'Phone number is required';
+      if (zipInput.value.trim() === '') errorZip = 'ZIP code is required';
       form.reportValidity();
     }
   };
-
-
-// @ts-ignore
-const formatPhoneNumber = (event) => {
-  let value = event.target.value.replace(/\D/g, '').slice(0, 10);
-
-  if (value.length > 6) {
-    phone = `${value.slice(0, 3)}-${value.slice(3, 6)}-${value.slice(6)}`;
-  } else if (value.length > 3) {
-    phone = `${value.slice(0, 3)}-${value.slice(3)}`;
-  } else {
-    phone = value;
-  }
-};
 
   const features = [
     {
@@ -136,12 +193,6 @@ const formatPhoneNumber = (event) => {
     }
   ];
 
-  function validateZip() {
-    const regex = /^\d{5}(-\d{4})?$/;
-    isValid = regex.test(zip);
-  }
-
-  
   let onClose = () => {
     show = false;
   };

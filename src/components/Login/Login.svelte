@@ -5,18 +5,43 @@
   let password = '';
   let errorMsg = '';
   let loading = false;
+  let sidebarOpen = false;
   let logoSrc = '';
-  $: companyLogo = logoSrc;
 
   // AES-GCM key used for decryption
   const key1 = new Uint8Array([16, 147, 220, 113, 166, 142, 22, 93, 241, 91, 13, 252, 112, 122, 119, 95]);
 
   onMount(() => {
+    // Retrieve the logo from local storage
     const storedLogo = localStorage.getItem('companyLogo');
     if (storedLogo) {
       logoSrc = storedLogo;
     }
+
+    // Click outside sidebar handler
+    const handleClickOutside = (event: MouseEvent) => {
+      const sidebar = document.getElementById('sidebar');
+      const toggler = document.querySelector('.navbar-toggler');
+      
+      if (sidebar && toggler) {
+        const isClickInside = sidebar.contains(event.target as Node) || 
+                             toggler.contains(event.target as Node);
+        if (!isClickInside) {
+          sidebarOpen = false;
+        }
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
   });
+
+  function toggleSidebar() {
+    sidebarOpen = !sidebarOpen;
+  }
 
   async function decrypt(encryptedDataWithIV: string, key: Uint8Array): Promise<string> {
     const buffer = new Uint8Array(atob(encryptedDataWithIV).split('').map(char => char.charCodeAt(0)));
@@ -31,7 +56,7 @@
   }
 
   async function getCustomerData(cid: string) {
-    const url = `https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/customer/getUsingCID/${cid}`;
+    const url = `https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/customer/getUsingCID/${cid}`;
     try {
       const response = await fetch(url);
       const data = await response.json();
@@ -48,71 +73,78 @@
   }
 
   async function getTimeZone(cid: string) {
-    const url = `https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/device/getAll/${cid}`;
+    const url = `https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/device/getAll/${cid}`;
     try {
       const res = await fetch(url);
       const data = await res.json();
       if (!data.length || data.error === 'No devices found !') {
         localStorage.setItem('TimeZone', 'PST');
       } else {
-        localStorage.setItem('TimeZone', data[0].TimeZone || 'PST');
+        // Use the first device's timezone or default to PST
+        localStorage.setItem('TimeZone', data[0]?.TimeZone || 'PST');
       }
     } catch (err) {
+      console.error("Error fetching timezone:", err);
       localStorage.setItem('TimeZone', 'PST');
     }
   }
 
   async function handleSubmit() {
-  errorMsg = '';
-  if (!username.trim() || !password.trim()) {
-    errorMsg = 'Please enter both username and password';
-    return;
-  }
+    errorMsg = '';
+    if (!username.trim() || !password.trim()) {
+      errorMsg = 'Please enter both username and password';
+      return;
+    }
 
-  loading = true;
+    loading = true;
 
-  try {
-    const res = await fetch(`https://yrvi6y00u8.execute-api.us-west-2.amazonaws.com/dev/company/getuser/${username}`);
-    if (!res.ok) throw new Error('User fetch failed');
+    try {
+      const res = await fetch(`https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/company/getuser/${username}`);
+      if (!res.ok) throw new Error('User fetch failed');
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!data || !data.Password || !data.UserName) {
+      if (!data || !data.Password || !data.UserName) {
         errorMsg = 'Invalid response from server';
         return;
       }
 
-    const decryptedPwd = await decrypt(data.Password, key1);
+      const decryptedPwd = await decrypt(data.Password, key1);
 
-    const isAuthenticated = data.UserName === username && decryptedPwd === password;
+      const isAuthenticated = data.UserName === username && decryptedPwd === password;
 
-    if (!isAuthenticated) {
-      errorMsg = 'Invalid username or password';
-      return;
+      if (!isAuthenticated) {
+        errorMsg = 'Invalid username or password';
+        return;
+      }
+
+      // Set LocalStorage
+      localStorage.setItem('companyID', data.CID);
+      localStorage.setItem('companyName', data.CName);
+      localStorage.setItem('companyLogo', data.CLogo);
+      localStorage.setItem('companyAddress', data.CAddress);
+      localStorage.setItem('username', data.UserName);
+      localStorage.setItem('password', data.Password);
+      localStorage.setItem('reportType', data.ReportType);
+
+      // Update logo if it exists
+      if (data.CLogo) {
+        logoSrc = data.CLogo;
+      }
+
+      await Promise.all([
+        getCustomerData(data.CID),
+        getTimeZone(data.CID)
+      ]);
+
+      window.location.href = '/employeelist';
+    } catch (err) {
+      console.error(err);
+      errorMsg = 'An error occurred during login';
+    } finally {
+      loading = false;
     }
-
-    // Set LocalStorage
-    localStorage.setItem('companyID', data.CID);
-    localStorage.setItem('companyName', data.CName);
-    localStorage.setItem('companyLogo', data.CLogo);
-    localStorage.setItem('companyAddress', data.CAddress);
-    localStorage.setItem('username', data.UserName);
-    // localStorage.setItem('password', data.Password);
-    localStorage.setItem('reportType', data.ReportType);
-
-    await Promise.all([
-      getCustomerData(data.CID),
-      getTimeZone(data.CID)
-    ]);
-
-    window.location.href = '/employeeList';
-  } catch (err) {
-    console.error(err);
-    errorMsg = 'An error occurred during login';
-  } finally {
-    loading = false;
   }
-}
 </script>
 
 <!-- Page layout -->
@@ -130,11 +162,11 @@
   <div class="w-full md:w-1/2 flex justify-center items-center py-16 px-6 sm:px-8 md:px-8 md:pt-30 lg:px-20">
     <div class="w-full bg-white rounded-xl p-6 sm:p-8 text-center">
       
-      {#if companyLogo}
+      <!-- {#if companyLogo}
         <div class="mb-6">
           <img src={companyLogo} alt="Company Logo" class="w-24 h-auto mx-auto" />
         </div>
-      {/if}
+      {/if} -->
 
       <h2 class="sm:text-3xl md:text-3xl text-2xl pt-4 font-semibold text-gray-800 mb-10">Login</h2>
 
