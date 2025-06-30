@@ -135,13 +135,13 @@
         return true;
     }
 
-    function toggleFrequency(frequency: ReportFrequency, list: ReportFrequency[]) {
-        if (list.includes(frequency)) {
-            return list.filter(f => f !== frequency);
-        } else {
-            return [...list, frequency];
-        }
-    }
+    // function toggleFrequency(frequency: ReportFrequency, list: ReportFrequency[]) {
+    //     if (list.includes(frequency)) {
+    //         return list.filter(f => f !== frequency);
+    //     } else {
+    //         return [...list, frequency];
+    //     }
+    // }
 
     // async function saveReportSettings() {
     //     if (!validateEmail(newEmail)) return;
@@ -335,6 +335,30 @@
         }
         frequencyError = '';
     }
+
+    // import { onClickOutside } from './utils'; // Optional, for clicking outside to close dropdown
+
+let frequencies = ['Daily','Weekly', 'Biweekly', 'Monthly', 'Bimonthly'];
+let selectedFrequencies: string[] = [];
+let showDropdown = false;
+// let frequencyError = '';
+
+function toggleDropdown() {
+  showDropdown = !showDropdown;
+}
+
+function toggleFrequency(freq: string) {
+  if (selectedFrequencies.includes(freq)) {
+    selectedFrequencies = selectedFrequencies.filter(f => f !== freq);
+  } else if (selectedFrequencies.length < 2) {
+    selectedFrequencies = [...selectedFrequencies, freq];
+    frequencyError = '';
+  } else {
+    frequencyError = 'You can select up to 2 frequencies only.';
+  }
+}
+
+$: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
 </script>
 
 <div class="min-h-screen bg-gray-100 p-4 md:p-8">
@@ -385,19 +409,23 @@
                                                     setting.CompanyReporterEmail,
                                                     formatFrequencies(setting).split(', ') as ReportFrequency[]
                                                 )}
-                                                class="text-blue-900 hover:text-blue-700 p-1 rounded hover:bg-gray-200"
+                                                class="text-[#02066F]"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <!-- <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                </svg>
+                                                </svg> -->
+                                                <!-- <button on:click={openViewEditModal} class="text-[#02066F]  hover:text-[#02066F]"> -->
+                                                    <i class="fas fa-pencil-alt cursor-pointer"></i>
+                                                  <!-- </button> -->
                                             </button>
                                             <button
                                                 on:click={() => openDeleteModal(setting.CompanyReporterEmail)}
-                                                class="text-blue-90 hover:text-blue-700 p-1 rounded hover:bg-gray-200"
+                                                class="text-[#02066F]"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <!-- <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
+                                                </svg> -->
+                                                <i class="fas fa-trash cursor-pointer"></i>
                                             </button>
                                         </div>
                                     </td>
@@ -533,7 +561,7 @@
                 
                 <div class="p-6 text-center">
                     <div class="mb-4">
-                        <label for="edit-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <!-- <label for="edit-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label> -->
                         <input
                             type="email"
                             id="edit-email"
@@ -547,19 +575,33 @@
                     </div>
                     
                     <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
+                        <!-- <label class="block text-sm font-medium text-gray-700 mb-1">Frequency</label> -->
                         <div class="space-y-2">
-                            {#each ['Daily', 'Weekly', 'Biweekly', 'Monthly', 'Bimonthly'] as freq}
-                                <label class="flex items-center space-x-2">
-                                    <input
-                                        type="checkbox"
-                                        checked={currentFrequencies.includes(freq as ReportFrequency)}
-                                        on:change={() => currentFrequencies = toggleFrequency(freq as ReportFrequency, currentFrequencies)}
-                                        class="rounded border-gray-300 text-blue-900 focus:ring-blue-500 h-4 w-4"
-                                    />
-                                    <span class="text-sm text-gray-700">{freq}</span>
-                                </label>
-                            {/each}
+                            <div
+    class="border border-gray-300 rounded-md px-4 py-2 cursor-pointer bg-white"
+    on:click={toggleDropdown}
+  >
+    {displayValue}
+  </div>
+
+  <!-- Dropdown options -->
+  {#if showDropdown}
+    <div class="dropdown">
+      {#each frequencies as freq}
+        <label class="flex items-center px-4 py-2 hover:bg-gray-100">
+          <input
+            type="checkbox"
+            value={freq}
+            checked={selectedFrequencies.includes(freq)}
+            on:change={() => toggleFrequency(freq)}
+            class="mr-2"
+          />
+          {freq}
+        </label>
+      {/each}
+    </div>
+  {/if}
+
                         </div>
                         {#if frequencyError}
                             <p class="mt-1 text-sm text-red-600">{frequencyError}</p>
@@ -649,24 +691,27 @@
             style="background: rgba(0, 0, 0, 0.5)"
         >
             <div class="bg-white rounded-xl max-w-md w-full shadow-xl">
-                <div class="bg-blue-900 text-white p-4 rounded-t-xl">
-                    <h3 class="text-lg font-medium text-center">Delete</h3>
+
+                <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center text-center">
+                    <h3 class="text-2xl font-semibold p-2 text-white">Delete</h3>
+                    <button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2" on:click={()=> showDeleteModal = false}> ×</button>
                 </div>
+
                 
-                <div class="p-6">
-                    <p class="text-center mb-6 text-gray-700">Are you sure you want to remove this email from report settings?</p>
+                <div class="p-4">
+                    <p class="text-center text-lg font-bold mb-6 text-gray-800">Are you sure, you want to remove the employee?</p>
                     
                     <div class="flex justify-center space-x-4">
                         <button
                             on:click={deleteReportSetting}
-                            class="px-6 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors duration-200 disabled:opacity-50"
+                            class="px-6 py-2 bg-[#02066F] text-white rounded-lg transition-colors duration-200 hover:opacity-90 cursor-pointer"
                             disabled={isLoading}
                         >
                             {isLoading ? 'Deleting...' : 'Yes'}
                         </button>
                         <button
                             on:click={() => showDeleteModal = false}
-                            class="px-6 py-2 border border-blue-900 text-blue-900 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                            class="px-6 py-2 border border-[#02066F] text-blue-900 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer duration-200"
                         >
                             No
                         </button>

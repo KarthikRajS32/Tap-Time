@@ -248,24 +248,24 @@
                         <tbody class="bg-white divide-y divide-gray-200">
                             {#each devices as device}
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{device.TimeZone}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center">{device.TimeZone}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center">
                                         {maskString(device.AccessKey, 4)}
                                         <button 
-                                            class="ml-2 text-blue-900 hover:text-blue-700"
+                                            class="ml-2 text-[#02066F] hover:text-black cursor-pointer"
                                             on:click={() => copyAccessKey(device.AccessKey)}
                                         >
                                             <i class="far fa-copy"></i>
                                         </button>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{device.DeviceID}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{device.DeviceName}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center">{device.DeviceID}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center">{device.DeviceName}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center">
                                         <button 
-                                            class="text-blue-900 hover:text-red-700"
+                                            class="text-[#02066F]"
                                             on:click={() => confirmDelete(device.AccessKey)}
                                         >
-                                            <i class="fas fa-trash"></i>
+                                            <i class="fas fa-trash cursor-pointer"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -296,21 +296,24 @@
     {#if showDeleteModal}
         <div class="fixed inset-0 flex items-center justify-center z-50 transition-opacity duration-300"
         style="background: rgba(0, 0, 0, 0.5)">
-            <div class="bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all duration-300">
-                <div class="bg-red-600 text-white px-6 py-4 rounded-t-lg">
-                    <h3 class="text-lg font-semibold text-center">Delete Device</h3>
+            <div class="bg-white rounded-md max-w-sm w-full shadow-xl">
+                <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center text-center">
+                    <h3 class="text-xl font-semibold p-2 text-white">Delete</h3>
+                    <button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2"  on:click={() => showDeleteModal = false}>
+                      ×</button>
                 </div>
-                <div class="p-6">
-                    <h5 class="font-bold mb-6 text-center">Are you sure you want to delete this device?</h5>
+              
+                <div class="p-4">
+                    <h5 class="font-bold text-md mb-6 text-center">Are you sure, you want to remove the device?</h5>
                     <div class="flex justify-center space-x-4">
                         <button 
-                            class="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-500 transition-colors"
+                            class="bg-[#02066F] opacity-80 cursor-pointer text-white px-6 py-2 rounded-md hover:opacity-70 transition-colors"
                             on:click={deleteDevice}
                         >
                             Yes
                         </button>
                         <button 
-                            class="border border-red-600 text-red-600 px-6 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                            class="border border-[#02066F] text-blue-800 px-6 py-2 rounded-md cursor-pointer hover:bg-gray-100 transition-colors"
                             on:click={() => showDeleteModal = false}
                         >
                             No

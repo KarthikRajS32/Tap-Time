@@ -358,82 +358,74 @@
             on:click={() => showEmployeeModal = false}
         >
             <div 
-                class="bg-white rounded-lg w-full max-w-md mx-4"
+                class="bg-white rounded-lg w-full max-w-xs mx-4"
                 on:click|stopPropagation
                 transition:fade
             >
-                <div class="bg-[#02066F] text-white p-4 rounded-t-lg">
-                    <h3 class="text-lg font-semibold text-center">
-                        {isEditing ? 'Edit Employee' : 'Add Employee'}
+                <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center text-center">
+                    <h3 class="text-xl font-semibold p-2 text-white">
+                        {isEditing ? 'Admin Details' : 'Employee Details'}
                     </h3>
+                    <button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2"  on:click={() => showEmployeeModal = false}>
+                      ×</button>
                 </div>
                 <div class="p-6">
                     <form on:submit|preventDefault={submitForm}>
                         <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="pin">
-                                Pin
-                            </label>
-                            <input
-                                id="pin"
-                                type="text"
-                                bind:value={formData.pin}
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                readonly
-                            />
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="firstName">
-                                First Name
-                            </label>
+                           
                             <input
                                 id="firstName"
                                 type="text"
+                                placeholder="First Name"
                                 bind:value={formData.firstName}
-                                class={`w-full px-3 py-2 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                class={`w-full px-3 py-2 border-2 ${errors.firstName ? 'border-red-500' : 'border-[#02066F]'} font-bold rounded-md focus:outline-none `}
                             />
                             {#if errors.firstName}
                                 <p class="text-red-500 text-xs italic mt-1">{errors.firstName}</p>
                             {/if}
                         </div>
                         <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="lastName">
-                                Last Name
-                            </label>
+                           
                             <input
                                 id="lastName"
                                 type="text"
+                                placeholder="Last Name"
                                 bind:value={formData.lastName}
-                                class={`w-full px-3 py-2 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                class={`w-full px-3 py-2 border-2 ${errors.lastName ? 'border-red-500' : 'border-[#02066F]'} font-bold rounded-md focus:outline-none`}
                             />
                             {#if errors.lastName}
                                 <p class="text-red-500 text-xs italic mt-1">{errors.lastName}</p>
                             {/if}
                         </div>
                         <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="phone">
-                                Phone Number
-                            </label>
+                           
                             <input
                                 id="phone"
                                 type="text"
+                                placeholder="Phone Number"
                                 bind:value={formData.phone}
                                 on:input={handlePhoneInput}
                                 maxlength="14"
-                                class={`w-full px-3 py-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                                placeholder="(123) 456-7890"
+                                class={`w-full px-3 py-2 border-2 ${errors.phone ? 'border-red-500' : 'border-[#02066F]'} font-bold rounded-md focus:outline-none`}
+                                
                             />
                             {#if errors.phone}
                                 <p class="text-red-500 text-xs italic mt-1">{errors.phone}</p>
                             {/if}
                         </div>
-                        <div class="flex justify-end space-x-3 mt-6">
-                            <button
-                                type="button"
-                                on:click={() => showEmployeeModal = false}
-                                class="px-4 py-2 border border-[#02066F] text-[#02066F] rounded-md cursor-pointer hover:bg-gray-100 cursor-pointer"
-                            >
-                                Cancel
-                            </button>
+                        <div class="mb-4">
+                         
+                          <input
+                              id="pin"
+                              type="text"
+                              placeholder="Instructor Pin"
+                              bind:value={formData.pin}
+                              class="w-full px-3 py-2 border-2 border-[#02066F] font-bold bg-gray-300 rounded-md focus:outline-none "
+                              readonly
+                          />
+                      </div>
+                        <div class="flex justify-center mt-6">
+                           
                             <button
                                 type="submit"
                                 class="px-4 py-2 bg-[#02066F] text-white rounded-md cursor-pointer cursor-pointer"
@@ -455,82 +447,74 @@
             on:click={() => showAdminModal = false}
         >
             <div 
-                class="bg-white rounded-lg w-full max-w-md mx-4"
+                class="bg-white rounded-lg w-full max-w-xs mx-4"
                 on:click|stopPropagation
                 transition:fade
             >
-                <div class="bg-[#02066F] text-white p-4 rounded-t-lg">
-                    <h3 class="text-lg font-semibold text-center">
-                        {isEditing ? 'Edit Admin' : 'Add Admin'}
+                <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center text-center">
+                    <h3 class="text-xl font-semibold p-2 text-white">
+                        <!-- {isEditing ? 'Admin Details' : 'Admin Details'} -->
+                        Admin Details
                     </h3>
+                    <button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2"  on:click={() => showAdminModal = false}>
+                      ×</button>
                 </div>
                 <div class="p-6">
                     <form on:submit|preventDefault={submitForm}>
+                      
                         <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="adminPin">
-                                Pin
-                            </label>
-                            <input
-                                id="adminPin"
-                                type="text"
-                                bind:value={formData.pin}
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                readonly
-                            />
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="adminFirstName">
-                                First Name
-                            </label>
+                            
                             <input
                                 id="adminFirstName"
                                 type="text"
+                                placeholder="First Name"
                                 bind:value={formData.firstName}
-                                class={`w-full px-3 py-2 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                class={`w-full px-3 py-2 font-bold border-2 ${errors.firstName ? 'border-red-500' : 'border-[#02066F]'} rounded-md focus:outline-none `}
                             />
                             {#if errors.firstName}
                                 <p class="text-red-500 text-xs italic mt-1">{errors.firstName}</p>
                             {/if}
                         </div>
                         <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="adminLastName">
-                                Last Name
-                            </label>
+                            
                             <input
                                 id="adminLastName"
                                 type="text"
+                                placeholder="Last Name"
                                 bind:value={formData.lastName}
-                                class={`w-full px-3 py-2 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                class={`w-full px-3 py-2 font-bold border-2 ${errors.lastName ? 'border-red-500' : 'border-[#02066F]'} rounded-md focus:outline-none`}
                             />
                             {#if errors.lastName}
                                 <p class="text-red-500 text-xs italic mt-1">{errors.lastName}</p>
                             {/if}
                         </div>
                         <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="adminPhone">
-                                Phone Number
-                            </label>
+                           
                             <input
                                 id="adminPhone"
                                 type="text"
                                 bind:value={formData.phone}
                                 on:input={handlePhoneInput}
                                 maxlength="14"
-                                class={`w-full px-3 py-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                                placeholder="(123) 456-7890"
+                                class={`w-full px-3 py-2 font-bold border-2 ${errors.phone ? 'border-red-500' : 'border-[#02066F]'} rounded-md focus:outline-none`}
+                                placeholder="Phone Number"
                             />
                             {#if errors.phone}
                                 <p class="text-red-500 text-xs italic mt-1">{errors.phone}</p>
                             {/if}
                         </div>
-                        <div class="flex justify-end space-x-3 mt-6">
-                            <button
-                                type="button"
-                                on:click={() => showAdminModal = false}
-                                class="px-4 py-2 border border-[#02066F] text-[#02066F] rounded-md hover:bg-gray-100 cursor-pointer"
-                            >
-                                Cancel
-                            </button>
+                        <div class="mb-4">
+                          <input
+                              id="adminPin"
+                              type="text"
+                              placeholder="Instructor Pin"
+                              bind:value={formData.pin}
+                              class="w-full px-3 py-2 font-bold border-2 border-[#02066F] rounded-md bg-gray-300 focus:outline-none"
+                              readonly
+                          />
+                      </div>
+                        <div class="flex justify-center mt-6">
+                            
                             <button
                                 type="submit"
                                 class="px-4 py-2 bg-[#02066F] text-white rounded-md cursor-pointer"
