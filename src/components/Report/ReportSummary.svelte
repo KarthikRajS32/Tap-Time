@@ -67,6 +67,8 @@
       await fetchEmployeeData();
       await viewCurrentDateReport();
     });
+    
+    const convertToAmPm = formatToAmPm;
   
     afterUpdate(() => {
       if (dataTable) dataTable.destroy();
@@ -248,8 +250,8 @@
     <main class="bg-gray-100 px-4 sm:px-6 lg:px-8 py-6">
         <div>
           <!-- Title -->
-          <div class="text-center mb-8">
-            <h2 class="text-base sm:text-xl md:text-2xl font-bold">Current Day Report</h2>
+          <div class="text-center mb-4 pt-6">
+            <h2 class="text-base sm:text-md md:text-xl font-bold text-gray-800">Current Day Report</h2>
           </div>
       
           <!-- Date & Add Entry Button -->
@@ -270,11 +272,11 @@
             <table bind:this={tableElement} class="min-w-full border border-gray-300 text-sm">
               <thead class="bg-[#02066F] text-white">
                 <tr>
-                  <th class="px-4 sm:px-6 py-3 text-left font-semibold border-r">Employee ID</th>
-                  <th class="px-4 sm:px-6 py-3 text-left font-semibold border-r">Name</th>
-                  <th class="px-4 sm:px-6 py-3 text-left font-semibold border-r">Check-in Time</th>
-                  <th class="px-4 sm:px-6 py-3 text-left font-semibold border-r">Check-out Time</th>
-                  <th class="px-4 sm:px-6 py-3 text-left font-semibold border-r">Action</th>
+                  <th class="text-base px-4 sm:px-6 py-3 text-left font-bold border-r">Employee ID</th>
+                  <th class="text-base px-4 sm:px-6 py-3 text-left font-bold border-r">Name</th>
+                  <th class="text-base px-4 sm:px-6 py-3 text-left font-bold border-r">Check-in Time</th>
+                  <th class="text-base px-4 sm:px-6 py-3 text-left font-bold border-r">Check-out Time</th>
+                  <th class="text-base px-4 sm:px-6 py-3 text-left font-bold border-r">Action</th>
                 </tr>
               </thead>
       
@@ -333,9 +335,9 @@
     {#if showModal}
       <div class="fixed inset-0  flex items-center justify-center z-50 p-4"
       style="background: rgba(0, 0, 0, 0.5)">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-xs">
           <div class="bg-[#02066F] text-white px-6 py-4 rounded-t-lg flex justify-between items-center">
-            <h3 class="text-lg font-bold">Add entry</h3>
+            <h3 class="text-lg font-bold text-center">Add entry</h3>
             <button on:click={() => showModal = false} class="text-gray-400 text-4xl hover:text-white cursor-pointer">
               &times;
             </button>
@@ -344,7 +346,7 @@
             <form on:submit|preventDefault={submitForm}>
               <div class="mb-4">
                 <select 
-                  class="w-full border-2 border-blue-900 rounded-lg px-4 py-2 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full border-2 text-[#02066F] border-[#02066F] rounded-lg px-4 py-2 font-bold focus:outline-none"
                   bind:value={formData.employee}
                 >
                   <option value="">Select Employee</option>
@@ -359,7 +361,7 @@
   
               <div class="mb-4">
                 <select 
-                  class="w-full border-2 border-blue-900 rounded-lg px-4 py-2 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full border-2 border-[#02066F] text-[#02066F] rounded-lg px-4 py-2 font-bold focus:outline-none "
                   bind:value={formData.type}
                 >
                   <option value="">Select Type</option>
@@ -378,7 +380,7 @@
               <div class="mb-4">
                 <input 
                   type="date" 
-                  class="w-full border-2 border-blue-900 rounded-lg px-4 py-2 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full border-2 border-[#02066F] text-[#02066F] rounded-lg px-4 py-2 font-bold focus:outline-none "
                   bind:value={formData.date}
                   max={currentDate}
                 />
@@ -390,7 +392,7 @@
               <div class="mb-4">
                 <input 
                   type="time" 
-                  class="w-full border-2 border-blue-900 rounded-lg px-4 py-2 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  class="w-full border-2 border-[#02066F] text-[#02066F] rounded-lg px-4 py-2 font-bold focus:outline-none "
                   bind:value={formData.checkinTime}
                   on:change={() => formData.checkoutTime = ''}
                 />
@@ -402,7 +404,7 @@
               <div class="mb-6">
                 <input 
                   type="time" 
-                  class="w-full border-2 border-blue-900 rounded-lg px-4 py-2 font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                  class="w-full border-2 border-[#02066F] text-[#02066F] rounded-lg px-4 py-2 font-bold focus:outline-none"
                   bind:value={formData.checkoutTime}
                   disabled={!formData.checkinTime}
                 />

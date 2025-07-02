@@ -11,8 +11,6 @@
     // @ts-ignore
     let employees = [];
     let isLoading = true;
-    let showHomeModal = false;
-    let showLogoutModal = false;
     let searchTerm = '';
     let sortConfig = { key: 'name', direction: 'asc' };
 
@@ -216,22 +214,6 @@
         <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-sm overflow-hidden mb-8 border-1 border-gray-300">
             <div class="p-4 sm:p-6 overflow-x-auto">
            
-            <!-- <div class="flex space-x-2">
-                <button 
-                    on:click={() => showHomeModal = true}
-                    class="px-4 py-2 bg-white border border-blue-900 text-blue-900 rounded-lg hover:bg-blue-50 transition"
-                >
-                    Home
-                </button>
-                <button 
-                    on:click={() => showLogoutModal = true}
-                    class="px-4 py-2 bg-white border border-blue-900 text-blue-900 rounded-lg hover:bg-blue-50 transition"
-                >
-                    Logout
-                </button>
-            </div> -->
-        
-
         <!-- Employee Table -->
         <div class="overflow-hidden">
             {#if filteredEmployees.length === 0}

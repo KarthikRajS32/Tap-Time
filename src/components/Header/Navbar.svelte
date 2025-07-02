@@ -126,17 +126,17 @@ function handleLogout() {
 	style="background: rgba(0, 0, 0, 0.5)">
 	  <div class="bg-white rounded-lg w-auto max-w-md shadow-lg overflow-hidden">
 		<!-- Header -->
-		<div class="bg-[#02066F] text-white p-4 flex justify-between text-center items-center">
+		<div class="bg-[#02066F] text-white p-1 flex justify-between text-center items-center">
 		  <h2 class="text-xl font-semibold w-full text-center">Logout</h2>
 		  <button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2" on:click={close}>&times;</button>
 		</div>
   
 		<!-- Body -->
 		<div class="p-6 text-center">
-		  <h5 class="text-xl font-bold mb-4 text-black">Are you sure you want to logout?</h5>
+		  <h5 class="text-xl font-bold mb-4 text-gray-800">Are you sure you want to logout?</h5>
 		  <div class="flex justify-center space-x-2">
-			<button class="bg-[#02066F] text-white px-5 py-2 rounded-md cursor-pointer" on:click={handleLogout}>Yes</button>
-			<button class="bg-white text-black px-5 py-2 rounded-md cursor-pointer border-1 border-[#02066F]" on:click={close}>No</button>
+			<button class="bg-[#02066F] opacity-80 hover:opacity-70 text-white px-6 py-2 rounded-md cursor-pointer" on:click={handleLogout}>Yes</button>
+			<button class="bg-white text-black px-6 py-2 rounded-md cursor-pointer border-1 border-[#02066F]" on:click={close}>No</button>
 		  </div>
 		</div>
 	  </div>
@@ -212,20 +212,22 @@ function handleLogout() {
       <div class="fixed inset-0 flex items-center justify-center z-50"
 	  style="background: rgba(0, 0, 0, 0.5)">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-sm">
-          <div class="bg-[#02066F] text-white px-6 py-4 rounded-t-lg">
-            <h3 class="text-lg font-bold text-center">Home</h3>
+          <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center rounded-t-md text-center">
+            <h3 class="text-xl font-semibold text-center text-white pl-30">Home</h3>
+			<button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2"  on:click={() => showHomeModal = false}>
+				×</button>
           </div>
           <div class="p-6">
-            <p class="text-center font-bold mb-6">Are you sure you want to go home?</p>
+            <p class="text-center text-xl font-bold mb-6 text-gray-800">Are you sure you want to go home?</p>
             <div class="flex justify-center space-x-4">
               <button 
-                class="bg-[#02066F] text-white px-6 py-2 rounded font-bold cursor-pointer transition"
+                class="bg-[#02066F] opacity-80 hover:opacity-60 text-white px-6 py-2 rounded font-semibold cursor-pointer transition"
                 on:click={() => window.location.href = '/'}
               >
                 Yes
               </button>
               <button 
-                class="border border-[#02066F] text-[#02066F] px-6 py-2 rounded font-bold hover:bg-gray-100 cursor-pointer transition"
+                class="border border-[#02066F] text-[#02066F] px-6 py-2 rounded font-semibold hover:bg-gray-100 cursor-pointer transition"
                 on:click={() => showHomeModal = false}
               >
                 No

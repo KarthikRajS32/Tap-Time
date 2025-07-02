@@ -17,31 +17,9 @@
     if (storedLogo) {
       logoSrc = storedLogo;
     }
-
-    // Click outside sidebar handler
-    const handleClickOutside = (event: MouseEvent) => {
-      const sidebar = document.getElementById('sidebar');
-      const toggler = document.querySelector('.navbar-toggler');
-      
-      if (sidebar && toggler) {
-        const isClickInside = sidebar.contains(event.target as Node) || 
-                             toggler.contains(event.target as Node);
-        if (!isClickInside) {
-          sidebarOpen = false;
-        }
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
   });
 
-  function toggleSidebar() {
-    sidebarOpen = !sidebarOpen;
-  }
+  
 
   async function decrypt(encryptedDataWithIV: string, key: Uint8Array): Promise<string> {
     const buffer = new Uint8Array(atob(encryptedDataWithIV).split('').map(char => char.charCodeAt(0)));

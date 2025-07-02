@@ -292,13 +292,7 @@
         class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
       />
-      <!-- <input
-        type="text"
-        placeholder="Zip"
-        class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
-        required
-      /> -->
-
+      
       <input
       type="text"
       placeholder="Zip"

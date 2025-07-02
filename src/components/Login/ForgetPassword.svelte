@@ -49,7 +49,7 @@
   
     function verifyOtp() {
       if (otp === generatedOtp) {
-        window.location.href = 'updatePassword.html';
+        window.location.href = '/UpdatePassword';
       } else {
         otpError = 'Invalid OTP. Please try again.';
       }
@@ -58,7 +58,7 @@
   
  
   <div id="forgetPassword" class="flex flex-col md:flex-row min-h-screen ">
-    <div class="md:w-1/2 bg-blue-100 flex flex-col justify-center items-center p-8">
+    <div class="md:w-1/2 bg-blue-100 flex flex-col justify-center items-center p-6">
       <img src="/loginImage.png" alt="Login" class="xl:w-113 md:w-42 w-60 md:pt-56 xl:mb-26 mb-24 xl:pt-42 pt-52" />
       <h3 class="text-center xl:text-3xl md:text-2xl text-[22px] md:pt-0 xl:pt-0 font-semibold text-gray-800 pb-2">Optimize Your Workforce Efficiency</h3>
       <p class="text-center text-lg md:text-base xl:text-base text-[15px] pb-12 text-gray-900">Streamlined time tracking and management for a productive workplace.</p>
@@ -69,14 +69,20 @@
         <h2 class="text-center text-2xl xl:text-3xl md:text-3xl font-semibold mb-6 xl:mb-10 md:mb-8">Forget Password</h2>
         <div class="mb-4 xl:mb-4 md:mb-14 relative space-y-12 xl:space-y-0 md:space-y-0">
           <input id="email" type="email" bind:value={email} placeholder=" " required class="peer mt-1 block w-full px-3 py-3 md:px-4 border border-[#02066F] rounded-md shadow-sm focus:outline-none focus:ring-[#02066F] focus:border-[#02066F]" />
-          <label for="email" class=" text-sm text-[#02066F] 
-                  absolute left-4 top-2 bg-white px-1 transition-all
-                  peer-placeholder-shown:top-2
-                  peer-placeholder-shown:text-lg
-                  peer-placeholder-shown:text-[#02066F]
-                  peer-focus:top-[-10px]
-                  peer-focus:text-sm
-                  peer-focus:text-[#02066F]">Email</label>
+          <label for="email" 
+          class="absolute left-2 xs:left-3 top-2 xs:top-3 sm:top-4 px-1 bg-white text-[#02066F] transition-all duration-200
+                         text-xs xs:text-sm sm:text-base
+                         peer-placeholder-shown:text-[#02066F] 
+                         peer-placeholder-shown:top-2 xs:peer-placeholder-shown:top-3 sm:peer-placeholder-shown:top-4
+                         peer-placeholder-shown:text-xs xs:peer-placeholder-shown:text-sm sm:peer-placeholder-shown:text-base
+                         peer-focus:-top-2 xs:peer-focus:-top-3 sm:peer-focus:-top-3
+                         peer-focus:text-2xs xs:peer-focus:text-xs sm:peer-focus:text-sm
+                         peer-focus:text-[#02066F]
+                         peer-not-placeholder-shown:-top-2 xs:peer-not-placeholder-shown:-top-3 sm:peer-not-placeholder-shown:-top-3
+                         peer-not-placeholder-shown:text-2xs xs:peer-not-placeholder-shown:text-xs sm:peer-not-placeholder-shown:text-sm
+                         pointer-events-none">
+                         Email
+            </label>
           {#if errorMsg}
             <p class="text-red-500 text-base mt-1">{errorMsg}</p>
           {/if}

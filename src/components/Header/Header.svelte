@@ -19,6 +19,9 @@
     if (formatted.includes('forget') || formatted.includes('forgot')) {
         return 'Login';
     }
+    if (formatted.includes('updatepassword')) {
+        return 'Login';
+    }
     if (formatted.includes('register2')) {
         return 'Register';
         

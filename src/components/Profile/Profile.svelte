@@ -180,26 +180,16 @@
               </svg>
             </div>
           {/if}
-          {#if editMode}
-            <button
-              on:click={triggerFileUpload}
-              class="absolute top-1 bg-white p-1 rounded-full text-blue-900 hover:bg-gray-100"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+                    {#if editMode}
+            <div class="relative">
+              <!-- Assuming your logo is in a container with class "logo-container" -->
+              <button
+                on:click={triggerFileUpload}
+                class="absolute -bottom-1 left-2/3 transform -translate-x-1/2 bg-white px-2 py-1 rounded-full text-[#02066F] hover:bg-gray-100 border border-gray-200 shadow-sm"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                />
-              </svg>
-            </button>
+                <i class="fas fa-pencil-alt text-base"></i>
+              </button>
+            </div>
             <input
               id="fileInput"
               type="file"

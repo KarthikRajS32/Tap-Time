@@ -7,6 +7,7 @@
       name: string;
       phone: string;
       isAdmin: boolean;
+      
     };
   
     // Sample data
@@ -19,6 +20,7 @@
     let filteredEmployees: Employee[] = [];
     let admins: Employee[] = [];
     let searchTerm: string = '';
+    let searchTerms: string = '';
     let showEmployeeModal = false;
     let showAdminModal = false;
     let showDeleteModal = false;
@@ -43,6 +45,12 @@
       phone: ''
     };
   
+    function filterEmployees() {
+      filteredEmployees = employees.filter(emp => !emp.isAdmin);
+      admins = employees.filter(emp => emp.isAdmin);
+      adminCount = admins.length;
+    }
+
     onMount(() => {
       setTimeout(() => {
         filterEmployees();
@@ -50,11 +58,18 @@
       }, 1000);
     });
   
-    function filterEmployees() {
-      filteredEmployees = employees.filter(emp => !emp.isAdmin);
-      admins = employees.filter(emp => emp.isAdmin);
-      adminCount = admins.length;
-    }
+    function searchEmployees() {
+  if (!searchTerms) {
+    filterEmployees();
+    return;
+  }
+  filteredEmployees = employees.filter(emp =>
+    !emp.isAdmin &&
+    (emp.name.toLowerCase().includes(searchTerms.toLowerCase()) ||
+     emp.pin.includes(searchTerms) ||
+     emp.phone.includes(searchTerms))
+  );
+}
   
     function searchAdmins() {
       if (!searchTerm) {
@@ -241,8 +256,20 @@
 
     <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-400">
         <div class="p-4 sm:p-6 overflow-x-auto">
+          
+           <!-- Search Input Responsive -->
+        <div class="pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
+          <label for="employee-search" class="text-base font-semibold text-gray-800">Search:</label>
+          <input
+              id="employee-search"
+              type="text"
+              bind:value={searchTerms}
+              on:input={searchEmployees}
+              class="w-full sm:w-50 h-9 pl-2 border border-gray-500 rounded-md focus:outline-none focus:ring-1 focus:ring-black"
+          />
+      </div>
+          
           <table class="w-full border-separate border-spacing-0 divide-y divide-gray-200">
-                      
             <thead class="bg-[#02066F] text-white text-sm sm:text-base">
               <tr>
                 <th class="px-4 sm:px-6 py-3 text-left font-semibold tracking-wide">Pin</th>
@@ -301,24 +328,25 @@
           
           <!-- Search Input Responsive -->
           <div class="pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
-            <label for="search" class="text-sm font-medium text-gray-700">Search:</label>
+            <label for="search" class="text-base font-semibold text-gray-800">Search:</label>
             <input
               id="search"
               type="text"
               bind:value={searchTerm}
               on:input={searchAdmins}
-              class="w-full sm:w-64 h-9 pl-2 border border-gray-400 rounded-md focus:outline-none focus:ring-1 focus:ring-black"
+              class="w-full sm:w-50 h-9 pl-2 border border-gray-500 rounded-md focus:outline-none focus:ring-1 focus:ring-black"
             />
           </div>
       
           <!-- Responsive Table -->
-          <table class="min-w-full border-separate border-spacing-0 divide-y divide-gray-200 text-sm">
-            <thead class="bg-[#02066F] text-white">
+          <table class="w-full border-separate border-spacing-0 divide-y divide-gray-200">
+                        
+            <thead class="bg-[#02066F] text-white text-sm sm:text-base">
               <tr>
-                <th class="px-4 py-3 text-left font-semibold tracking-wide">Pin</th>
-                <th class="px-4 py-3 text-left font-semibold tracking-wide">Name</th>
-                <th class="px-4 py-3 text-left font-semibold tracking-wide">Phone Number</th>
-                <th class="px-4 py-3 text-left font-semibold tracking-wide">Action</th>
+                <th class="px-4 sm:px-6 py-3 text-left font-semibold tracking-wide">Pin</th>
+                <th class="px-4 sm:px-6 py-3 text-left font-semibold tracking-wide">Name</th>
+                <th class="px-4 sm:px-6 py-3 text-left font-semibold tracking-wide">Phone Number</th>
+                <th class="px-4 sm:px-6 py-3 text-left font-semibold tracking-wide">Action</th>
               </tr>
             </thead>
       
@@ -362,9 +390,9 @@
                 on:click|stopPropagation
                 transition:fade
             >
-                <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center text-center">
-                    <h3 class="text-xl font-semibold p-2 text-white">
-                        {isEditing ? 'Admin Details' : 'Employee Details'}
+                <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center rounded-t-md text-center">
+                    <h3 class="text-xl font-bold p-2 text-white">
+                        Employee Details
                     </h3>
                     <button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2"  on:click={() => showEmployeeModal = false}>
                       ×</button>
@@ -378,7 +406,7 @@
                                 type="text"
                                 placeholder="First Name"
                                 bind:value={formData.firstName}
-                                class={`w-full px-3 py-2 border-2 ${errors.firstName ? 'border-red-500' : 'border-[#02066F]'} font-bold rounded-md focus:outline-none `}
+                                class={`w-full px-3 py-2 border-2 ${errors.firstName ? 'border-red-500' : 'border-[#02066F]'} font-bold rounded-xl focus:outline-none `}
                             />
                             {#if errors.firstName}
                                 <p class="text-red-500 text-xs italic mt-1">{errors.firstName}</p>
@@ -391,7 +419,7 @@
                                 type="text"
                                 placeholder="Last Name"
                                 bind:value={formData.lastName}
-                                class={`w-full px-3 py-2 border-2 ${errors.lastName ? 'border-red-500' : 'border-[#02066F]'} font-bold rounded-md focus:outline-none`}
+                                class={`w-full px-3 py-2 border-2 ${errors.lastName ? 'border-red-500' : 'border-[#02066F]'} font-bold rounded-xl focus:outline-none`}
                             />
                             {#if errors.lastName}
                                 <p class="text-red-500 text-xs italic mt-1">{errors.lastName}</p>
@@ -406,7 +434,7 @@
                                 bind:value={formData.phone}
                                 on:input={handlePhoneInput}
                                 maxlength="14"
-                                class={`w-full px-3 py-2 border-2 ${errors.phone ? 'border-red-500' : 'border-[#02066F]'} font-bold rounded-md focus:outline-none`}
+                                class={`w-full px-3 py-2 border-2 ${errors.phone ? 'border-red-500' : 'border-[#02066F]'} font-bold rounded-xl focus:outline-none`}
                                 
                             />
                             {#if errors.phone}
@@ -420,7 +448,7 @@
                               type="text"
                               placeholder="Instructor Pin"
                               bind:value={formData.pin}
-                              class="w-full px-3 py-2 border-2 border-[#02066F] font-bold bg-gray-300 rounded-md focus:outline-none "
+                              class="w-full px-3 py-2 border-2 border-[#02066F] font-bold bg-gray-300 rounded-xl focus:outline-none "
                               readonly
                           />
                       </div>
@@ -451,9 +479,8 @@
                 on:click|stopPropagation
                 transition:fade
             >
-                <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center text-center">
-                    <h3 class="text-xl font-semibold p-2 text-white">
-                        <!-- {isEditing ? 'Admin Details' : 'Admin Details'} -->
+                <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center rounded-t-md text-center">
+                    <h3 class="text-xl font-bold p-2 text-white">
                         Admin Details
                     </h3>
                     <button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2"  on:click={() => showAdminModal = false}>
@@ -469,7 +496,7 @@
                                 type="text"
                                 placeholder="First Name"
                                 bind:value={formData.firstName}
-                                class={`w-full px-3 py-2 font-bold border-2 ${errors.firstName ? 'border-red-500' : 'border-[#02066F]'} rounded-md focus:outline-none `}
+                                class={`w-full px-3 py-2 font-bold border-2 ${errors.firstName ? 'border-red-500' : 'border-[#02066F]'} rounded-xl focus:outline-none `}
                             />
                             {#if errors.firstName}
                                 <p class="text-red-500 text-xs italic mt-1">{errors.firstName}</p>
@@ -482,7 +509,7 @@
                                 type="text"
                                 placeholder="Last Name"
                                 bind:value={formData.lastName}
-                                class={`w-full px-3 py-2 font-bold border-2 ${errors.lastName ? 'border-red-500' : 'border-[#02066F]'} rounded-md focus:outline-none`}
+                                class={`w-full px-3 py-2 font-bold border-2 ${errors.lastName ? 'border-red-500' : 'border-[#02066F]'} rounded-xl focus:outline-none`}
                             />
                             {#if errors.lastName}
                                 <p class="text-red-500 text-xs italic mt-1">{errors.lastName}</p>
@@ -496,7 +523,7 @@
                                 bind:value={formData.phone}
                                 on:input={handlePhoneInput}
                                 maxlength="14"
-                                class={`w-full px-3 py-2 font-bold border-2 ${errors.phone ? 'border-red-500' : 'border-[#02066F]'} rounded-md focus:outline-none`}
+                                class={`w-full px-3 py-2 font-bold border-2 ${errors.phone ? 'border-red-500' : 'border-[#02066F]'} rounded-xl focus:outline-none`}
                                 placeholder="Phone Number"
                             />
                             {#if errors.phone}
@@ -509,7 +536,7 @@
                               type="text"
                               placeholder="Instructor Pin"
                               bind:value={formData.pin}
-                              class="w-full px-3 py-2 font-bold border-2 border-[#02066F] rounded-md bg-gray-300 focus:outline-none"
+                              class="w-full px-3 py-2 font-bold border-2 border-[#02066F] rounded-xl bg-gray-300 focus:outline-none"
                               readonly
                           />
                       </div>
@@ -517,7 +544,7 @@
                             
                             <button
                                 type="submit"
-                                class="px-4 py-2 bg-[#02066F] text-white rounded-md cursor-pointer"
+                                class="px-4 py-2 bg-[#02066F] text-white rounded-md cursor-pointer hover:opacity-80"
                             >
                                 {isEditing ? 'Update' : 'Submit'}
                             </button>
@@ -546,33 +573,35 @@
                 on:click|stopPropagation
                 transition:fade
             >
-                <div class="bg-[#02066F] text-white p-4 rounded-t-lg">
-                    <h3 class="text-lg font-semibold text-center">Delete</h3>
+                <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center rounded-t-md text-center">
+                    <h3 class="text-xl font-bold text-center text-white p-2">Delete</h3>
+                    <button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2"  on:click={() => showDeleteModal = false}>
+                      ×</button>
                 </div>
-                <div class="p-6">
+                <div class="py-6 px-0">
                     {#if currentEmployee}
-                        <p class="text-center mb-6">
-                            Are you sure you want to remove this {currentEmployee.isAdmin ? 'admin' : 'employee'}?
+                        <p class="text-center text-gray-800 font-bold text-lg mb-6">
+                            Are you sure, you want to remove the {currentEmployee.isAdmin ? 'admin' : 'employee'}?
                         </p>
                     {:else}
-                        <p class="text-center mb-6">
-                            Are you sure you want to remove this employee?
+                        <p class="text-center font-bold mb-6">
+                            Are you sure, you want to remove the employee?
                         </p>
                     {/if}
                     <div class="flex justify-center space-x-4">
                         <button
                             type="button"
-                            on:click={() => showDeleteModal = false}
-                            class="px-4 py-2 border border-[#02066F] text-[#02066F] rounded-md hover:bg-gray-100 cursor-pointer"
+                            on:click={deleteEmployee}
+                            class="px-6 py-2 bg-[#02066F] opacity-80 hover:opacity-60 text-white rounded-md cursor-pointer"
                         >
-                            No
+                            Yes
                         </button>
                         <button
                             type="button"
-                            on:click={deleteEmployee}
-                            class="px-4 py-2 bg-[#02066F] text-white rounded-md hover:bg-blue-800 cursor-pointer"
+                            on:click={() => showDeleteModal = false}
+                            class="px-6 py-2 border border-[#02066F] text-[#02066F] rounded-md hover:bg-gray-100 cursor-pointer"
                         >
-                            Yes
+                            No
                         </button>
                     </div>
                 </div>

@@ -298,7 +298,7 @@
         style="background: rgba(0, 0, 0, 0.5)">
             <div class="bg-white rounded-md max-w-sm w-full shadow-xl">
                 <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center text-center">
-                    <h3 class="text-xl font-semibold p-2 text-white">Delete</h3>
+                    <h3 class="text-xl font-semibold p-2 text-white pl-30">Delete</h3>
                     <button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2"  on:click={() => showDeleteModal = false}>
                       ×</button>
                 </div>

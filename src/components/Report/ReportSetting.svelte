@@ -366,7 +366,7 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
     <!-- Main Content -->
     <div class="max-w-5xl mx-auto pt-25">
         <!-- Report Email Settings Section -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between md:justify-between mb-6">
+        <div class="flex flex-row md:flex-row md:items-center items-center justify-between md:justify-between mb-6">
             <h2 class="text-xl md:text-2xl xl:text-3xl font-bold mb-4 md:mb-0 text-gray-800">Report Settings</h2>
             <button 
                 on:click={openAddModal}
@@ -403,7 +403,7 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
                                         {formatFrequencies(setting)}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        <div class="flex space-x-2">
+                                        <div class="flex space-x-6">
                                             <button
                                                 on:click={() => openEditModal(
                                                     setting.CompanyReporterEmail,
@@ -411,20 +411,12 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
                                                 )}
                                                 class="text-[#02066F]"
                                             >
-                                                <!-- <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                </svg> -->
-                                                <!-- <button on:click={openViewEditModal} class="text-[#02066F]  hover:text-[#02066F]"> -->
-                                                    <i class="fas fa-pencil-alt cursor-pointer"></i>
-                                                  <!-- </button> -->
+                                                <i class="fas fa-pencil-alt cursor-pointer"></i>
                                             </button>
                                             <button
                                                 on:click={() => openDeleteModal(setting.CompanyReporterEmail)}
                                                 class="text-[#02066F]"
                                             >
-                                                <!-- <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg> -->
                                                 <i class="fas fa-trash cursor-pointer"></i>
                                             </button>
                                         </div>
@@ -704,14 +696,14 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
                     <div class="flex justify-center space-x-4">
                         <button
                             on:click={deleteReportSetting}
-                            class="px-6 py-2 bg-[#02066F] text-white rounded-lg transition-colors duration-200 hover:opacity-90 cursor-pointer"
+                            class="px-6 py-2 bg-[#02066F] opacity-80 hover:opacity-60 text-white rounded-lg transition-colors duration-200  cursor-pointer"
                             disabled={isLoading}
                         >
                             {isLoading ? 'Deleting...' : 'Yes'}
                         </button>
                         <button
                             on:click={() => showDeleteModal = false}
-                            class="px-6 py-2 border border-[#02066F] text-blue-900 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer duration-200"
+                            class="px-6 py-2 border border-[#02066F] text-[#02066F] rounded-lg hover:bg-gray-100 transition-colors cursor-pointer duration-200"
                         >
                             No
                         </button>
