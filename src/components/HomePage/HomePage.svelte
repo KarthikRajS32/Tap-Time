@@ -207,11 +207,12 @@
 
 
 <!-- Loading Overlay -->
-<!-- {#if showOverlay}
-<div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-10">
-  <div class="w-12 h-12 border-4 border-white border-t-blue-600 rounded-full animate-spin"></div>
-</div>
-{/if} -->
+{#if showOverlay}
+<div class="fixed inset-0 flex items-center justify-center z-50"
+            style="background: rgba(0, 0, 0, 0.5)">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-900"></div>
+            </div>
+{/if}
 
 <!-- Header -->
 <section class="max-w-7xl mx-auto px-4 pt-24 text-center">
@@ -335,11 +336,12 @@
       Submit
     </button>
   </form>
-  <!-- {#if showOverlay}
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white text-xl">
-    Processing...
-  </div>
-{/if} -->
+  {#if showOverlay}
+ <div class="fixed inset-0 flex items-center justify-center z-50"
+            style="background: rgba(0, 0, 0, 0.5)">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-900"></div>
+            </div>
+{/if}
 {#if show}
   <div
     class="fixed inset-0 flex items-center justify-center z-50 " 

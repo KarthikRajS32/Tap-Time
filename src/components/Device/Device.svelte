@@ -262,10 +262,10 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center">{device.DeviceName}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center">
                                         <button 
-                                            class="text-[#02066F]"
+                                            class="text-[#02066F] p-1 cursor-pointer"
                                             on:click={() => confirmDelete(device.AccessKey)}
                                         >
-                                            <i class="fas fa-trash cursor-pointer"></i>
+                                            <i class="fas fa-trash "></i>
                                         </button>
                                     </td>
                                 </tr>

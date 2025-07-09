@@ -272,11 +272,11 @@
             <table bind:this={tableElement} class="min-w-full border border-gray-300 text-sm">
               <thead class="bg-[#02066F] text-white">
                 <tr>
-                  <th class="text-base px-4 sm:px-6 py-3 text-left font-bold border-r">Employee ID</th>
-                  <th class="text-base px-4 sm:px-6 py-3 text-left font-bold border-r">Name</th>
-                  <th class="text-base px-4 sm:px-6 py-3 text-left font-bold border-r">Check-in Time</th>
-                  <th class="text-base px-4 sm:px-6 py-3 text-left font-bold border-r">Check-out Time</th>
-                  <th class="text-base px-4 sm:px-6 py-3 text-left font-bold border-r">Action</th>
+                  <th class="text-base px-4 sm:px-6 py-3 text-center font-bold border-r">Employee ID</th>
+                  <th class="text-base px-4 sm:px-6 py-3 text-center font-bold border-r">Name</th>
+                  <th class="text-base px-4 sm:px-6 py-3 text-center font-bold border-r">Check-in Time</th>
+                  <th class="text-base px-4 sm:px-6 py-3 text-center font-bold border-r">Check-out Time</th>
+                  <th class="text-base px-4 sm:px-6 py-3 text-center font-bold border-r">Action</th>
                 </tr>
               </thead>
       
@@ -350,9 +350,15 @@
                   bind:value={formData.employee}
                 >
                   <option value="">Select Employee</option>
-                  {#each Object.keys(employeeDetails) as employee}
+                  <!-- {#each Object.keys(employeeDetails) as employee}
                     <option value={employee}>{employee}</option>
-                  {/each}
+                  {/each} -->
+                  <option value="Arjava">Arjava</option>
+                  <option value="Mani">Mani</option>
+                  <option value="balaji">balaji</option>
+                  <option value="Test">Test</option>
+                  <option value="PITCHAIMANI">PITCHAIMANI</option>
+                  <option value="Balaji">Balaji</option>
                 </select>
                 {#if errors.employee}
                   <p class="text-red-500 text-sm mt-1 text-center">{errors.employee}</p>

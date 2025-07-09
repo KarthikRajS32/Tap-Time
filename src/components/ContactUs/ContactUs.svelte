@@ -266,23 +266,30 @@
   {#if showSuccessModal}
     <div class="fixed inset-0 flex items-center justify-center z-50"
     style="background: rgba(0, 0, 0, 0.5)">
-      <div class="bg-white rounded-lg shadow-xl max-w-sm w-full mx-4">
-        <div class="bg-blue-900 text-white py-4 px-6 rounded-t-lg text-center">
-          <h5 class="text-xl font-bold">Thank You for Contacting Us!</h5>
-        </div>
-        <div class="p-6 text-center">
-          <p class="font-bold mb-4">
-            We have received your message and will get back to you shortly.
-          </p>
-          <div class="flex justify-center">
-            <img 
-              src="https://www.shutterstock.com/image-vector/blue-check-mark-icon-tick-260nw-787016416.jpg" 
-              alt="Checkmark" 
-              class="w-24 h-24"
-            />
-          </div>
+    <div class="bg-white rounded-sm shadow-xl w-full max-w-sm sm:max-w-lg mx-auto my-6 sm:my-12">
+      <!-- Header -->
+      <div class="bg-[#02066F] text-white py-4 px-4 sm:px-6 rounded-t-sm text-center">
+        <h5 class="text-lg sm:text-xl font-semibold">
+          Thank You for Contacting Us!
+        </h5>
+      </div>
+    
+      <!-- Body -->
+      <div class="p-4 sm:p-6 text-center">
+        <p class="font-bold mb-4 text-base sm:text-xl">
+          We have received your message and will get back to you shortly.
+        </p>
+    
+        <!-- Image -->
+        <div class="flex justify-center">
+          <img 
+            src="https://www.shutterstock.com/image-vector/blue-check-mark-icon-tick-260nw-787016416.jpg" 
+            alt="Checkmark" 
+            class="w-20 h-20 sm:w-24 sm:h-24 object-contain"
+          />
         </div>
       </div>
+    </div>
     </div>
   {/if}
 </section>

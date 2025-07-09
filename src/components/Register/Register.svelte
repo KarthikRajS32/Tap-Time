@@ -151,11 +151,11 @@
           </div>
         {/if}
       
-        <form class="w-full pt-16 md:pt-24 ">
+        <form class="w-full pt-14 md:pt-12 ">
           <h2 class="text-center text-3xl xl:text-3xl md:text-2xl text-gray-800 font-semibold mb-4">Signup</h2>
       
           <!-- Horizontal line -->
-          <hr class="w-full rounded-full border-4 mb-6" style="border-color:  rgb(234,234,234);" />
+          <hr class="w-full h-4 bg-gray-200 rounded-full border-4 mb-6 border-gray-200"  />
 
       
           {#if totalError}
@@ -179,8 +179,9 @@
       
           <!-- Company Logo -->
           
-
+          <h1 class="text-[#02066F] text-md md:text-lg font-bold text-center mb-2">Company Logo</h1>
           <div class="border-2 border-[#02066F] rounded-lg mb-4 p-4 ">
+            
             <label
               for="companyLogo"
               class="inline-block font-bold xl:text-lg md:text-lg text-base py-1 px-2 border-2 rounded cursor-pointer transition " style="border-color:  rgb(234,234,234); background-color: #f0f0f0; border: 1px solid gray ;">

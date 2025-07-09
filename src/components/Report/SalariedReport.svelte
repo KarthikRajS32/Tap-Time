@@ -231,50 +231,56 @@
                   class="w-full sm:w-64 h-9 pl-2 border border-gray-400 rounded-md focus:outline-none focus:ring-1 focus:ring-black"
                 />
               </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-blue-900 text-white">
-                            <tr>
-                                <th 
-                                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
-                                    on:click={() => requestSort('name')}
-                                >
-                                    Name
-                                    {#if sortConfig.key === 'name'}
-                                        <span class="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                                    {/if}
-                                </th>
-                                <th 
-                                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
-                                    on:click={() => requestSort('pin')}
-                                >
-                                    Pin
-                                    {#if sortConfig.key === 'pin'}
-                                        <span class="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                                    {/if}
-                                </th>
-                                <th 
-                                    class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider cursor-pointer"
-                                    on:click={() => requestSort('hoursWorked')}
-                                >
-                                   Total Worked Hours (HH:MM)
-                                    {#if sortConfig.key === 'hoursWorked'}
-                                        <span class="ml-1">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                                    {/if}
-                                </th>
+              <div class="overflow-x-auto w-full max-w-full sm:rounded-lg">
+                <table class="min-w-[600px] sm:min-w-full border border-gray-300 text-sm">
+                    <thead class="bg-[#02066F] text-white">
+                        <tr>
+                            <th 
+                                class="px-6 py-3 text-center text-base font-bold tracking-wider cursor-pointer border-r" 
+                                on:click={() => requestSort('name')}
+                            >
+                                Name
+                                {#if sortConfig.key === 'name'}
+                                    <span class="ml-6 text-lg">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                                {:else}
+                                    <span class="ml-6 text-lg">↑↓</span>
+                                {/if}
+                            </th>
+                            <th 
+                                class="px-6 py-3 text-center text-base font-bold tracking-wider cursor-pointer border-r"
+                                on:click={() => requestSort('pin')}
+                            >
+                                Pin
+                                {#if sortConfig.key === 'pin'}
+                                    <span class="ml-1 text-lg">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                                {:else}
+                                   <span class="ml-6 text-lg">↑↓</span>
+                                {/if}
+                            </th>
+                            <th 
+                                class="px-6 py-3 text-center text-base font-bold tracking-wider cursor-pointer border-r"
+                                on:click={() => requestSort('hoursWorked')}
+                            >
+                               Total Worked Hours (HH:MM)
+                                {#if sortConfig.key === 'hoursWorked'}
+                                    <span class="ml-1 text-lg">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                                {:else}
+                                   <span class="ml-6 text-lg">↑↓</span>
+                                {/if}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {#each filteredEmployees as employee}
+                            <tr class="hover:bg-gray-50 text-center">
+                                <td class="px-6 py-3 whitespace-nowrap text-sm font-semibold text-gray-900 border-gray-300 border-r">{employee.name}</td>
+                                <td class="px-6 py-3 whitespace-nowrap text-sm font-semibold text-gray-900 border-gray-300 border-r">{employee.pin}</td>
+                                <td class="px-6 py-3 whitespace-nowrap text-sm font-semibold text-gray-900 border-gray-300 border-r">{employee.hoursWorked}</td>
                             </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            {#each filteredEmployees as employee}
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{employee.name}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{employee.pin}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{employee.hoursWorked}</td>
-                                </tr>
-                            {/each}
-                        </tbody>
-                    </table>
-                </div>
+                        {/each}
+                    </tbody>
+                </table>
+            </div>
             {/if}
         </div>
         </div>

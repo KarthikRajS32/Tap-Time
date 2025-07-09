@@ -10,19 +10,19 @@
     
     // Form data structure
     let formData = {
-      companyName: 'Icode Samm',
-      username: 'Icodesamm',
-      companyStreet: '215678',
-      companyCity: 'Sammamiah',
-      companyState: 'US',
-      companyZip: '98074',
-      firstName: 'Test',
-      lastName: 'User',
-      customerStreet: 'xyz',
-      customerCity: 'xyz',
-      customerState: 'xyz',
-      customerZip: '90874',
-      email: 'test@gmail.com',
+      companyName: 'Arjava Technologies Pvt Ltd',
+      username: 'testusersecond',
+      companyStreet: '215th',
+      companyCity: '',
+      companyState: '',
+      companyZip: '',
+      firstName: 'Arjava',
+      lastName: 'Technologies',
+      customerStreet: 'Arjava Tech India (Pvt) Limited',
+      customerCity: 'Selaiyur',
+      customerState: 'TamilNadu',
+      customerZip: '600073',
+      email: 'mani@arjavatech.com',
       phone: '',
       logo: ''
     };
@@ -161,7 +161,7 @@
       <div class="flex justify-center mb-8">
         <div class=" rounded-full border-2 border-[#02066F] overflow-hidden">
           {#if formData.logo}
-            <img src={formData.logo} alt="Company Logo" class="w-full h-full object-cover rounded-full" />
+            <img src={formData.logo} alt="Company Logo" class="w-30 h-30 object-cover rounded-full" />
           {:else}
             <div class="w-full h-full p-6 bg-gray-300 flex items-center justify-center rounded-full">
               <svg
@@ -187,7 +187,7 @@
                 on:click={triggerFileUpload}
                 class="absolute -bottom-1 left-2/3 transform -translate-x-1/2 bg-white px-2 py-1 rounded-full text-[#02066F] hover:bg-gray-100 border border-gray-200 shadow-sm"
               >
-                <i class="fas fa-pencil-alt text-base"></i>
+                <i class="fas fa-pencil-alt text-base cursor-pointer"></i>
               </button>
             </div>
             <input

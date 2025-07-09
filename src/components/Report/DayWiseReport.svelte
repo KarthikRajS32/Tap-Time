@@ -258,19 +258,19 @@
                             {:else}
                                 {#each paginatedData() as item (item.Pin)}
                                     <tr class="hover:bg-gray-50">
-                                        <td class="px-4 py-4 text-center text-sm text-gray-700">
+                                        <td class="px-4 py-3 text-center text-sm text-gray-700 border-gray-300 border-r">
                                             {item.Name.split(" ")[0]}
                                         </td>
-                                        <td class="px-4 py-4 text-center text-sm text-gray-700">
+                                        <td class="px-4 py-3 text-center text-sm text-gray-700 border-gray-300 border-r">
                                             {item.Pin}
                                         </td>
-                                        <td class="px-4 py-4 text-center text-sm text-gray-700">
+                                        <td class="px-4 py-3 text-center text-sm text-gray-700 border-gray-300 border-r">
                                             {item.formattedCheckIn}
                                         </td>
-                                        <td class="px-4 py-4 text-center text-sm text-gray-700">
+                                        <td class="px-4 py-3 text-center text-sm text-gray-700 border-gray-300 border-r">
                                             {item.formattedCheckOut}
                                         </td>
-                                        <td class="px-4 py-4 text-center text-sm text-gray-700">
+                                        <td class="px-4 py-3 text-center text-sm text-gray-700 border-gray-300 border-r">
                                             {item.timeWorked}
                                         </td>
                                     </tr>
