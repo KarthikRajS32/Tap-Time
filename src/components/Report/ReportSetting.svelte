@@ -381,9 +381,10 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
                 <table class="w-full divide-y divide-gray-200">
                     <thead class="">
                         <tr>
-                            <th class="px-6 py-3 text-left text-base font-medium tracking-wider">Email</th>
-                            <th class="px-6 py-3 text-left text-base font-medium tracking-wider">Frequency</th>
-                            <th class="px-6 py-3 text-left text-base font-medium tracking-wider">Action</th>
+                            <th class="px-6 py-3 text-center text-base font-bold tracking-wider">Email</th>
+                                      
+                            <th class="px-6 py-3 text-center text-base font-bold tracking-wider">Frequency</th>
+                            <th class="px-6 py-3 text-center text-base font-bold tracking-wider">Action</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -395,15 +396,16 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
                             </tr>
                         {:else}
                             {#each emailSettings as setting}
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <tr class=" text-center">
+                                    <td class="px-6 py-3 whitespace-nowrap text-sm font-semibold text-gray-900">
+                                               
                                         {setting.CompanyReporterEmail}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <td class="px-6 py-3 whitespace-nowrap text-sm font-semibold text-gray-900">
                                         {formatFrequencies(setting)}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        <div class="flex space-x-6">
+                                    <td class="px-6 py-3 whitespace-nowrap text-sm font-semibold text-gray-900">
+                                        <div class="flex justify-center space-x-6">
                                             <button
                                                 on:click={() => openEditModal(
                                                     setting.CompanyReporterEmail,
@@ -439,16 +441,16 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
                 <table class="w-full divide-y divide-gray-200">
                     <thead class="">
                         <tr>
-                            <th class="px-6 py-3 text-left text-base font-medium tracking-wider">Frequency</th>
-                            <th class="px-6 py-3 text-left text-base font-medium tracking-wider">Action</th>
+                            <th class="px-6 py-3 text-center text-base font-bold tracking-wider">Frequency</th>
+                            <th class="px-6 py-3 text-center text-base font-bold tracking-wider">Action</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <tr class="text-center">
+                            <td class="px-6 py-3 whitespace-nowrap text-sm font-semibold text-gray-900">
                                 {viewSetting}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-base text-gray-900">
+                            <td class="px-6 py-3 whitespace-nowrap text-sm font-semibold text-gray-900">
                                 <button on:click={openViewEditModal} class="text-[#02066F]  hover:text-[#02066F]">
                                     <i class="fas fa-pencil-alt cursor-pointer"></i>
                                   </button>
@@ -468,9 +470,10 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
         class="fixed inset-0 flex items-center justify-center z-50 p-4"
         style="background: rgba(0, 0, 0, 0.5)"
     >
-        <div class="bg-white rounded-md max-w-sm w-full shadow-xl">
-            <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center text-center">
-                <h3 class="text-2xl font-semibold p-2 text-white">Report Details</h3>
+        <div class="bg-white rounded-lg w-full max-w-sm mx-4 shadow-xl">
+            <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center rounded-t-md text-center">
+                <h3 class="text-xl font-bold text-white">Report Details</h3>
+                           
                 <button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2" on:click={closeAddModal}> ×</button>        
             </div>
             <div class="p-6 text-center">
@@ -527,7 +530,8 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
                 <!-- Save Button -->
                 <button
                     on:click={saveReportSettings}
-                    class="w-30 py-3 bg-[#02066F] cursor-pointer text-white rounded-lg text-center justify-center items-center hover:opacity-90"
+                    class=" px-6 py-2 bg-[#02066F] text-white rounded-lg hover:bg-[#02066F]/80 transition-colors cursor-pointer"
+                          
                     disabled={!newEmail || newFrequencies.length === 0}
                 >
                     Save
@@ -544,8 +548,8 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
             class="fixed inset-0 flex items-center justify-center z-50 p-4"
             style="background: rgba(0, 0, 0, 0.5)"
         >
-            <div class="bg-white rounded-md max-w-sm w-full shadow-xl">
-                <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center text-center">
+            <div class="bg-white rounded-lg w-full max-w-sm mx-4 shadow-xl">
+                <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center rounded-t-md text-center">
                     <h3 class="text-2xl font-semibold p-2 text-white">Report Details</h3>
                     <button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2"  on:click={() => showEditModal = false}>
                          ×</button>        
@@ -570,29 +574,29 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
                         <!-- <label class="block text-sm font-medium text-gray-700 mb-1">Frequency</label> -->
                         <div class="space-y-2">
                             <div
-    class="border border-gray-300 rounded-md px-4 py-2 cursor-pointer bg-white"
-    on:click={toggleDropdown}
-  >
-    {displayValue}
-  </div>
+                            class="border border-gray-300 rounded-md px-4 py-2 cursor-pointer bg-white"
+                            on:click={toggleDropdown}
+                        >
+                            {displayValue}
+                        </div>
 
-  <!-- Dropdown options -->
-  {#if showDropdown}
-    <div class="dropdown">
-      {#each frequencies as freq}
-        <label class="flex items-center px-4 py-2 hover:bg-gray-100">
-          <input
-            type="checkbox"
-            value={freq}
-            checked={selectedFrequencies.includes(freq)}
-            on:change={() => toggleFrequency(freq)}
-            class="mr-2"
-          />
-          {freq}
-        </label>
-      {/each}
-    </div>
-  {/if}
+                            <!-- Dropdown options -->
+                            {#if showDropdown}
+                                <div class="dropdown">
+                                {#each frequencies as freq}
+                                    <label class="flex items-center px-4 py-2 hover:bg-gray-100">
+                                    <input
+                                        type="checkbox"
+                                        value={freq}
+                                        checked={selectedFrequencies.includes(freq)}
+                                        on:change={() => toggleFrequency(freq)}
+                                        class="mr-2"
+                                    />
+                                    {freq}
+                                    </label>
+                                {/each}
+                                </div>
+                            {/if}
 
                         </div>
                         {#if frequencyError}
@@ -602,7 +606,7 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
                     
                     <button
                     on:click={updateReportSettings}
-                    class="w-30 py-3 bg-[#02066F] cursor-pointer text-white rounded-lg text-center justify-center items-center hover:opacity-90"
+                    class="px-6 py-2 bg-[#02066F] text-white rounded-lg hover:bg-[#02066F]/80 transition-colors cursor-pointer"
                     disabled={!newEmail || newFrequencies.length === 0}
                 >
                     Save
@@ -634,8 +638,8 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
             class="fixed inset-0  flex items-center justify-center z-50 p-4"
             style="background: rgba(0, 0, 0, 0.5)"
         >
-            <div class="bg-white rounded-xl max-w-xs w-full shadow-xl">
-                <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center text-center">
+            <div class="bg-white rounded-lg w-full max-w-sm mx-4 shadow-xl">
+                <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center rounded-t-md text-center">
                     <h3 class="text-2xl font-semibold p-2 text-white">Report Details</h3>
                     <button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2" on:click={()=> showViewEditModal = false}> ×</button>        
                 </div>
@@ -646,7 +650,7 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
                         <select
                           id="frequency"
                           bind:value={viewSetting}
-                          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none "
+                          class="w-full border border-gray-300 rounded-lg px-4 py-2 cursor-pointer focus:outline-none "
                         >
                           <!-- <option value="">-- Select Frequency --</option> -->
                           <option value="Weekly">Weekly</option>
@@ -682,28 +686,28 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
             class="fixed inset-0  flex items-center justify-center z-50 p-4"
             style="background: rgba(0, 0, 0, 0.5)"
         >
-            <div class="bg-white rounded-xl max-w-md w-full shadow-xl">
+            <div class="bg-white rounded-lg w-full max-w-md mx-4">
 
-                <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center text-center">
-                    <h3 class="text-2xl font-semibold p-2 text-white">Delete</h3>
+                <div class="flex w-full bg-[#02066F] justify-between p-2 pl-4 pr-4 items-center rounded-t-md text-center">
+                    <h3 class="text-xl font-bold text-center text-white p-2 justify-center">Delete</h3>
                     <button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2" on:click={()=> showDeleteModal = false}> ×</button>
                 </div>
 
                 
                 <div class="p-4">
-                    <p class="text-center text-lg font-bold mb-6 text-gray-800">Are you sure, you want to remove the employee?</p>
+                    <p class="text-center text-gray-800 font-bold text-lg mb-6">Are you sure, you want to remove the employee?</p>
                     
                     <div class="flex justify-center space-x-4">
                         <button
                             on:click={deleteReportSetting}
-                            class="px-6 py-2 bg-[#02066F] opacity-80 hover:opacity-60 text-white rounded-lg transition-colors duration-200  cursor-pointer"
+                            class="px-6 py-2 bg-[#02066F] opacity-80 hover:opacity-60 text-white rounded-md cursor-pointer"
                             disabled={isLoading}
                         >
-                            {isLoading ? 'Deleting...' : 'Yes'}
+                            Yes
                         </button>
                         <button
                             on:click={() => showDeleteModal = false}
-                            class="px-6 py-2 border border-[#02066F] text-[#02066F] rounded-lg hover:bg-gray-100 transition-colors cursor-pointer duration-200"
+                            class="px-6 py-2 border border-[#02066F] text-[#02066F] rounded-md cursor-pointer"
                         >
                             No
                         </button>

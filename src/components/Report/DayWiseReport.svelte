@@ -453,9 +453,9 @@
                                                 on:click={() => currentPage = i + 1}
                                                 class={`px-3 py-1 border text-sm font-medium ${
                                                     currentPage === i + 1
-                                                        ? 'bg-gray-200 border-[#02066F] text-whit'
+                                                        ? 'bg-gray-200 border-[#02066F]'
                                                         : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                                                } rounded-md`}
+                                                } rounded-sm`}
                                             > 
                                                 {i + 1}
                                             </button>
