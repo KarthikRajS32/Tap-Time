@@ -226,6 +226,13 @@
 
 
   <div class="pt-16 md:pt-18 sm:pt-2">
+
+    {#if isLoading}
+        <div class="fixed inset-0 flex items-center justify-center z-50"    
+        style="background: rgba(0, 0, 0, 0.5)">
+        <div class="animate-spin w-12 h-12 border-t-4 border-b-4 border-[#02066F] rounded-full"></div>
+        </div>
+    {/if}
    
   
     <!-- Navigation -->

@@ -363,6 +363,14 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
 
 <div class="min-h-screen bg-gray-100 p-4 md:p-8">
 
+
+    {#if isLoading}
+        <div class="fixed inset-0 flex items-center justify-center z-50"    
+        style="background: rgba(0, 0, 0, 0.5)">
+        <div class="animate-spin w-12 h-12 border-t-4 border-b-4 border-[#02066F] rounded-full"></div>
+        </div>
+    {/if}
+
     <!-- Main Content -->
     <div class="max-w-5xl mx-auto pt-25">
         <!-- Report Email Settings Section -->
@@ -650,7 +658,7 @@ $: displayValue = selectedFrequencies.join(', ') || [...currentFrequencies];
                         <select
                           id="frequency"
                           bind:value={viewSetting}
-                          class="w-full border border-gray-300 rounded-lg px-4 py-2 cursor-pointer focus:outline-none "
+                          class="w-full bg-gray-100 rounded-md px-4 py-2 cursor-pointer focus:outline-none"
                         >
                           <!-- <option value="">-- Select Frequency --</option> -->
                           <option value="Weekly">Weekly</option>

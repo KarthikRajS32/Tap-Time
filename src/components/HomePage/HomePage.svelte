@@ -109,6 +109,7 @@
                                messageInput.value.trim() !== '';
 
     if (isFirstNameValid && isLastNameValid && isZipValid && isPhoneValid && isRequiredFieldsValid) {
+      
       showOverlay = true;
 
       const userData = {
@@ -142,6 +143,9 @@
           form.reset();
           phone = "";
           zip = "";
+          setTimeout(() => {
+            show = false;
+          }, 5000);
         }
       } catch (error) {
         form.reset();
@@ -210,7 +214,7 @@
 {#if showOverlay}
 <div class="fixed inset-0 flex items-center justify-center z-50"
             style="background: rgba(0, 0, 0, 0.5)">
-                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-900"></div>
+                <div class="animate-spin w-12 h-12 border-t-4 border-b-4 border-[#02066F] rounded-full"></div>
             </div>
 {/if}
 

@@ -8,6 +8,7 @@
   let cemail = '';
   let question = '';
   let phoneNumber = '';
+  let showOverlay = false;
   
   // Error messages
   let errorName = '';
@@ -107,14 +108,16 @@
     const isRequiredFieldsValid = cname.trim() !== '' && cemail.trim() !== '' && question.trim() !== '';
     
     if (isNameValid && isEmailValid && isValidMessage && isPhoneNumberValid && isRequiredFieldsValid) {
+      showOverlay = true;
       try {
         await callContactUsCreateAPiData();
         showSuccessModal = true;
         
         // Hide modal after 2 seconds
         setTimeout(() => {
+          showOverlay=false;
           showSuccessModal = false;
-        }, 2000);
+        }, 5000);
       } catch (error) {
         console.error('Form submission failed:', error);
       }
@@ -168,6 +171,15 @@
     phoneNumber = '';
   };
 </script>
+
+<!-- Loading Overlay -->
+{#if showOverlay}
+<div class="fixed inset-0 flex items-center justify-center z-50"
+            style="background: rgba(0, 0, 0, 0.5)">
+                <div class="animate-spin w-12 h-12 border-t-4 border-b-4 border-[#02066F] rounded-full"></div>
+            </div>
+{/if}
+
 
 <section class="min-h-full bg-gray-100 px-6 pt-28 pb-12">
   <div class="max-w-md mx-auto bg-gray-50 rounded-lg shadow-xl  overflow-hidden p-6 px-10">
