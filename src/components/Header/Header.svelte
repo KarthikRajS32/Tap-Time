@@ -114,7 +114,9 @@
                     <li>
                         <button
                             class="w-full block text-left px-4 py-2 rounded transition-all duration-200 hover:decoration-2 focus:decoration-2
-                                {activePage === page ? 'text-white decoration-2 font-semibold' : 'text-white'}"
+                                {activePage === page ? 
+                              'text-white underline decoration-white font-semibold decoration-2 underline-offset-6' 
+                            : 'text-white hover:underline hover:decoration-white hover:underline-offset-4'}"
                             on:click={() => {
                                 navigate(page);
                                 mobileMenuOpen = false;

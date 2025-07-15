@@ -350,19 +350,28 @@
   >
     <div
       id="modal-content"
-      class="bg-white rounded-lg shadow-lg max-w-lg w-full py-6  text-center"
+      class="bg-white rounded-sm shadow-xl w-full max-w-sm sm:max-w-lg mx-auto my-6 sm:my-12"
     >
-      <h2 class="text-xl text-gray-800 font-semibold mb-4">Thank You for Contacting Us!</h2> 
-      <hr class="text-gray-400 w-full mx-auto mb-6">
-      <p class="text-gray-800 font-semibold text-xl mb-6">
-        We have received your message and will get back to you shortly.
-      </p>
-      <div class="flex justify-center">
-        <img
-          src="https://www.shutterstock.com/image-vector/blue-check-mark-icon-tick-260nw-787016416.jpg"
-          alt="Checkmark"
-          class="w-24 h-24 object-contain"
-        />
+      <!-- <h2 class="text-xl text-gray-800 font-semibold mb-4">Thank You for Contacting Us!</h2>  -->
+      <div class="bg-[#02066F] text-white py-4 px-4 sm:px-6 rounded-t-sm text-center">
+        <h5 class="text-lg sm:text-xl font-semibold">
+          Thank You for Contacting Us!
+        </h5>
+      </div>
+      <!-- <hr class="text-gray-400 w-full mx-auto mb-6"> -->
+      <div class="p-4 sm:p-6 text-center">
+        <p class="font-bold mb-4 text-base sm:text-xl">
+          We have received your message and will get back to you shortly.
+        </p>
+    
+        <!-- Image -->
+        <div class="flex justify-center">
+          <img 
+            src="https://www.shutterstock.com/image-vector/blue-check-mark-icon-tick-260nw-787016416.jpg" 
+            alt="Checkmark" 
+            class="w-20 h-20 sm:w-24 sm:h-24 object-contain"
+          />
+        </div>
       </div>
     </div>
   </div>
