@@ -70,7 +70,7 @@
   function initializeGoogleSignIn() {
     try {
       google.accounts.id.initialize({
-        client_id: "635549429166-i4k431ifttdt7hfumvl0mtjlf10v28t6.apps.googleusercontent.com",
+        client_id: "1070255023214-gc25jf1quuc0bgu7vut9e2g4nghlhtbs.apps.googleusercontent.com",
         callback: handleCredentialResponse,
         auto_select: true,
       });

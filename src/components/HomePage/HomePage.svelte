@@ -91,6 +91,7 @@
     event.preventDefault();
     const form = event.target as HTMLFormElement;
 
+    
     // Validate all fields
     const isFirstNameValid = validateName(firstNameInput.value, true);
     const isLastNameValid = validateName(lastNameInput.value, false);
@@ -340,12 +341,7 @@
       Submit
     </button>
   </form>
-  {#if showOverlay}
- <div class="fixed inset-0 flex items-center justify-center z-50"
-            style="background: rgba(0, 0, 0, 0.5)">
-                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-900"></div>
-            </div>
-{/if}
+
 {#if show}
   <div
     class="fixed inset-0 flex items-center justify-center z-50 " 
