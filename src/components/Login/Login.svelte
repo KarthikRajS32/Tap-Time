@@ -231,6 +231,7 @@
         return;
       }
 
+      
       const decryptedPwd = await decrypt(data.Password, key1);
 
       const isAuthenticated =
@@ -251,6 +252,8 @@
       localStorage.setItem('password', data.Password);
       localStorage.setItem('reportType', data.ReportType);
 
+      window.location.href = '/employeelist';
+
       if (data.CLogo) {
         logoSrc = data.CLogo;
       }
@@ -260,7 +263,7 @@
         getTimeZone(data.CID)
       ]);
 
-      window.location.href = '/employeelist';
+      // window.location.href = '/employeelist';
     } catch (err) {
       console.error("Login error:", err);
       errorMsg = 'An error occurred during login';

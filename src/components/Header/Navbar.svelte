@@ -195,12 +195,70 @@ function handleLogout() {
 		</div>
 
 		<nav class="space-y-3 text-[#02066F] font-medium p-10 pt-0">
-			<a href="/device" class="block px-2 py-1 text-white rounded sm:text-xs">Device</a>
-			<a href="/employeelist" class="block px-2 py-1 text-white rounded sm:text-xs">Employee Management</a>
-			<a href="/reportsummary" class="block px-2 py-1 text-white rounded sm:text-xs">Report Summary</a>
-			<a href="/reportsetting" class="block px-2 py-1 text-white rounded sm:text-xs">Report Settings</a>
-			<a href="/profile" class="block px-2 py-1 text-white rounded sm:text-xs">Profile</a>
-			<a href="/contact" class="block px-2 py-1 text-white rounded sm:text-xs">Contact Us</a>
+			<a href="/device" 
+				class={isActive('/device') 
+					? 'block px-2 py-1 text-white rounded text-sm underline decoration-white decoration-2 underline-offset-6 underline-offset-4' 
+					: 'block px-2 py-1 text-white rounded text-sm hover:underline hover:decoration-white hover:underline-offset-4'}
+					
+			>
+				Device
+			</a>
+			
+			<a href="/employeelist" 
+				class={isActive('/employeelist') 
+					? 'block px-2 py-1 text-white rounded text-sm underline decoration-white decoration-2 underline-offset-6 underline-offset-4' 
+					: 'block px-2 py-1 text-white rounded text-sm hover:underline hover:decoration-white hover:underline-offset-4'}
+			>
+				Employee Management
+			</a>
+			
+			<!-- Report Dropdown Section -->
+			<div class="relative">
+				<button
+					class={isActive('/reportsummary') || isActive('/daywisereport') || isActive('/salariedreport') || isActive('/reportsetting')
+						? 'w-full text-left px-2 py-1 text-white rounded font-medium text-sm underline decoration-white decoration-2 underline-offset-6 underline-offset-4'
+						: 'w-full text-left px-2 py-1 text-white rounded font-medium text-sm hover:underline hover:decoration-white hover:underline-offset-4'}
+					on:click={toggleDropdown}
+				>
+					Report
+				</button>
+				
+				{#if dropdownOpen}
+					<div class="pl-4 space-y-1 mt-1">
+						<a href="/reportsummary" 
+							class={isActive('/reportsummary') 
+								? 'block px-2 py-1 text-white rounded text-sm underline decoration-white decoration-2 underline-offset-6 underline-offset-4' 
+								: 'block px-2 py-1 text-white rounded text-sm hover:underline hover:decoration-white hover:underline-offset-4'}
+						>
+							Report Summary
+						</a>
+						<a href="/reportsetting" 
+							class={isActive('/reportsetting') 
+								? 'block px-2 py-1 text-white rounded text-sm underline decoration-white decoration-2 underline-offset-6 underline-offset-4' 
+								: 'block px-2 py-1 text-white rounded text-sm hover:underline hover:decoration-white hover:underline-offset-4'}
+						>
+							Report Settings
+						</a>
+					</div>
+				{/if}
+			</div>
+			
+			<a href="/profile" 
+				class={isActive('/profile') 
+					? 'block px-2 py-1 text-white rounded text-sm underline decoration-white decoration-2 underline-offset-6 underline-offset-4' 
+					: 'block px-2 py-1 text-white rounded text-sm hover:underline hover:decoration-white hover:underline-offset-4'}
+			>
+				Profile
+			</a>
+			
+			<a href="/contact" 
+				class={isActive('/contact') 
+					? 'block px-2 py-1 text-white rounded text-sm underline decoration-white decoration-2 underline-offset-6 underline-offset-4' 
+					: 'block px-2 py-1 text-white rounded text-sm hover:underline hover:decoration-white hover:underline-offset-4'}
+			>
+				Contact Us
+			</a>
+			
 			<button class="w-25 mt-4 px-4 py-2 bg-white rounded text-center items-center justify-center" on:click={logOutAction}>
 				Logout
 			</button>
