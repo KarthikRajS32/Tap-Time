@@ -68,13 +68,11 @@
   }
 
   function initializeGoogleSignIn() {
-     const isProduction = import.meta.env.PROD;
     try {
       google.accounts.id.initialize({
         client_id: "1070255023214-gc25jf1quuc0bgu7vut9e2g4nghlhtbs.apps.googleusercontent.com",
         callback: handleCredentialResponse,
         auto_select: true,
-        ux_mode: isProduction ? 'redirect' : 'popup'
       });
 
       // Render the button with customized appearance
