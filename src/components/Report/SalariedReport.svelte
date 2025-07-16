@@ -361,34 +361,40 @@
                                             class="px-6 py-3 text-center text-base font-bold tracking-wider cursor-pointer border-r" 
                                             on:click={() => requestSort('name')}
                                         >
+                                        <div class="flex items-center justify-center">
                                             Name
                                             {#if sortConfig.key === 'name'}
                                                 <span class="ml-6 text-lg">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
                                             {:else}
                                                 <span class="ml-6 text-lg">↑↓</span>
                                             {/if}
+                                            </div>
                                         </th>
                                         <th 
                                             class="px-6 py-3 text-center text-base font-bold tracking-wider cursor-pointer border-r"
                                             on:click={() => requestSort('pin')}
                                         >
+                                         <div class="flex items-center justify-center">
                                             Pin
                                             {#if sortConfig.key === 'pin'}
                                                 <span class="ml-1 text-lg">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
                                             {:else}
                                                <span class="ml-6 text-lg">↑↓</span>
                                             {/if}
+                                            </div>
                                         </th>
                                         <th 
                                             class="px-6 py-3 text-center text-base font-bold tracking-wider cursor-pointer border-r"
                                             on:click={() => requestSort('hoursWorked')}
                                         >
+                                        <div class="flex items-center justify-center">
                                            Total Worked Hours (HH:MM)
                                             {#if sortConfig.key === 'hoursWorked'}
                                                 <span class="ml-1 text-lg">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
                                             {:else}
                                                <span class="ml-6 text-lg">↑↓</span>
                                             {/if}
+                                            </div>
                                         </th>
                                     </tr>
                                 </thead>
