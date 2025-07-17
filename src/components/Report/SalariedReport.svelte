@@ -252,6 +252,269 @@
         a.click();
         window.URL.revokeObjectURL(url);
     }
+
+
+
+    // Types
+    type Employee = {
+        name: string;
+        pin: string;
+        hoursWorked: string;
+    };
+
+    type DateRange = {
+        startRange: string;
+        endRange: string;
+        label?: string;
+    };
+
+    type EmployeeTimeData = {
+        name: string;
+        totalMinutes: number;
+        totalHoursWorked?: string;
+    };
+
+    
+    const months = [
+        'January', 'February', 'March', 'April', 
+        'May', 'June', 'July', 'August',
+        'September', 'October', 'November', 'December'
+    ];
+
+    // State
+    let reportData: any[] = [];
+    let dateRanges: DateRange[] = [];
+    let showDownloadButtons = false;
+    let selectedRangeIndex = 0;
+    let showWeekSelector = false;
+    let showHalfSelector = false;
+    let year = new Date().getFullYear();
+    let month = new Date().getMonth() + 1;
+    let week = 1;
+    let half = 'first';
+   
+
+   
+    onMount(() => {
+        const selectedValue = localStorage.getItem('reportType');
+        reportName = `${selectedValue} Report`;
+        reportTypeHeading = `${selectedValue} Report`;
+        toggleSelectors();
+        viewDateRangewiseReport();
+    });
+
+
+    function toggleSelectors() {
+        const reportType = localStorage.getItem('reportType');
+        showWeekSelector = reportType === 'Weekly';
+        showHalfSelector = reportType === 'Bimonthly';
+    }
+
+    function pad(n: number): string {
+        return n.toString().padStart(2, '0');
+    }
+
+
+    function generateDateRanges(): DateRange[] {
+        const ranges: DateRange[] = [];
+        const reportType = localStorage.getItem('reportType');
+        
+        if (reportType === "Weekly") {
+            const daysInMonth = new Date(year, month, 0).getDate(); // Jan = 1
+            const totalWeeks = Math.ceil(daysInMonth / 7);
+            
+            for (let week = 0; week < totalWeeks; week++) {
+                const startDay = week * 7 + 1;
+                let endDay = startDay + 6;
+
+                // Don't go past month end
+                if (endDay > daysInMonth) {
+                    endDay = daysInMonth;
+                }
+
+                ranges.push({
+                    startRange: `${year}-${pad(month)}-${pad(startDay)}`,
+                    endRange: `${year}-${pad(month)}-${pad(endDay)}`,
+                    label: `Report ${week + 1}: ${year}-${pad(month)}-${pad(startDay)} - ${year}-${pad(month)}-${pad(endDay)}`
+                });
+            }
+        }
+       if (reportType === "Bimonthly") {
+        const daysInMonth = new Date(year, month, 0).getDate();
+        const mid = Math.ceil(daysInMonth / 2);
+
+        // Report 1 (previously First Half)
+        ranges.push({
+            startRange: `${year}-${pad(month)}-01`,
+            endRange: `${year}-${pad(month)}-${pad(mid)}`,
+            label: `Report 1: ${year}-${pad(month)}-01 - ${year}-${pad(month)}-${pad(mid)}`
+        });
+        
+        // Report 2 (previously Second Half)
+        ranges.push({
+            startRange: `${year}-${pad(month)}-${pad(mid + 1)}`,
+            endRange: `${year}-${pad(month)}-${pad(daysInMonth)}`,
+            label: `Report 2: ${year}-${pad(month)}-${pad(mid + 1)} - ${year}-${pad(month)}-${pad(daysInMonth)}`
+        });
+    }
+
+        else if (reportType === "Monthly") {
+            const daysInMonth = new Date(year, month, 0).getDate();
+            ranges.push({
+                startRange: `${year}-${pad(month)}-01`,
+                endRange: `${year}-${pad(month)}-${pad(daysInMonth)}`,
+                label: "Full Month"
+            });
+        } 
+        else if (reportType === "Biweekly") {
+        // Get the first day of the selected month
+        const firstDay = new Date(year, month - 1, 1);
+        // Get the day of week for the first day (0 = Sunday)
+        const dayOfWeek = firstDay.getDay();
+        
+        // Calculate first Sunday (if first day isn't Sunday)
+        let firstSunday = new Date(firstDay);
+        if (dayOfWeek !== 0) {
+            firstSunday.setDate(firstDay.getDate() + (7 - dayOfWeek));
+        }
+        
+        // First biweekly period (14 days)
+        const endFirstPeriod = new Date(firstSunday);
+        endFirstPeriod.setDate(firstSunday.getDate() + 13);
+        
+        // Second biweekly period (next 14 days)
+        const startSecondPeriod = new Date(endFirstPeriod);
+        startSecondPeriod.setDate(endFirstPeriod.getDate() + 1);
+        const endSecondPeriod = new Date(startSecondPeriod);
+        endSecondPeriod.setDate(startSecondPeriod.getDate() + 13);
+        
+        // Make sure we don't go beyond month end
+        const lastDayOfMonth = new Date(year, month, 0);
+        
+        ranges.push({
+            startRange: formatDate(firstSunday),
+            endRange: formatDate(new Date(Math.min(endFirstPeriod.getTime(), lastDayOfMonth.getTime()))),
+            label: `Biweekly 1: ${formatDate(firstSunday)} - ${formatDate(new Date(Math.min(endFirstPeriod.getTime(), lastDayOfMonth.getTime())))}`
+        });
+        
+        // Only add second period if it starts before month end
+        if (startSecondPeriod <= lastDayOfMonth) {
+            ranges.push({
+                startRange: formatDate(startSecondPeriod),
+                endRange: formatDate(new Date(Math.min(endSecondPeriod.getTime(), lastDayOfMonth.getTime()))),
+                label: `Biweekly 2: ${formatDate(startSecondPeriod)} - ${formatDate(new Date(Math.min(endSecondPeriod.getTime(), lastDayOfMonth.getTime())))}`
+            });
+        }
+    }
+
+    return ranges;
+}
+
+    async function loadReportTable(startVal: string, endVal: string) {
+        isLoading = false;
+        startDateHeader = startVal;
+        endDateHeader = endVal;
+        
+        const cid = localStorage.getItem("companyID");
+        const localStorageKey = `report_${cid}_${startVal}_${endVal}`;
+        const cachedDataRaw = localStorage.getItem(localStorageKey);
+
+        if (cachedDataRaw) {
+            try {
+                reportData = JSON.parse(cachedDataRaw);
+                employees = Object.entries(calculateTotalTimeWorked(reportData))
+                    .map(([pin, empData]) => {
+                        const { name, totalHoursWorked } = empData as EmployeeTimeData;
+                        return {
+                            pin,
+                            name,
+                            hoursWorked: totalHoursWorked || '0:00'
+                        };
+                    });
+                showDownloadButtons = reportData.length > 0;
+                isLoading = false;
+                return;
+            } catch (e) {
+                console.error("Error parsing cached data", e);
+            }
+        }
+
+        try {
+            const response = await fetch(`${apiUrlBase}/${cid}/${startVal}/${endVal}`);
+            const data = await response.json();
+            
+            if (Array.isArray(data)) {
+                reportData = data;
+                localStorage.setItem(localStorageKey, JSON.stringify(data));
+                employees = Object.entries(calculateTotalTimeWorked(data))
+                    .map(([pin, empData]) => {
+                        const { name, totalHoursWorked } = empData as EmployeeTimeData;
+                        return {
+                            pin,
+                            name,
+                            hoursWorked: totalHoursWorked || '0:00'
+                        };
+                    });
+                showDownloadButtons = true;
+            } else {
+                reportData = [];
+                employees = [];
+                showDownloadButtons = false;
+            }
+        } catch (error) {
+            console.error("Error fetching report data", error);
+            reportData = [];
+            employees = [];
+            showDownloadButtons = false;
+        } finally {
+            isLoading = false;
+        }
+    }
+
+
+    function updateDates() {
+        const reportType = localStorage.getItem('reportType');
+        const selectedRange = dateRanges[selectedRangeIndex];
+        
+        if (selectedRange) {
+            startDateHeader = selectedRange.startRange;
+            endDateHeader = selectedRange.endRange;
+        } else if (reportType === 'Monthly') {
+            const daysInMonth = new Date(year, month, 0).getDate();
+            startDateHeader = `${year}-${pad(month)}-01`;
+            endDateHeader = `${year}-${pad(month)}-${pad(daysInMonth)}`;
+        } else if (reportType === 'Biweekly') {
+            const today = new Date();
+            const end = new Date(today);
+            const start = new Date(today);
+            start.setDate(end.getDate() - 13);
+            startDateHeader = formatDate(start);
+            endDateHeader = formatDate(end);
+        }
+    }
+
+    // Modify viewDateRangewiseReport to call updateDates
+    function viewDateRangewiseReport() {
+        const reportType = localStorage.getItem('reportType');
+        dateRanges = generateDateRanges();
+        
+        if (reportType === 'Monthly' || reportType === 'Biweekly') {
+            if (dateRanges.length > 0) {
+                loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
+            }
+        }
+        updateDates(); // Add this line
+    }
+
+    // Modify selectDateRange to call updateDates
+    function selectDateRange(index: number) {
+        selectedRangeIndex = index;
+        loadReportTable(dateRanges[index].startRange, dateRanges[index].endRange);
+        updateDates(); // Add this line
+    }
+   
+    
+
 </script>
 
 <div class="bg-gray-100">
@@ -282,6 +545,117 @@
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
         <h1 class="text-2xl font-bold text-center mb-8">{reportTypeHeading}</h1>
+
+
+        <!-- Date Selection Controls -->
+     <div class="flex flex-wrap justify-center gap-4 mb-6">
+            <div class="flex items-center">
+                <label for="yearInput" class="mr-2 text-base font-semibold text-gray-800">Year:</label>
+                <select 
+                    id="yearInput" 
+                    bind:value={year}
+                    class="bg-white border border-[#02066F] rounded px-3 py-1 text-[#02066F] font-medium focus:outline-none"
+                    on:change={() => {
+                        toggleSelectors();
+                        // Reset to first week when year changes
+                        if (showWeekSelector) week = 1;
+                        viewDateRangewiseReport();
+                        updateDates(); // Add this line
+                    }}
+                >
+                    {#each Array.from({length: 1}, (_, i) => 2025 + i) as y}
+                        <option value={y}>{y}</option>
+                    {/each}
+                </select>
+            </div>
+
+            <div class="flex items-center">
+                <label for="monthInput" class="mr-2 text-base font-semibold text-gray-800">Month:</label>
+                <select 
+                    id="monthInput" 
+                    bind:value={month}
+                    class="bg-white border border-[#02066F] rounded px-3 py-1 text-[#02066F] font-medium focus:outline-none"
+                    on:change={() => {
+                        toggleSelectors();
+                        // When month changes, select the first week/report automatically
+                        if (showWeekSelector) {
+                            week = 1;
+                            selectedRangeIndex = 0;
+                        }
+                        viewDateRangewiseReport();
+                        updateDates(); // Add this line
+                    }}
+                >
+                    {#each months as monthName, index}
+                        <option value={index + 1}>{monthName}</option>
+                    {/each}
+                </select>
+            </div>
+
+            {#if showWeekSelector}
+                <div class="flex items-center">
+                    <label for="weekInput" class="mr-2 text-base font-semibold text-gray-800">Week:</label>
+                    <select 
+                        id="weekInput" 
+                        bind:value={week}
+                        class="bg-white border border-[#02066F] rounded px-3 py-1 text-[#02066F] font-medium focus:outline-none"
+                        on:change={() => {
+                            // When week changes, select the corresponding report
+                            selectedRangeIndex = week - 1;
+                            viewDateRangewiseReport();
+                            updateDates(); // Add this line
+                        }}
+                    >
+                        {#each [1, 2, 3, 4, 5] as weekNum}
+                            <option value={weekNum}>Week {weekNum}</option>
+                        {/each}
+                    </select>
+                </div>
+            {/if}
+
+            {#if showHalfSelector}
+    <div class="flex items-center">
+        <label for="halfInput" class="mr-2 text-base font-semibold text-gray-800">Half:</label>
+        <select 
+            id="halfInput" 
+            bind:value={half}
+            class="bg-white border border-[#02066F] rounded px-3 py-1 text-[#02066F] font-medium focus:outline-none"
+            on:change={() => {
+                selectedRangeIndex = half === 'first' ? 0 : 1;
+                viewDateRangewiseReport();
+                updateDates();
+            }}
+        >
+            <option value="first">First Half</option>
+            <option value="second">Second Half</option>
+        </select>
+    </div>
+{/if}
+        </div>
+
+        <!-- Date Range Buttons -->
+        {#if dateRanges.length > 1}
+            <div class="flex flex-wrap justify-center   gap-2 mb-6">
+                {#each dateRanges as range, index}
+                    <button
+                        on:click={() => {
+                            selectedRangeIndex = index;
+                            // Update week/half selection to match the selected report
+                            if (showWeekSelector) week = index + 1;
+                            if (showHalfSelector) half = index === 0 ? 'first' : 'second';
+                            loadReportTable(range.startRange, range.endRange);
+                            updateDates(); // Add this line
+                        }}
+                        class={`px-4 py-3 text-sm md:text-md rounded border-2 border-[#02066F] font-medium transition-colors
+                            ${selectedRangeIndex === index 
+                                ? 'bg-[#02066F] text-white cursor-pointer' 
+                                : 'bg-white text-[#02066F] cursor-pointer'}`}
+                    >
+                          {range.label}
+                    </button>
+                {/each}
+            </div>
+        {/if}
 
         <!-- Date Range Display -->
         <div class="flex flex-col max-w-5xl mx-auto md:flex-row justify-between mb-6 p-4 rounded-lg">
@@ -394,7 +768,7 @@
                                             {:else}
                                                <span class="ml-6 text-lg">↑↓</span>
                                             {/if}
-                                            </div>
+                                        </div>
                                         </th>
                                     </tr>
                                 </thead>
