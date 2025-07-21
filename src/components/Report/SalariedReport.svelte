@@ -314,28 +314,69 @@
         return n.toString().padStart(2, '0');
     }
 
+     // Helper for short date display (06 Jan)
+    function formatShortDate(date: Date): string {
+        const day = date.getDate().toString().padStart(2, '0');
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `${day} ${monthNames[date.getMonth()]}`;
+    }
 
     function generateDateRanges(): DateRange[] {
         const ranges: DateRange[] = [];
         const reportType = localStorage.getItem('reportType');
         
-        if (reportType === "Weekly") {
-            const daysInMonth = new Date(year, month, 0).getDate(); // Jan = 1
-            const totalWeeks = Math.ceil(daysInMonth / 7);
+        // if (reportType === "Weekly") {
+        //     const daysInMonth = new Date(year, month, 0).getDate(); // Jan = 1
+        //     const totalWeeks = Math.ceil(daysInMonth / 7);
             
-            for (let week = 0; week < totalWeeks; week++) {
-                const startDay = week * 7 + 1;
-                let endDay = startDay + 6;
+        //     for (let week = 0; week < totalWeeks; week++) {
+        //         const startDay = week * 7 + 1;
+        //         let endDay = startDay + 6;
 
-                // Don't go past month end
-                if (endDay > daysInMonth) {
-                    endDay = daysInMonth;
-                }
+        //         // Don't go past month end
+        //         if (endDay > daysInMonth) {
+        //             endDay = daysInMonth;
+        //         }
 
+        //         ranges.push({
+        //             startRange: `${year}-${pad(month)}-${pad(startDay)}`,
+        //             endRange: `${year}-${pad(month)}-${pad(endDay)}`,
+        //             label: `Report ${week + 1}: ${year}-${pad(month)}-${pad(startDay)} - ${year}-${pad(month)}-${pad(endDay)}`
+        //         });
+        //     }
+        // }
+
+        if (reportType === "Weekly") {
+            // Predefined week ranges for specific months
+            const monthWeekRanges: Record<number, Array<{start: number, end: number}>> = {
+                1: [{start: 6, end: 12}, {start: 13, end: 19}, {start: 20, end: 26}], // January
+                2: [{start: 3, end: 9}, {start: 10, end: 16}, {start: 17, end: 23}], // February
+                3: [{start: 3, end: 9}, {start: 10, end: 16}, {start: 17, end: 23}, {start: 24, end: 30}], // March
+                4: [{start: 7, end: 13}, {start: 14, end: 20}, {start: 21, end: 27}],  // April
+                5: [{start: 5, end: 11}, {start: 12, end: 18}, {start: 19, end: 25}],  // May
+                6: [{start: 2, end: 8}, {start: 9, end: 15}, {start: 16, end: 22}, {start: 23, end: 29}],  //June
+                7: [{start: 7, end: 13}, {start: 14, end: 20}, {start: 21, end: 27}],  //July
+                8: [{start: 4, end: 10}, {start: 11, end: 17}, {start: 18, end: 24}, {start: 25, end: 31}],  //August
+                9: [{start: 1, end: 7}, {start: 8, end: 14}, {start: 15, end: 21}, {start: 22, end: 28}], //September
+                10: [{start: 6, end: 12}, {start: 13, end: 19}, {start: 20, end: 26}], //October
+                11: [{start: 3, end: 9}, {start: 10, end: 16}, {start: 17, end: 23}, {start: 24, end: 30}], //November
+                12: [{start: 1, end: 7}, {start: 8, end: 14}, {start: 15, end: 21}, {start: 22, end: 28}] //December
+                // Add other months as needed
+            };
+
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const monthRanges = monthWeekRanges[month] || [];
+
+            for (let i = 0; i < monthRanges.length; i++) {
+                const {start, end} = monthRanges[i];
+                const startDate = new Date(year, month - 1, Math.min(start, daysInMonth));
+                const endDate = new Date(year, month - 1, Math.min(end, daysInMonth));
+                
                 ranges.push({
-                    startRange: `${year}-${pad(month)}-${pad(startDay)}`,
-                    endRange: `${year}-${pad(month)}-${pad(endDay)}`,
-                    label: `Report ${week + 1}: ${year}-${pad(month)}-${pad(startDay)} - ${year}-${pad(month)}-${pad(endDay)}`
+                    startRange: formatDate(startDate),
+                    endRange: formatDate(endDate),
+                    label: `Week ${i+1}: ${formatShortDate(startDate)} - ${formatShortDate(endDate)}`
                 });
             }
         }
@@ -592,7 +633,7 @@
                 </select>
             </div>
 
-            {#if showWeekSelector}
+            <!-- {#if showWeekSelector}
                 <div class="flex items-center">
                     <label for="weekInput" class="mr-2 text-base font-semibold text-gray-800">Week:</label>
                     <select 
@@ -611,8 +652,29 @@
                         {/each}
                     </select>
                 </div>
-            {/if}
+            {/if} -->
 
+            {#if showWeekSelector}
+    <div class="flex items-center">
+        <label for="weekInput" class="mr-2 text-base font-semibold text-gray-800">Week:</label>
+        <select 
+            id="weekInput" 
+            bind:value={week}
+            class="bg-white border border-[#02066F] rounded px-3 py-1 text-[#02066F] font-medium focus:outline-none"
+            on:change={() => {
+                selectedRangeIndex = week - 1;
+                loadReportTable(
+                    dateRanges[selectedRangeIndex].startRange, 
+                    dateRanges[selectedRangeIndex].endRange
+                );
+            }}
+        >
+            {#each dateRanges as range, index}
+                <option value={index + 1}>{range.label}</option>
+            {/each}
+        </select>
+    </div>
+{/if}
             {#if showHalfSelector}
     <div class="flex items-center">
         <label for="halfInput" class="mr-2 text-base font-semibold text-gray-800">Half:</label>
@@ -633,31 +695,7 @@
 {/if}
         </div>
 
-        <!-- Date Range Buttons -->
-        {#if dateRanges.length > 1}
-            <div class="flex flex-wrap justify-center   gap-2 mb-6">
-                {#each dateRanges as range, index}
-                    <button
-                        on:click={() => {
-                            selectedRangeIndex = index;
-                            // Update week/half selection to match the selected report
-                            if (showWeekSelector) week = index + 1;
-                            if (showHalfSelector) half = index === 0 ? 'first' : 'second';
-                            loadReportTable(range.startRange, range.endRange);
-                            updateDates(); // Add this line
-                        }}
-                        class={`px-4 py-3 text-sm md:text-md rounded border-2 border-[#02066F] font-medium transition-colors
-                            ${selectedRangeIndex === index 
-                                ? 'bg-[#02066F] text-white cursor-pointer' 
-                                : 'bg-white text-[#02066F] cursor-pointer'}`}
-                    >
-                          {range.label}
-                    </button>
-                {/each}
-            </div>
-        {/if}
-
-        <!-- Date Range Display -->
+          <!-- Date Range Display -->
         <div class="flex flex-col max-w-5xl mx-auto md:flex-row justify-between mb-6 p-4 rounded-lg">
             <div class="mb-2 md:mb-0">
                 <span class="text-md md:text-lg font-semibold text-gray-800">Start Date: </span>
