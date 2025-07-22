@@ -19,9 +19,13 @@
     let currentPage = 1;
     let itemsPerPage = 10;
 
+    let selectedFrequency: string = ''; // Currently selected frequency
+    let availableFrequencies: string[] = []; // All frequencies from settings
+
+
     // Computed properties
     // @ts-ignore
-    $: filteredEmployees = employees
+     $: filteredEmployees = employees
         .filter(emp => 
             emp.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
             emp.pin.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -37,6 +41,7 @@
             return 0;
         });
 
+
     $: paginatedEmployees = filteredEmployees.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
@@ -51,6 +56,37 @@
         loadReportData();
     });
 
+       onMount(() => {
+        // Get all selected frequencies from settings
+        const savedFrequencies = localStorage.getItem('reportType');
+        if (savedFrequencies) {
+            availableFrequencies = savedFrequencies.split(',');
+            // Default to first frequency if multiple exist
+            selectedFrequency = availableFrequencies[0];
+            reportName = `${selectedFrequency} Report`;
+            reportTypeHeading = `${selectedFrequency} Report`;
+            
+            // Generate date ranges based on selected frequency
+            dateRanges = generateDateRanges();
+            if (dateRanges.length > 0) {
+                loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
+            }
+        }
+    });
+
+     // Function to switch between frequencies
+    function switchFrequency(frequency: string) {
+        selectedFrequency = frequency;
+        reportName = `${frequency} Report`;
+        reportTypeHeading = `${frequency} Report`;
+        
+        // Regenerate date ranges for the new frequency
+        dateRanges = generateDateRanges();
+        if (dateRanges.length > 0) {
+            loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
+        }
+    }
+
     // @ts-ignore
     function requestSort(key) {
         let direction = 'asc';
@@ -64,7 +100,7 @@
     async function loadReportData() {
         isLoading = true;
         const cid = localStorage.getItem('companyID');
-        const dateRange = getDateRange();
+        const dateRange = getDateRange(selectedFrequency); // Pass selected frequency
         
         startDateHeader = dateRange.startRange;
         endDateHeader = dateRange.endRange;
@@ -91,10 +127,8 @@
         }
     }
 
-    function getDateRange() {
-        const selectedValue = localStorage.getItem('reportType');
-        
-        switch (selectedValue) {
+    function getDateRange(frequency: string) {
+        switch (frequency) {
             case "Weekly": return getLastWeekDateRange();
             case "Monthly": return getLastMonthStartAndEndDates();
             case "Bimonthly": return getLastMonthStartAndEndDates();
@@ -347,7 +381,7 @@
         //     }
         // }
 
-        if (reportType === "Weekly") {
+        if (reportType === "Weekly" || selectedFrequency === 'Weekly') {
             // Predefined week ranges for specific months
             const monthWeekRanges: Record<number, Array<{start: number, end: number}>> = {
                 1: [{start: 6, end: 12}, {start: 13, end: 19}, {start: 20, end: 26}], // January
@@ -380,7 +414,7 @@
                 });
             }
         }
-       if (reportType === "Bimonthly") {
+       if (reportType === "Bimonthly" || selectedFrequency === 'Bimonthly') {
         const daysInMonth = new Date(year, month, 0).getDate();
         const mid = Math.ceil(daysInMonth / 2);
 
@@ -399,7 +433,7 @@
         });
     }
 
-        else if (reportType === "Monthly") {
+        else if (reportType === "Monthly" || selectedFrequency === 'Monthly') {
             const daysInMonth = new Date(year, month, 0).getDate();
             ranges.push({
                 startRange: `${year}-${pad(month)}-01`,
@@ -407,7 +441,7 @@
                 label: "Full Month"
             });
         } 
-        else if (reportType === "Biweekly") {
+        else if (reportType === "Biweekly" || selectedFrequency === 'Biweekly') {
         // Get the first day of the selected month
         const firstDay = new Date(year, month - 1, 1);
         // Get the day of week for the first day (0 = Sunday)
@@ -570,21 +604,63 @@
 
     <!-- Navigation -->
     <nav class="bg-white shadow">
-        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex flex-col md:flex-row justify-between items-center h-auto md:h-16 py-4 md:py-0 justify-end">
-            
+    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-center h-auto md:h-16 py-4 md:py-0 justify-end">
             <!-- Menu Links - visible on all devices -->
             <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 text-center w-auto md:w-auto">
-              <a href="/reportsummary" class="px-4 py-2 text-[#02066F]  font-semibold rounded-full">Today's Report</a>
-              <a href="/daywisereport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full">Day Wise Report</a>
-              <a href="/salariedreport" class="px-4 py-2 bg-[#02066F] text-white font-semibold rounded-full">{reportTypeHeading}</a>
+                <a href="/reportsummary" class="px-4 py-2 text-[#02066F] font-semibold rounded-full">Today's Report</a>
+                <a href="/daywisereport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full">Day Wise Report</a>
+                
+                {#if availableFrequencies.length > 1}
+                    <!-- Show separate frequency buttons in nav when multiple frequencies are selected -->
+                    <div class="flex flex-wrap gap-2">
+                        {#each availableFrequencies as frequency}
+                            <a 
+                                href="/salariedreport" 
+                                on:click|preventDefault={() => switchFrequency(frequency)}
+                                class={`px-4 py-2 rounded-full font-semibold transition-colors
+                                    ${selectedFrequency === frequency
+                                        ? 'bg-[#02066F] text-white'
+                                        : 'bg-white text-[#02066F] '}
+                                    text-sm sm:text-base`}
+                            >
+                                {frequency} Report
+                            </a>
+                        {/each}
+                    </div>
+                {:else}
+                    <!-- Show single salaried report link when only one frequency is selected -->
+                    <a href="/salariedreport" class="px-4 py-2 bg-[#02066F] text-white font-semibold rounded-full">
+                        <!-- Salaried Report -->
+                         {reportTypeHeading}
+                    </a>
+                {/if}
             </div>
-          </div>
         </div>
-    </nav>
+    </div>
+</nav>
    
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
+
+         <!-- Frequency Selector Tabs -->
+        <!-- {#if availableFrequencies.length > 1}
+            <div class="flex flex-wrap justify-center gap-2 mb-6">
+                {#each availableFrequencies as frequency}
+                    <button
+                        on:click={() => switchFrequency(frequency)}
+                        class={`px-4 py-2 rounded-lg font-medium transition-colors
+                            ${selectedFrequency === frequency
+                                ? 'bg-[#02066F] text-white'
+                                : 'bg-white text-[#02066F] border border-[#02066F] hover:bg-gray-100'}
+                            text-sm sm:text-base`}
+                    >
+                        {frequency} Report
+                    </button>
+                {/each}
+            </div>
+        {/if} -->
+
         <h1 class="text-2xl font-bold text-center mb-8">{reportTypeHeading}</h1>
 
 
@@ -598,10 +674,9 @@
                     class="bg-white border border-[#02066F] rounded px-3 py-1 text-[#02066F] font-medium focus:outline-none"
                     on:change={() => {
                         toggleSelectors();
-                        // Reset to first week when year changes
                         if (showWeekSelector) week = 1;
                         viewDateRangewiseReport();
-                        updateDates(); // Add this line
+                        updateDates();
                     }}
                 >
                     {#each Array.from({length: 1}, (_, i) => 2025 + i) as y}
@@ -654,7 +729,7 @@
                 </div>
             {/if} -->
 
-            {#if showWeekSelector}
+            {#if showWeekSelector || selectedFrequency === 'Weekly'}
     <div class="flex items-center">
         <label for="weekInput" class="mr-2 text-base font-semibold text-gray-800">Week:</label>
         <select 
@@ -675,7 +750,7 @@
         </select>
     </div>
 {/if}
-            {#if showHalfSelector}
+            {#if showHalfSelector || selectedFrequency === 'Bimonthly'}
     <div class="flex items-center">
         <label for="halfInput" class="mr-2 text-base font-semibold text-gray-800">Half:</label>
         <select 
@@ -695,7 +770,31 @@
 {/if}
         </div>
 
-          <!-- Date Range Display -->
+        <!-- Date Range Buttons -->
+        <!-- {#if dateRanges.length > 1}
+            <div class="flex flex-wrap justify-center   gap-2 mb-6">
+                {#each dateRanges as range, index}
+                    <button
+                        on:click={() => {
+                            selectedRangeIndex = index;
+                            // Update week/half selection to match the selected report
+                            if (showWeekSelector) week = index + 1;
+                            if (showHalfSelector) half = index === 0 ? 'first' : 'second';
+                            loadReportTable(range.startRange, range.endRange);
+                            updateDates(); // Add this line
+                        }}
+                        class={`px-4 py-3 text-sm md:text-md rounded border-2 border-[#02066F] font-medium transition-colors
+                            ${selectedRangeIndex === index 
+                                ? 'bg-[#02066F] text-white cursor-pointer' 
+                                : 'bg-white text-[#02066F] cursor-pointer'}`}
+                    >
+                          {range.label}
+                    </button>
+                {/each}
+            </div>
+        {/if} -->
+
+        <!-- Date Range Display -->
         <div class="flex flex-col max-w-5xl mx-auto md:flex-row justify-between mb-6 p-4 rounded-lg">
             <div class="mb-2 md:mb-0">
                 <span class="text-md md:text-lg font-semibold text-gray-800">Start Date: </span>

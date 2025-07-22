@@ -19,7 +19,7 @@
 
     let isLoading = false;
     let emailSettings: ReportSetting[] = [];
-    let viewSetting: ReportFrequency = 'Weekly';
+    let viewSetting: ReportFrequency = localStorage.getItem('reportType') as ReportFrequency; // Default to 'Daily' if not set
     let showAddModal = false;
     let showEditModal = false;
     let showViewEditModal = false;
