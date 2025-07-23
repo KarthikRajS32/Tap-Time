@@ -68,10 +68,19 @@
 
      function loadViewSetting() {
         const savedSetting = localStorage.getItem('reportType');
-        if (savedSetting && ['Daily', 'Weekly', 'Biweekly', 'Monthly', 'Bimonthly'].includes(savedSetting)) {
-            viewSetting = savedSetting as ReportFrequency;
-            // Initialize viewFrequencies with the current setting
-            viewFrequencies = [viewSetting];
+        // if (savedSetting && ['Daily', 'Weekly', 'Biweekly', 'Monthly', 'Bimonthly'].includes(savedSetting)) {
+        //     viewSetting = savedSetting as ReportFrequency;
+        //     // Initialize viewFrequencies with the current setting
+        //     viewFrequencies = [viewSetting];
+        // }
+        if (savedSetting) {
+            // Split the saved frequencies by comma and filter out any empty values
+            viewFrequencies = savedSetting.split(',').filter(f => f.trim() !== '') as ReportFrequency[];
+            
+            // Update viewSetting with the first frequency (for backward compatibility)
+            if (viewFrequencies.length > 0) {
+                viewSetting = viewFrequencies[0] as ReportFrequency;
+            }
         }
     }
 

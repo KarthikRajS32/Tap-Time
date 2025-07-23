@@ -23,6 +23,14 @@
     let availableFrequencies: string[] = []; // All frequencies from settings
 
 
+
+
+
+
+
+
+     let currentReportType = '';
+
     // Computed properties
     // @ts-ignore
      $: filteredEmployees = employees
@@ -49,42 +57,54 @@
 
     $: totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
 
+     // Combine the two onMount into one
     onMount(() => {
         const selectedValue = localStorage.getItem('reportType');
+       // @ts-ignore
+        currentReportType = selectedValue;
         reportName = `${selectedValue} Report`;
         reportTypeHeading = `${selectedValue} Report`;
-        loadReportData();
-    });
-
-       onMount(() => {
-        // Get all selected frequencies from settings
+        
+        // Initialize frequencies
         const savedFrequencies = localStorage.getItem('reportType');
         if (savedFrequencies) {
             availableFrequencies = savedFrequencies.split(',');
-            // Default to first frequency if multiple exist
             selectedFrequency = availableFrequencies[0];
-            reportName = `${selectedFrequency} Report`;
-            reportTypeHeading = `${selectedFrequency} Report`;
             
-            // Generate date ranges based on selected frequency
+            // Generate initial date ranges
             dateRanges = generateDateRanges();
             if (dateRanges.length > 0) {
                 loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
             }
         }
+        
+        toggleSelectors();
     });
 
+    
+
      // Function to switch between frequencies
-    function switchFrequency(frequency: string) {
+     function switchFrequency(frequency: string) {
         selectedFrequency = frequency;
         reportName = `${frequency} Report`;
         reportTypeHeading = `${frequency} Report`;
+        currentReportType = frequency;
         
-        // Regenerate date ranges for the new frequency
+        // Reset to current year/month when switching frequencies
+        year = new Date().getFullYear();
+        month = new Date().getMonth() + 1;
+        week = 1;
+        half = 'first';
+        
+        // Regenerate date ranges
         dateRanges = generateDateRanges();
         if (dateRanges.length > 0) {
             loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
         }
+        
+        // Update UI selectors
+        toggleSelectors();
+        updateDates();
     }
 
     // @ts-ignore
@@ -127,13 +147,89 @@
         }
     }
 
+    // function getDateRange(frequency: string) {
+    //     switch (frequency) {
+    //         case "Weekly": return getLastWeekDateRange();
+    //         case "Monthly": return getLastMonthStartAndEndDates();
+    //         case "Bimonthly": return getLastMonthStartAndEndDates();
+    //         case "Biweekly": return getLastTwoWeeksDateRange();
+    //         default: return { startRange: '', endRange: '' };
+    //     }
+    // }
+
+
+
     function getDateRange(frequency: string) {
+        // Get first and last day of selected month
+        const firstDay = new Date(year, month - 1, 1);
+        const lastDay = new Date(year, month, 0);
+        
         switch (frequency) {
-            case "Weekly": return getLastWeekDateRange();
-            case "Monthly": return getLastMonthStartAndEndDates();
-            case "Bimonthly": return getLastMonthStartAndEndDates();
-            case "Biweekly": return getLastTwoWeeksDateRange();
-            default: return { startRange: '', endRange: '' };
+            case "Weekly":
+                // Calculate weeks for selected month
+                const weeksInMonth = Math.ceil((lastDay.getDate() - firstDay.getDay() + 1) / 7);
+                const selectedWeek = Math.min(week, weeksInMonth);
+                
+                const weekStart = new Date(year, month - 1, 1 + (selectedWeek - 1) * 7 - firstDay.getDay());
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                
+                // Ensure dates stay within month
+                if (weekStart < firstDay) weekStart.setDate(1);
+                if (weekEnd > lastDay) weekEnd.setDate(lastDay.getDate());
+                
+                return {
+                    startRange: formatDate(weekStart),
+                    endRange: formatDate(weekEnd)
+                };
+                
+            case "Biweekly":
+                // Find first Sunday of month
+                let firstSunday = new Date(firstDay);
+                firstSunday.setDate(firstDay.getDate() + (7 - firstDay.getDay()) % 7);
+                
+                // Calculate selected period
+                let periodStart = new Date(firstSunday);
+                if (week === 2) {
+                    periodStart.setDate(firstSunday.getDate() + 14);
+                }
+                
+                const periodEnd = new Date(periodStart);
+                periodEnd.setDate(periodStart.getDate() + 13);
+                
+                // Ensure dates stay within month
+                if (periodStart < firstDay) periodStart = new Date(firstDay);
+                if (periodEnd > lastDay) periodEnd.setDate(lastDay.getDate());
+                
+                return {
+                    startRange: formatDate(periodStart),
+                    endRange: formatDate(periodEnd)
+                };
+                
+            case "Bimonthly":
+                const daysInMonth = lastDay.getDate();
+                const mid = Math.ceil(daysInMonth / 2);
+                
+                if (half === 'first') {
+                    return {
+                        startRange: `${year}-${pad(month)}-01`,
+                        endRange: `${year}-${pad(month)}-${pad(mid)}`
+                    };
+                } else {
+                    return {
+                        startRange: `${year}-${pad(month)}-${pad(mid + 1)}`,
+                        endRange: `${year}-${pad(month)}-${pad(daysInMonth)}`
+                    };
+                }
+                
+            case "Monthly":
+                return {
+                    startRange: `${year}-${pad(month)}-01`,
+                    endRange: `${year}-${pad(month)}-${pad(lastDay.getDate())}`
+                };
+                
+            default: 
+                return { startRange: '', endRange: '' };
         }
     }
 
@@ -358,7 +454,7 @@
 
     function generateDateRanges(): DateRange[] {
         const ranges: DateRange[] = [];
-        const reportType = localStorage.getItem('reportType');
+          const reportType = currentReportType || localStorage.getItem('reportType');
         
         // if (reportType === "Weekly") {
         //     const daysInMonth = new Date(year, month, 0).getDate(); // Jan = 1
@@ -410,7 +506,7 @@
                 ranges.push({
                     startRange: formatDate(startDate),
                     endRange: formatDate(endDate),
-                    label: `Week ${i+1}: ${formatShortDate(startDate)} - ${formatShortDate(endDate)}`
+                    label: `${formatShortDate(startDate)} to ${formatShortDate(endDate)}`
                 });
             }
         }
@@ -569,16 +665,13 @@
     }
 
     // Modify viewDateRangewiseReport to call updateDates
-    function viewDateRangewiseReport() {
-        const reportType = localStorage.getItem('reportType');
+     function viewDateRangewiseReport() {
         dateRanges = generateDateRanges();
         
-        if (reportType === 'Monthly' || reportType === 'Biweekly') {
-            if (dateRanges.length > 0) {
-                loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
-            }
+        if (dateRanges.length > 0) {
+            loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
         }
-        updateDates(); // Add this line
+        updateDates();
     }
 
     // Modify selectDateRange to call updateDates
@@ -688,24 +781,22 @@
             <div class="flex items-center">
                 <label for="monthInput" class="mr-2 text-base font-semibold text-gray-800">Month:</label>
                 <select 
-                    id="monthInput" 
-                    bind:value={month}
-                    class="bg-white border border-[#02066F] rounded px-3 py-1 text-[#02066F] font-medium focus:outline-none"
-                    on:change={() => {
-                        toggleSelectors();
-                        // When month changes, select the first week/report automatically
-                        if (showWeekSelector) {
-                            week = 1;
-                            selectedRangeIndex = 0;
-                        }
-                        viewDateRangewiseReport();
-                        updateDates(); // Add this line
-                    }}
-                >
-                    {#each months as monthName, index}
-                        <option value={index + 1}>{monthName}</option>
-                    {/each}
-                </select>
+        id="monthInput" 
+        bind:value={month}
+        class="bg-white border border-[#02066F] rounded px-3 py-1 text-[#02066F] font-medium focus:outline-none"
+        on:change={() => {
+            toggleSelectors();
+            // Always reset to week 1 when month changes
+            week = 1;
+            selectedRangeIndex = 0;
+            viewDateRangewiseReport();
+            updateDates();
+        }}
+    >
+        {#each months as monthName, index}
+            <option value={index + 1}>{monthName}</option>
+        {/each}
+    </select>
             </div>
 
             <!-- {#if showWeekSelector}
