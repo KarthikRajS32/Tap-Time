@@ -3,14 +3,18 @@
 import { page } from '$app/stores';
 import { onMount } from 'svelte';
 import { get } from 'svelte/store';
+import { createEventDispatcher } from 'svelte';
 
 let sidebarOpen = false;
 let dropdownOpen = false;
 let currentPath = '';
+let showModal = false;
 let showHomeModal = false; // State for home modal
+let userType = "";
 
 onMount(() => {
 	currentPath = get(page).url.pathname;
+	userType = localStorage.getItem('adminType') || '';
 });
 
 $: currentPath = $page.url.pathname; // reactive update
@@ -30,10 +34,10 @@ function isActive(path: string) {
 		dropdownOpen = !dropdownOpen;
 	}
 
-	import { createEventDispatcher } from 'svelte';
+	
 
 const dispatch = createEventDispatcher();
-let showModal = false;
+
 
 function logOutAction() {
 	if (showModal=true) {
@@ -55,6 +59,7 @@ function handleLogout() {
   localStorage.removeItem("companyID");
   localStorage.removeItem("customId");
   localStorage.removeItem("password");
+  localStorage.removeItem("adminType");
 
   setTimeout(() => {
 	window.location.href = "/login"; // or use routing if needed
@@ -73,11 +78,13 @@ function handleLogout() {
 
 		<!-- Desktop Nav -->
 		<nav class="hidden lg:flex items-center gap-10 text-gray-500 text-lg">
+			{#if userType !== 'Admin'}
 			<a href="/device" 
       class={isActive('/device')
 		? 'text-[#02066F] font-semibold underline decoration-2 underline-offset-12 underline-offset-4'
 		: 'text-gray-500 underline-offset-4 hover:underline hover:decoration-2 hover:underline-offset-12 focus:text-[#02066F] focus:underline focus:decoration-2 focus:underline-offset-12'}
     >Device</a>
+	{/if}
 			<a href="/employeelist" 
       class={isActive('/employeelist')
 		? 'text-[#02066F] font-semibold underline decoration-2 underline-offset-12 underline-offset-4'

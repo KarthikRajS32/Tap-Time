@@ -73,9 +73,13 @@
   let pageSizeOptions = [10, 25, 50, 100];
   let paginatedEmployees: Employee[] = [];
 
+  let userType = "";
+
   // Initialize component
   onMount(() => {
     fetchEmployeeData();
+    // userType = localStorage.getItem('userType') || '';
+    userType = localStorage.getItem('adminType') || '';
   });
 
   // Fetch all employee data
@@ -629,6 +633,7 @@
 
     <!-- Admin Section (only for SuperAdmin) -->
     <!-- {#if adminType === 'SuperAdmin'} -->
+     {#if adminType !== 'Admin'}
       <div class="mb-8 pt-4">
         <div class="flex flex-row sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
           <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">Admin Details</h2>
@@ -698,8 +703,10 @@
           </div>
         </div>
       </div>
+      {/if}
 
       <!-- SuperAdmin Section -->
+       {#if adminType === "Owner"}
       <div class="mb-8 pt-4">
         <div class="flex flex-row sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
           <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">SuperAdmin Details</h2>
@@ -769,6 +776,7 @@
           </div>
         </div>
       </div>
+      {/if}
     <!-- {/if} -->
   </div>
 
