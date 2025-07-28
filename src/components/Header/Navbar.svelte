@@ -7,10 +7,17 @@ import { get } from 'svelte/store';
 let sidebarOpen = false;
 let dropdownOpen = false;
 let currentPath = '';
+let userType = '';
 let showHomeModal = false; // State for home modal
+let getEmail:string = '';
+let firstLetter:string = '';
 
 onMount(() => {
 	currentPath = get(page).url.pathname;
+	userType = localStorage.getItem('adminType') as 'Owner' | 'Admin' | 'SuperAdmin' || 'Owner';
+	getEmail = localStorage.getItem('adminMail') || '';
+	console.log('getEmail', getEmail);
+	 firstLetter = getEmail.charAt(0).toUpperCase();
 });
 
 $: currentPath = $page.url.pathname; // reactive update
@@ -50,16 +57,38 @@ function HomePage() {
   showHomeModal = true; 
 }
 
-function handleLogout() {
-  localStorage.removeItem("username");
-  localStorage.removeItem("companyID");
-  localStorage.removeItem("customId");
-  localStorage.removeItem("password");
+// function handleLogout() {
+//   localStorage.removeItem("username");
+//   localStorage.removeItem("companyID");
+//   localStorage.removeItem("customId");
+//   localStorage.removeItem("password");
 
-  setTimeout(() => {
-	window.location.href = "/login"; // or use routing if needed
-  }, 10);
+//   setTimeout(() => {
+// 	window.location.href = "/login"; // or use routing if needed
+//   }, 10);
+// }
+
+let avatarDropdown = false;
+
+function toggleAvatarDropdown(event: MouseEvent) {
+    event.stopPropagation();
+    avatarDropdown = !avatarDropdown;
 }
+
+function closeAvatarDropdown() {
+    avatarDropdown = false;
+}
+
+onMount(() => {
+    document.addEventListener('click', closeAvatarDropdown);
+});
+
+function handleLogout() {
+    localStorage.clear();
+    window.location.href = "/login";
+}
+
+
 
 </script>
 
@@ -68,16 +97,18 @@ function handleLogout() {
 	<div class="flex justify-between items-center h-[70px] px-4">
 		<!-- Logo -->
 		<div class="flex items-center gap-2">
-			<img src="/icode-logo.png" alt="icode-logo" class="w-20 cursor-pointer" on:click={HomePage}/>
+			<img src="/tap-time-logo.png" alt="icode-logo" class="w-20 cursor-pointer" on:click={HomePage}/>
 		</div>
 
 		<!-- Desktop Nav -->
 		<nav class="hidden lg:flex items-center gap-10 text-gray-500 text-lg">
-			<a href="/device" 
-      class={isActive('/device')
-		? 'text-[#02066F] font-semibold underline decoration-2 underline-offset-12 underline-offset-4'
-		: 'text-gray-500 underline-offset-4 hover:underline hover:decoration-2 hover:underline-offset-12 focus:text-[#02066F] focus:underline focus:decoration-2 focus:underline-offset-12'}
-    >Device</a>
+			{#if userType !== 'Admin'}
+				<a href="/device" 
+		class={isActive('/device')
+			? 'text-[#02066F] font-semibold underline decoration-2 underline-offset-12 underline-offset-4'
+			: 'text-gray-500 underline-offset-4 hover:underline hover:decoration-2 hover:underline-offset-12 focus:text-[#02066F] focus:underline focus:decoration-2 focus:underline-offset-12'}
+		>Device</a>
+		{/if}
 			<a href="/employeelist" 
       class={isActive('/employeelist')
 		? 'text-[#02066F] font-semibold underline decoration-2 underline-offset-12 underline-offset-4'
@@ -98,7 +129,11 @@ function handleLogout() {
 				{#if dropdownOpen}
 					<ul class="absolute mt-2 w-48 bg-white shadow-md border rounded z-10 text-[#02066F]">
 						<li><a href="/reportsummary" class="block px-4 py-2 hover:bg-gray-100">Report Summary</a></li>
-						<li><a href="/reportsetting" class="block px-4 py-2 hover:bg-gray-100">Report Settings</a></li>
+						{#if userType !== 'Admin'}
+						<li>
+							<a href="/reportsetting" class="block px-4 py-2 hover:bg-gray-100">Report Settings</a>
+						</li>
+						{/if}
 					</ul>
 				{/if}
 			</div>
@@ -116,9 +151,48 @@ function handleLogout() {
 			
 	
 	<!-- Logout Button -->
-<button on:click={logOutAction} class="px-4 py-2 font-semibold bg-[#02066F] text-white rounded-xl hover:opacity-85 cursor-pointer transition-colors">
+<!-- <button on:click={logOutAction} class="px-4 py-2 font-semibold bg-[#02066F] text-white rounded-xl hover:opacity-85 cursor-pointer transition-colors">
 	Logout
-  </button>
+  </button> -->
+
+  <div class="relative">
+    <!-- Avatar Icon -->
+    <button 
+        class="w-10 h-10 rounded-full bg-[#02066F] text-white flex items-center justify-center font-bold uppercase"
+        on:click={toggleAvatarDropdown}
+    >
+        {firstLetter}
+    </button>
+
+    <!-- Dropdown Menu -->
+    {#if avatarDropdown}
+        <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-20 overflow-hidden">
+            <!-- User Info -->
+            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                <p class="text-sm font-medium text-gray-800">Hello,</p>
+                <p class="text-sm text-gray-600 truncate">{getEmail}</p>
+            </div>
+            
+            <!-- Actions -->
+            <ul class="py-2 text-sm text-[#02066F]">
+                <li>
+                    <a href="/profile" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
+                </li>
+                <li>
+                    <button 
+                        class="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                        on:click={logOutAction}
+                    >
+                        Logout
+                    </button>
+                </li>
+            </ul>
+        </div>
+    {/if}
+</div>
+
+
+
   
   <!-- Logout Modal -->
   {#if showModal}

@@ -9,26 +9,24 @@
     let showSuccessModal = false;
     let phoneError = '';
     let activeSection: 'company' | 'customer' | 'admin' = 'company';
-    let userType: 'customer' | 'admin' | 'SuperAdmin' = 'customer';
+    let userType: string = '';
     let passwordEditable = false;
     let showPassword = false;
 
     // API URLs
-    const customerAPIUrlBase = `https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/customer`;
-    const companyAPIUrlBase = `https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/company`;
+    const customerAPIUrlBase = `https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/customer`;
+    const companyAPIUrlBase = `https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/company`;
 
     // Form data structure
     let formData = {
         companyName: '',
-        username: '',
-        password: '',
-        decryptedPassword: '',
         companyStreet: '',
         companyCity: '',
         companyState: '',
         companyZip: '',
         firstName: '',
         lastName: '',
+        EName: '',
         customerStreet: '',
         customerCity: '',
         customerState: '',
@@ -37,27 +35,26 @@
         phone: '',
         logo: '',
         adminPin: '',
-        adminEmail: ''
+        decryptedPassword: '', // Added property
     };
 
-    let errors = {
-    companyName: '',
-    companyStreet: '',
-    companyCity: '',
-    companyState: '',
-    companyZip: '',
-    username: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-    customerStreet: '',
-    customerCity: '',
-    customerState: '',
-    customerZip: '',
-    email: '',
-    phone: ''
-  };
-
+let errors = {
+companyName: '',
+companyStreet: '',
+companyCity: '',
+companyState: '',
+companyZip: '',
+firstName: '',
+lastName: '',
+customerStreet: '',
+customerCity: '',
+customerState: '',
+customerZip: '',
+email: '',
+phone: '',
+adminPin: '',
+EName: ''
+};
 
 
     // Local storage data
@@ -68,46 +65,56 @@
     
     onMount(async () => {
     companyId = localStorage.getItem('companyID') || '';
-    customerId = localStorage.getItem('customerId') || '';
+    customerId = localStorage.getItem('customerID') || '';
     adminEmail = localStorage.getItem('adminMail') || '';
-    userType = localStorage.getItem('adminType') as 'customer' | 'admin' | 'SuperAdmin' || 'customer';
+    userType = localStorage.getItem('adminType') || '';
 
     // First load from localStorage
     const companyData = localStorage.getItem("companyProfileData");
     const customerData = localStorage.getItem("customerProfileData");
-    const adminData = localStorage.getItem("adminProfileData");
+    const storedAdmin = localStorage.getItem('loggedAdmin');
+const adminDetails = storedAdmin ? JSON.parse(storedAdmin) : null;
+    const companyAddress = localStorage.getItem('companyAddress') || '';
+    const customerAddress = localStorage.getItem('address') || '';
+    const [companyStreet, companyCity, companyState, companyZip] = companyAddress.split('--');
+    const [customerStreet, customerCity, customerState, customerZip] = customerAddress.split('--');
 
-    if (companyData) {
-        const parsedCompany = JSON.parse(companyData);
-        formData = {
-            ...formData, // Keep existing structure
-            ...parsedCompany, // Override with saved company data
-            companyName: parsedCompany.CName,
-            username: parsedCompany.UserName,
-            password: parsedCompany.Password,
-            companyStreet: parsedCompany.CAddress?.split('--')[0] || '',
-            companyCity: parsedCompany.CAddress?.split('--')[1] || '',
-            companyState: parsedCompany.CAddress?.split('--')[2] || '',
-            companyZip: parsedCompany.CAddress?.split('--')[3] || '',
-            logo: parsedCompany.CLogo || localStorage.getItem('companyLogo') || ''
-        };
-    }
+    formData = {
+    ...formData,
+    companyName: localStorage.getItem('companyName') || '',
+    companyStreet: companyStreet || '',
+    companyCity: companyCity || '',
+    companyState: companyState || '',
+    companyZip: companyZip || '',
+    logo: localStorage.getItem('companyLogo') || '',
+};
 
-    if (customerData) {
-        const parsedCustomer = JSON.parse(customerData);
-        formData = {
-            ...formData,
-            ...parsedCustomer,
-            firstName: parsedCustomer.FName,
-            lastName: parsedCustomer.LName,
-            customerStreet: parsedCustomer.Address?.split('--')[0] || '',
-            customerCity: parsedCustomer.Address?.split('--')[1] || '',
-            customerState: parsedCustomer.Address?.split('--')[2] || '',
-            customerZip: parsedCustomer.Address?.split('--')[3] || '',
-            email: parsedCustomer.Email,
-            phone: parsedCustomer.PhoneNumber ? formatPhoneNumberForDisplay(parsedCustomer.PhoneNumber) : ''
-        };
-    }
+console.log('Company Data:', adminDetails);
+
+  if(adminDetails){
+    formData = {
+   ...formData,
+EName: `${adminDetails.FName || ''} ${adminDetails.LName || ''}`.trim(),
+adminPin: adminDetails.Pin || '',
+email: adminDetails.Email || '',
+phone: adminDetails.PhoneNumber || ''
+
+    };
+  }
+  //Customer Data
+  else{
+    formData = {
+    ...formData,
+    firstName: localStorage.getItem('firstName') || '',
+    lastName: localStorage.getItem('lastName') || '',
+    customerStreet: customerStreet || '',
+    customerCity: customerCity || '',
+    customerState: customerState || '',
+    customerZip: customerZip || '',
+    email: localStorage.getItem('email') || '',
+    phone: localStorage.getItem('phone') || ''
+    };
+  }
 
     isLoading = false;
 });
@@ -123,8 +130,6 @@
     errors.companyCity = '';
     errors.companyState = '';
     errors.companyZip = '';
-    errors.username = '';
-    errors.password = '';
 
     // Validate each field
     if (!formData.companyName.trim()) {
@@ -149,16 +154,6 @@
 
     if (!formData.companyZip.trim()) {
       errors.companyZip = 'Please fill out this field';
-      isValid = false;
-    }
-
-    if (!formData.username.trim()) {
-      errors.username = 'Please fill out this field';
-      isValid = false;
-    }
-
-    if (passwordEditable && !formData.password.trim()) {
-      errors.password = 'Please fill out this field';
       isValid = false;
     }
 
@@ -265,15 +260,16 @@
     // API functions
     async function callCompanyAPI() {
         if (!companyId) return;
-
         const encryptedPassword = await encryptPasswordInput();
+        const passwordEncryptVal = localStorage.getItem('password');
+        const unameLocalStorage = localStorage.getItem('username');
         const companyData = {
             CID: companyId,
-            UserName: formData.username,
+            UserName: unameLocalStorage,
             CName: formData.companyName,
             CAddress: `${formData.companyStreet}--${formData.companyCity}--${formData.companyState}--${formData.companyZip}`,
-            CLogo: formData.logo || localStorage.getItem("imageFile"),
-            Password: encryptedPassword,
+            CLogo: formData.logo || localStorage.getItem("companyLogo"),
+            Password: passwordEncryptVal,
             ReportType: "Weekly",
             LastModifiedBy: 'Admin'
         };
@@ -288,8 +284,10 @@
             if (!response.ok) throw new Error(`Company update failed: ${response.status}`);
 
             localStorage.setItem("companyProfileData", JSON.stringify(companyData));
-            showSuccessModal = true;
+            console.log("Company data updated successfully:", companyData);
+             showSuccessModal = true;
             setTimeout(() => showSuccessModal = false, 2000);
+            
         } catch (error) {
             console.error("Company API Error:", error);
         }
@@ -297,14 +295,13 @@
 
     async function callCustomerAPI() {
         if (!companyId || !customerId) return;
-
         const customerData = {
             CustomerID: customerId,
             CID: companyId,
             FName: formData.firstName,
             LName: formData.lastName,
             Address: `${formData.customerStreet}--${formData.customerCity}--${formData.customerState}--${formData.customerZip}`,
-            PhoneNumber: formData.phone.replace(/\D/g, ''),
+            PhoneNumber: formData.phone,
             Email: formData.email,
             IsActive: true,
             LastModifiedBy: 'Admin'
@@ -373,60 +370,35 @@
     }
 
     // Logo upload
+     let fileInput: HTMLInputElement;
+
     function handleLogoUpload(event: Event) {
         const input = event.target as HTMLInputElement;
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = (e) => {
                 formData.logo = e.target?.result as string;
+                localStorage.setItem('companyLogo', formData.logo); // Save to localStorage
             };
             reader.readAsDataURL(input.files[0]);
         }
     }
 
     function triggerFileUpload() {
-        if (companyEditMode) {
-            const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+        if (companyEditMode && fileInput) {
             fileInput.click();
         }
     }
 
-    // Edit mode toggles
-    // function toggleCompanyEditMode() {
-    //     if (companyEditMode) {
-            
-    //         passwordEditable = false;
-    //         if (validateRequiredFields('company')) {
-    //             showSuccessModal = true;
-    //             companyEditMode = false;
-    //             setTimeout(() => showSuccessModal = false, 2000);
-    //         }
-    //     } else {
-    //         companyEditMode = true;
-    //         customerEditMode = false;
-    //         passwordEditable = false;
-    //     }
-    // }
-
-    // function toggleCustomerEditMode() {
-    //     if (customerEditMode) {
-    //         if (validatePhoneNumber() && validateRequiredFields('customer')) {
-    //             showSuccessModal = true;
-    //             customerEditMode = false;
-    //             setTimeout(() => showSuccessModal = false, 2000);
-    //         }
-    //     } else {
-    //         customerEditMode = true;
-    //         companyEditMode = false;
-    //     }
-    // }
 
     function toggleCompanyEditMode() {
-    if (companyEditMode) {
+    if (userType == 'Owner' && companyEditMode) {
       if (validateCompanyFields()) {
         callCompanyAPI();
         companyEditMode = false;
         passwordEditable = false;
+        showSuccessModal = true;
+        setTimeout(() => showSuccessModal = false, 2000);
       }
     } else {
       companyEditMode = true;
@@ -439,6 +411,8 @@
       if (validateCustomerFields()) {
         callCustomerAPI();
         customerEditMode = false;
+        showSuccessModal= true;
+        setTimeout(() => showSuccessModal = false, 2000);
       }
     } else {
       customerEditMode = true;
@@ -507,7 +481,7 @@
     <div class="max-w-4xl w-full mx-auto px-4 py-8 pt-28">
         <!-- Section Toggle Buttons -->
         <div class="text-center mb-6 space-y-2">
-            <button 
+            <button
                 class={`px-6 py-3 rounded-xl mr-2 cursor-pointer ${activeSection === 'company' ? 'bg-[#02066F] text-white' : 'bg-white text-[#02066F] border border-[#02066F]'}`}
                 on:click={() => showSection('company')}
             >
@@ -517,7 +491,7 @@
                 class={`px-6 py-3 rounded-xl cursor-pointer ${activeSection === 'customer' ? 'bg-[#02066F] text-white' : 'bg-white text-[#02066F] border border-[#02066F]'}`}
                 on:click={() => showSection('customer')}
             >
-                Customer Details
+            {userType === 'Owner' ? 'Customer Details' : (userType === 'Admin' ? 'Admin Details' : 'Super Admin Details')}
             </button>
         </div>
 
@@ -526,32 +500,29 @@
         <!-- Company Section -->
         {#if activeSection === 'company'}
             <!-- Logo Section -->
-            <div class="flex justify-center mb-8">
-                <div class="relative w-24 h-24 rounded-full border-2 border-[#02066F] overflow-hidden">
-                    {#if formData.logo}
-                        <img src={formData.logo} alt="Company Logo" class="w-full h-full object-cover" />
-                    {:else}
-                        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
-                            <i class="fas fa-building text-3xl text-gray-500"></i>
-                        </div>
-                    {/if}
-                    {#if companyEditMode}
-                        <div 
-                            class="absolute bottom-0 right-0 bg-white p-2 rounded-full cursor-pointer"
-                            on:click={triggerFileUpload}
-                        >
-                            <i class="fas fa-pencil-alt text-[#02066F]"></i>
-                        </div>
-                        <input
-                            id="fileInput"
-                            type="file"
-                            accept="image/*"
-                            on:change={handleLogoUpload}
-                            class="hidden"
-                        />
-                    {/if}
-                </div>
-            </div>
+          <div class="flex justify-center mb-8">
+        <div 
+    class="relative w-24 h-24 rounded-full border-2 border-[#02066F] overflow-hidden 
+           {companyEditMode ? 'cursor-pointer bg-white' : 'bg-gray-200 cursor-not-allowed'}"
+    on:click={() => companyEditMode && triggerFileUpload()}
+>
+    {#if formData.logo}
+        <img src={formData.logo} alt="Company Logo" class="w-full h-full object-cover" />
+    {:else}
+        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+            <i class="fas fa-building text-3xl text-gray-500"></i>
+        </div>
+    {/if}
+
+    <input
+        bind:this={fileInput}
+        type="file"
+        accept="image/*"
+        on:change={handleLogoUpload}
+        class="hidden"
+    />
+</div>
+</div>
 
             <div class="bg-white rounded-xl shadow-lg overflow-hidden p-6 pb-10 mb-8">
                 <!-- Company Form -->
@@ -600,6 +571,7 @@
                                 <p class="text-red-500 text-sm mt-1">{errors.companyStreet}</p>
                             {/if}
                         </div>
+
                         <div>
                             <label class="block text-base font-bold text-gray-900 mb-1">Company State:</label>
                             <input
@@ -663,86 +635,6 @@
                                 <p class="text-red-500 text-sm mt-1">{errors.companyZip}</p>
                             {/if}
                         </div>
-                        <div>
-                            <label class="block text-base font-bold text-gray-900 mb-1">Username:</label>
-                            <input
-                                bind:value={formData.username}
-                                type="text"
-                                placeholder="Username"
-                                class={`w-full px-4 py-3 rounded-lg border border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 focus:ring-black ${!companyEditMode ? 'bg-gray-200 text-gray-500' : ''}`}
-                                disabled={!companyEditMode}
-                                required
-                                on:blur={() => {
-                                    if (companyEditMode && !formData.username.trim()) {
-                                        errors.username = 'Please fill out this field';
-                                    } else {
-                                        errors.username = '';
-                                    }
-                                    }}
-                            />
-                             {#if errors.username}
-                                <p class="text-red-500 text-sm mt-1">{errors.username}</p>
-                            {/if}
-                        </div>
-                        <!-- <div>
-                            <label class="block text-base font-bold text-gray-900 mb-1">Password:</label>
-                            <input
-                                bind:value={formData.password}
-                                type="password"
-                                placeholder="Password"
-                                class={`w-full px-4 py-3 rounded-lg border border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 focus:ring-black ${!companyEditMode ? 'bg-gray-200 text-gray-500' : ''}`}
-                                disabled={!companyEditMode}
-                                required
-                            />
-                        </div> -->
-                        <div>
-                            <label class="block text-base font-bold text-gray-900 mb-1">Password:</label>
-                            <input
-                                bind:value={formData.password}
-                                type="password"
-                                id="passwordField"
-                                placeholder="Password"
-                                class={`w-full px-4 py-3 rounded-lg border border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 focus:ring-black ${!passwordEditable ? 'bg-gray-200 text-gray-500' : ''}`}
-                                disabled={!passwordEditable}
-                                readonly={!passwordEditable}
-                                required
-                                on:blur={() => {
-                                    if (companyEditMode && !formData.password.trim()) {
-                                        errors.password = 'Please fill out this field';
-                                    } else {
-                                        errors.password = '';
-                                    }
-                                    }}
-                            />
-                             {#if errors.password}
-                                <p class="text-red-500 text-sm mt-1">{errors.password}</p>
-                            {/if}
-                        </div>
-                        <div class="flex items-center text-center justify-center">
-                            <!-- {#if companyEditMode} -->
-                                <button
-                                    type="button"
-                                    class="px-6 py-3 bg-[#02066F] text-white rounded-xl cursor-pointer"
-                                    disabled={!companyEditMode}
-                                    on:click={() => {
-                                        passwordEditable = !passwordEditable;
-                                        // const passwordInput = document.getElementById('password') as HTMLInputElement | null;
-                                        // if (passwordInput) {
-                                        //     passwordInput.disabled = !passwordInput.disabled;
-                                        // }
-                                        if (passwordEditable) {
-                                        setTimeout(() => {
-                                            const passwordInput = document.getElementById('passwordField');
-                                            if (passwordInput) passwordInput.focus();
-                                        }, 0);
-                                    }
-                                    }}
-                                >
-                                
-                                    Change Password
-                                </button>
-                            <!-- {/if} -->
-                        </div>
                     </div>
                 </form>
             </div>
@@ -760,6 +652,7 @@
         {:else}
             <!-- Customer Section -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden p-6 mb-8">
+            {#if userType !== 'Admin' && userType !== 'SuperAdmin'}
                 <form id="customerForm">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -927,6 +820,105 @@
                         </div>
                     </div>
                 </form>
+                {:else}
+                <form id="adminForm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Pin -->
+                        <div>
+                            <label class="block text-base font-bold text-gray-900 mb-1">Pin:</label>
+                            <input
+                                bind:value={formData.adminPin}
+                                type="number"
+                                placeholder="Pin"
+                                class={`w-full px-4 py-3 rounded-lg border border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 focus:ring-black ${!customerEditMode ? 'bg-gray-200 text-gray-500' : ''}`}
+                                disabled={!customerEditMode}
+                                required
+                                on:blur={() => {
+                                    if (customerEditMode && !formData.adminPin) {
+                                        errors.adminPin = 'Please fill out this field';
+                                    } else {
+                                        errors.adminPin = '';
+                                    }
+                                }}
+                            />
+                            {#if errors.adminPin}
+                                <p class="text-red-500 text-sm mt-1">{errors.adminPin}</p>
+                            {/if}
+                        </div>
+
+                        <!-- Last Name -->
+                      <div>
+    <label class="block text-base font-bold text-gray-900 mb-1">Employee Name:</label>
+    <input
+        bind:value={formData.EName}
+        type="text"
+        placeholder="Employee Name"
+        class={`w-full px-4 py-3 rounded-lg border border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 focus:ring-black ${!customerEditMode ? 'bg-gray-200 text-gray-500' : ''}`}
+        disabled={!customerEditMode}
+        required
+        on:blur={() => {
+            if (customerEditMode && !formData.EName.trim()) {
+                errors.EName = 'Please fill out this field';
+            } else {
+                errors.EName = '';
+            }
+        }}
+    />
+    {#if errors.EName}
+        <p class="text-red-500 text-sm mt-1">{errors.EName}</p>
+    {/if}
+</div>
+
+
+                        <!-- Email -->
+                        <div>
+                            <label class="block text-base font-bold text-gray-900 mb-1">Email:</label>
+                            <input
+                                bind:value={formData.email}
+                                type="email"
+                                placeholder="Email"
+                                class={`w-full px-4 py-3 rounded-lg border border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 focus:ring-black ${!customerEditMode ? 'bg-gray-200 text-gray-500' : ''}`}
+                                disabled={!customerEditMode}
+                                required
+                                on:blur={() => {
+                                    if (customerEditMode && !formData.email.trim()) {
+                                        errors.email = 'Please fill out this field';
+                                    } else {
+                                        errors.email = '';
+                                    }
+                                }}
+                            />
+                            {#if errors.email}
+                                <p class="text-red-500 text-sm mt-1">{errors.email}</p>
+                            {/if}
+                        </div>
+
+                        <!-- Phone -->
+                        <div>
+                            <label class="block text-base font-bold text-gray-900 mb-1">Phone Number:</label>
+                            <input
+                                bind:value={formData.phone}
+                                on:input={formatPhoneNumberInput}
+                                type="tel"
+                                placeholder="Phone Number"
+                                class={`w-full px-4 py-3 rounded-lg border border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 focus:ring-black ${!customerEditMode ? 'bg-gray-200 text-gray-500' : ''}`}
+                                disabled={!customerEditMode}
+                                required
+                                on:blur={() => {
+                                    if (customerEditMode && !formData.phone.trim()) {
+                                        errors.phone = 'Please fill out this field';
+                                    } else {
+                                        errors.phone = '';
+                                    }
+                                }}
+                            />
+                            {#if errors.phone}
+                                <p class="text-red-500 text-sm mt-1">{errors.phone}</p>
+                            {/if}
+                        </div>
+                    </div>
+                </form>
+                {/if}
             </div>
             
             <!-- Form Actions -->

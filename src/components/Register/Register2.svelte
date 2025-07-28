@@ -7,8 +7,8 @@
 
     // Constants
     const isAlpha = /^[a-zA-Z\s]+$/;
-    const apiUrlBase = 'https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/customer';
-    const firstSignupPageapiUrlBase = 'https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/company';
+    const apiUrlBase = 'https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/customer';
+    const firstSignupPageapiUrlBase = 'https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/company';
     const cid = uuidv4();
     const key = new Uint8Array([16, 147, 220, 113, 166, 142, 22, 93, 241, 91, 13, 252, 112, 122, 119, 95]);
     const stripePromise = loadStripe('pk_test_51OB8JlIPoM7JHRT2DlaE8KmPRFkgeSXkqf4eQZxEahu0Lbno3vHzCTH5J4rDAfw53PjdWlLteNJNzPVdahkzTb8100DA6sqAp4');
@@ -147,56 +147,18 @@
         phoneNumber = value;
     }
 
-    // Encryption functions
-    async function encrypt(data: string, key: Uint8Array): Promise<string> {
-        const dataBuffer = new TextEncoder().encode(data);
-        const algorithm = { name: 'AES-GCM', iv: generateRandomBytes(12) };
-        
-        const importedKey = await window.crypto.subtle.importKey(
-            'raw', key, algorithm, false, ['encrypt']
-        );
-
-        const encryptedData = await window.crypto.subtle.encrypt(
-            algorithm, importedKey, dataBuffer
-        );
-
-        const iv = algorithm.iv;
-        const encryptedDataWithIV = new Uint8Array(iv.byteLength + encryptedData.byteLength);
-        encryptedDataWithIV.set(iv);
-        encryptedDataWithIV.set(new Uint8Array(encryptedData), iv.byteLength);
-
-        return btoa(String.fromCharCode(...new Uint8Array(encryptedDataWithIV)));
-    }
-
-    function generateRandomBytes(length: number): Uint8Array {
-        const randomValues = new Uint8Array(length);
-        window.crypto.getRandomValues(randomValues);
-        return randomValues;
-    }
-
-    async function checkPassword(): Promise<string> {
-        const password = localStorage.getItem('password') || '';
-        try {
-            const encryptedPassword = await encrypt(password, key);
-            return encryptedPassword.toString();
-        } catch (error) {
-            console.error('Encryption error:', error);
-            return '';
-        }
-    }
-
     // API functions
     async function createCheckoutSession(): Promise<void> {
         showOverlay = true;
         totalError = '';
         
         try {
-            const link = "http://127.0.0.1:5504";
-            const link2 = "https://tap-time.com";
+            const link2 = "http://localhost:5173";
+            const link = "https://tap-time.com";
             const link3 = "https://arunkavitha1982.github.io/icode";
             
             const response = await fetch(
-                'https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/create-checkout-session', 
+                'https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/create-checkout-session', 
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -234,74 +196,25 @@
         }
     }
 
-    async function craeteFirstPageSignupAPiData(): Promise<void> {
-        const firstSignupPageapiUrl = `${firstSignupPageapiUrlBase}/create`;
-        const cname = localStorage.getItem('companyName');
-        const clogo = localStorage.getItem('companyLogo');
-        const companyStreet = localStorage.getItem('companyStreet');
-        const companyCity = localStorage.getItem('companyCity');
-        const companyState = localStorage.getItem('companyState');
-        const companyZip = localStorage.getItem('companyZip');
-        const username = localStorage.getItem('username');
-        const passwordEncrypted = await checkPassword();
-
-        const userData = {
-            CID: cid,
-            CName: cname,
-            CLogo: clogo,
-            CAddress: `${companyStreet} -- ${companyCity} -- ${companyState} -- ${companyZip}`,
-            UserName: username,
-            Password: passwordEncrypted,
-            ReportType: "Weekly",
-            LastModifiedBy: 'Admin'
-        };
-
-        try {
-            const response = await fetch(firstSignupPageapiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData)
-            });
-
-            if (!response.ok) {
-                throw new Error(`Error: ${response.status}`);
-            }
-
-            const data = await response.json();
-            if (!data.error) {
-                createApiData();
-            } else {
-                setTimeout(() => {
-                    window.location.href = "/register";
-                    showOverlay = true;
-                }, 100);
-            }
-        } catch (error) {
-            console.error('API error:', error);
-        }
-    }
+    
 
     function createApiData(): void {
         const customerId = uuidv4();
         const apiUrl = `${apiUrlBase}/create`;
 
-        localStorage.setItem('firstName', firstName);
-        localStorage.setItem('lastName', lastName);
-        localStorage.setItem('customerStreet', customerStreet);
-        localStorage.setItem('customerCity', customerCity);
-        localStorage.setItem('customerState', customerState);
-        localStorage.setItem('customerZip', customerZip);
-        localStorage.setItem('phone', phoneNumber);
-        localStorage.setItem('email', email);
-        localStorage.setItem('customerID', customerId);
+        const firstName = localStorage.getItem('firstName');
+        const lastName = localStorage.getItem('lastName');
+        const address = localStorage.getItem('address');
+        const phone = localStorage.getItem('phone');
+        const email = localStorage.getItem('email');
 
         const userData = {
             CustomerID: customerId.toString(),
             CID: cid,
             FName: firstName,
             LName: lastName,
-            Address: `${customerStreet} -- ${customerCity} -- ${customerState} -- ${customerZip}`,
-            PhoneNumber: phoneNumber,
+            Address: address,
+            PhoneNumber: phone,
             Email: email,
             IsActive: true,
             LastModifiedBy: 'Admin'
@@ -350,8 +263,6 @@
             localStorage.setItem('phone', phoneNumber);
             localStorage.setItem('email', email);
 
-            const passwordEncrypted = await checkPassword();
-            localStorage.setItem("passwordEncrypted", passwordEncrypted);
             await createCheckoutSession();
         } else {
             totalError = 'Please fix the errors';
@@ -379,7 +290,7 @@
       <!-- Left Section -->
       <div class="hidden md:flex md:w-1/2 bg-blue-100 flex-col justify-center items-center p-5  ">
         <!-- <img src="/icode-logo.png" alt="icode-logo" class="w-18 mb-4" /> -->
-         <img src="/icode-logo.png" alt="icode-logo" class="w-44 xl:w-94 md:w-32 md:pt-2 xl:pt-8 ">
+         <img src="/tap-time-logo.png" alt="icode-logo" class="w-44 xl:w-94 md:w-32 md:pt-2 xl:pt-8 ">
         <div>
          <h3 class="text-center text-3xl xl:text-3xl md:text-2xl text-gray-800 font-semibold xl:pt-20 md:pt-18">Join Us Today</h3>
         <p class="text-center text-gray-700 mt-2 ">

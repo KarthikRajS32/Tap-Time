@@ -15,8 +15,29 @@
     let itemsPerPage = 10;
     let sortColumn = '';
     let sortDirection: 'asc' | 'desc' = 'asc';
+    
+    // Device dropdown state
+    let devices: any[] = [];
+    let selectedDevice: any = null;
 
-    const apiUrlBase = 'https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/dailyreport/getdatebasedata';
+    const adminType = localStorage.getItem('adminType');
+    const deviceID = localStorage.getItem('DeviceID');
+    
+    // Report frequency state - Load immediately, not async
+    let availableFrequencies: string[] = loadFrequenciesSync();
+    let selectedFrequency: string = availableFrequencies[0] || '';
+    
+    // Synchronous function to load frequencies immediately
+    function loadFrequenciesSync(): string[] {
+        const savedFrequencies = localStorage.getItem('reportType');
+        if (savedFrequencies) {
+            return savedFrequencies.split(',').filter(f => f.trim() !== '');
+        }
+        return [];
+    }
+
+    const apiUrlBase = 'https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/dailyreport/getdatebasedata';
+    const deviceApiUrl = 'https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/device';
     const cid: string | null = localStorage.getItem('companyID');
     let reportName: string = localStorage.getItem('reportType') || 'Salaried';
 
@@ -37,6 +58,41 @@
         const hours = Math.floor(diff / (1000 * 60 * 60));
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         return `${hours}:${minutes.toString().padStart(2, '0')}`;
+    };
+
+    // Fetch device data
+    const fetchDevices = async () => {
+        try {
+            const response = await fetch(`${deviceApiUrl}/getAll/${cid}`);
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
+            
+            const data = await response.json();
+            // Filter out devices with "Not Registered" names
+            const allDevices = Array.isArray(data) ? data : [data];
+            devices = allDevices.filter(device => 
+                device.DeviceName && 
+                device.DeviceName !== "Not Registered" && 
+                device.DeviceName.trim() !== ""
+            );
+            
+            // Set first valid device as default selection
+            if (devices.length > 0) {
+                selectedDevice = devices[0];
+                console.log('Default selected device:', selectedDevice);
+            }
+        } catch (error) {
+            console.error('Error fetching devices:', error);
+        }
+    };
+
+    // Handle device selection
+    const handleDeviceSelection = (device: any) => {
+        selectedDevice = device;
+        console.log('Selected device for reports:', device);
+        // Refresh report with new device filter
+        if (selectedDate) {
+            viewDatewiseReport(selectedDate);
+        }
     };
 
     const viewDatewiseReport = async (dateValue: string) => {
@@ -62,7 +118,7 @@
         // ✅ Guard against undefined records
         if (!Array.isArray(records)) throw new Error('Invalid API data');
 
-        reportData = records.map((item: any) => ({
+        let processedData = records.map((item: any) => ({
             ...item,
             formattedCheckIn: item.CheckInTime ? convertToAmPm(item.CheckInTime) : '--',
             formattedCheckOut: item.CheckOutTime ? convertToAmPm(item.CheckOutTime) : '--',
@@ -70,7 +126,19 @@
                 ? calculateTimeWorked(item.CheckInTime, item.CheckOutTime)
                 : '--'
         }));
+        if(adminType != 'Owner')
+        {
+          processedData = processedData.filter(item => item.DeviceID === deviceID);
+          console.log(`Filtered today's report by DeviceID ${deviceID}:`, processedData.length, 'records');
+        }
 
+        // Filter by selected device if available
+        else if (selectedDevice && selectedDevice.DeviceID) {
+            processedData = processedData.filter(item => item.DeviceID === selectedDevice.DeviceID);
+            console.log(`Filtered report by DeviceID ${selectedDevice.DeviceID}:`, processedData.length, 'records');
+        }
+
+        reportData = processedData;
         filteredData = [...reportData];
         currentPage = 1;
         sortColumn = '';
@@ -164,9 +232,12 @@
         document.body.removeChild(link);
     };
 
-    onMount(() => {
+    onMount(async () => {
         const today = new Date();
         const formattedDate = today.toISOString().split('T')[0];
+        selectedDate = formattedDate;
+        
+        await fetchDevices();
         viewDatewiseReport(formattedDate);
 
         const selectedValue = localStorage.getItem('reportType') || 'Salaried';
@@ -243,11 +314,78 @@
                     <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 text-center w-auto md:w-auto">
                         <a href="/reportsummary" class="px-4 py-2 text-[#02066F]  font-semibold rounded-full">Today's Report</a>
                         <a href="/daywisereport" class="px-4 py-2 bg-[#02066F] text-white font-semibold rounded-full">Day Wise Report</a>
-                        <a href="/salariedreport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full">{reportTypeHeading}</a>
+                        
+                        <!-- Show separate frequency tabs -->
+                        {#if availableFrequencies.length > 1}
+                          {#each availableFrequencies as frequency}
+                            <a href="/salariedreport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full">
+                              {frequency} Report
+                            </a>
+                          {/each}
+                        {:else if availableFrequencies.length === 1}
+                          <a href="/salariedreport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full">
+                            {availableFrequencies[0]} Report
+                          </a>
+                        {/if}
                     </div>
                 </div>
             </div>
         </nav>
+
+        <!-- Device Dropdown Section -->
+        <div class="max-w-5xl mx-auto mb-6 px-4">
+            <div class="flex justify-center">
+                <div class="relative inline-block text-left">
+                    {#if adminType == 'Owner'}
+                    <div>
+                        <button
+                            type="button"
+                            class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                            id="device-menu-button"
+                            aria-expanded="true"
+                            aria-haspopup="true"
+                            on:click={() => {
+                                const dropdown = document.getElementById('device-dropdown');
+                                dropdown.classList.toggle('hidden');
+                            }}
+                        >
+                            {selectedDevice ? selectedDevice.DeviceName : 'Select Device Name'}
+                            <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                    {/if}
+                    <div 
+                        id="device-dropdown"
+                        class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden"
+                        role="menu" 
+                        aria-orientation="vertical" 
+                        aria-labelledby="device-menu-button" 
+                        tabindex="-1"
+                    >
+                        <div class="py-1" role="none">
+                            {#each devices as device}
+                                <button
+                                    type="button"
+                                    class="text-gray-700 block w-full px-4 py-2 text-left text-sm hover:bg-gray-100 hover:text-gray-900"
+                                    role="menuitem"
+                                    tabindex="-1"
+                                    on:click={() => {
+                                        handleDeviceSelection(device);
+                                        document.getElementById('device-dropdown').classList.add('hidden');
+                                    }}
+                                >
+                                    {device.DeviceName}
+                                </button>
+                            {:else}
+                                <div class="text-gray-500 block px-4 py-2 text-sm">No devices available</div>
+                            {/each}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Date Picker and Download Buttons -->
         <div class="flex flex-col md:flex-row justify-center items-center my-8 gap-4 px-4">

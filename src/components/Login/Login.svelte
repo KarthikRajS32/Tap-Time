@@ -107,8 +107,9 @@
     try {
       const userObject = decodeJwtResponse(response.credential);
       const email = userObject.email;
+      localStorage.clear();
 
-      const res = await fetch(`https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/login_check/${email}`);
+      const res = await fetch(`https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/login_check/${email}`);
       if (!res.ok) {
         throw new Error('Network response was not ok');
       }
@@ -120,19 +121,21 @@
         loading = false;
         return;
       }
-
-      if (data["AdminType"] === "Admin" || data["AdminType"] === "SuperAdmin") {
+      if (data["AdminType"] === "Admin" || data["AdminType"] === "SuperAdmin" || data["AdminType"] === "Owner") {
         const companyID = data["CID"];
         localStorage.setItem('companyID', companyID);
         localStorage.setItem('companyName', data["CName"]);
         localStorage.setItem('companyLogo', data["CLogo"]);
         localStorage.setItem('companyAddress', data["CAddress"]);
-        localStorage.setItem('username', data["UserName"]);
-        localStorage.setItem('password', data["Password"]);
+        localStorage.setItem('NoOfDevices', data["NoOfDevices"]);
+        localStorage.setItem('NoOfEmployees', data["NoOfEmployees"]);
         localStorage.setItem('reportType', data["ReportType"]);
         localStorage.setItem('adminMail', data["Email"]);
         localStorage.setItem('adminType', data["AdminType"]);
-
+        if("DeviceID" in data)
+        {
+          localStorage.setItem("DeviceID", data["DeviceID"]);
+        }
         await Promise.all([
           getTimeZone(companyID),
           getCustomerData(companyID)
@@ -182,7 +185,7 @@
 
   async function getCustomerData(cid: string) {
     try {
-      const response = await fetch(`https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/customer/getUsingCID/${cid}`);
+      const response = await fetch(`https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/customer/getUsingCID/${cid}`);
       const data = await response.json();
       localStorage.setItem('customerID', data.CustomerID);
       localStorage.setItem('firstName', data.FName);
@@ -194,11 +197,12 @@
     } catch (err) {
       console.error("Error fetching customer data:", err);
     }
+   
   }
 
   async function getTimeZone(cid: string) {
     try {
-      const res = await fetch(`https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/device/getAll/${cid}`);
+      const res = await fetch(`https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/device/getAll/${cid}`);
       const data = await res.json();
       if (!data.length || data.error === 'No devices found !') {
         localStorage.setItem('TimeZone', 'PST');
@@ -221,7 +225,7 @@
     loading = true;
 
     try {
-      const res = await fetch(`https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/company/getuser/${username}`);
+      const res = await fetch(`https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/company/getuser/${username}`);
       if (!res.ok) throw new Error('User fetch failed');
 
       const data = await res.json();
@@ -233,6 +237,7 @@
 
       
       const decryptedPwd = await decrypt(data.Password, key1);
+      localStorage.setItem("decryptVal",decryptedPwd);
 
       const isAuthenticated =
         data.UserName === username &&
@@ -252,8 +257,6 @@
       localStorage.setItem('password', data.Password);
       localStorage.setItem('reportType', data.ReportType);
 
-      window.location.href = '/employeelist';
-
       if (data.CLogo) {
         logoSrc = data.CLogo;
       }
@@ -262,8 +265,7 @@
         getCustomerData(data.CID),
         getTimeZone(data.CID)
       ]);
-
-      // window.location.href = '/employeelist';
+      window.location.href = '/employeelist';
     } catch (err) {
       console.error("Login error:", err);
       errorMsg = 'An error occurred during login';
@@ -277,7 +279,7 @@
   <!-- Left side image & intro -->
   <div class="hidden md:flex xl:w-1/2 md:w-1/2 bg-[#D9E9FB] flex-col justify-center items-center xl:p-6">
     <div class="w-full flex flex-col items-center text-center">
-      <img src="/icode-logo.png" alt="icode-logo" class="w-44 xl:w-94 md:w-32 mb-12 pt-42" />
+      <img src="/tap-time-logo.png" alt="icode-logo" class="w-44 xl:w-94 md:w-32 mb-12 pt-42" />
       <h3 class="text-2xl xl:text-3xl md:text-2xl font-semibold text-gray-800 mb-2">Employee Time Tracking</h3>
       <p class="text-gray-900">One tap solution for simplifying and streamlining employee time logging and reporting.</p>
     </div>
@@ -288,7 +290,7 @@
     <div class="w-full max-w-md bg-white rounded-xl p-6 sm:p-8 text-center">
       <h2 class="sm:text-3xl md:text-3xl text-2xl pt-4 font-semibold text-gray-800 mb-10">Login</h2>
 
-      <div class="mb-6">
+      <!-- <div class="mb-6">
         <input
           type="text"
           bind:value={username}
@@ -322,14 +324,17 @@
         disabled={loading}
       >
         {loading ? 'Logging in...' : 'Submit'}
-      </button>
+      </button> -->
 
-      <div>
-        <span class="text-base sm:text-xl font-bold text-gray-800">Don't have an account?</span>
-        <a href="/register" class="ml-2 text-[#02066F] text-base sm:text-xl font-bold hover:underline">Signup</a>
+      <div class="w-full flex justify-center mb-">
+        <div 
+          id="googleSignInBtn" 
+          class="google-signin-btn" 
+          style="width: 300px; height: 44px;"
+        ></div>
       </div>
 
-      <div class="relative my-6">
+        <div class="relative my-6">
         <div class="absolute inset-0 flex items-center">
           <div class="w-full border-t border-gray-300"></div>
         </div>
@@ -338,14 +343,16 @@
         </div>
       </div>
 
-      <!-- Google Sign-In Button -->
-      <div class="w-full flex justify-center mb-">
-        <div 
-          id="googleSignInBtn" 
-          class="google-signin-btn" 
-          style="width: 300px; height: 44px;"
-        ></div>
+
+      <div>
+        <span class="text-base sm:text-xl font-bold text-gray-800">Don't have an account?</span>
+        <a href="/register" class="ml-2 text-[#02066F] text-base sm:text-xl font-bold hover:underline">Signup</a>
       </div>
+
+      
+
+      <!-- Google Sign-In Button -->
+      
 
     </div>
   </div>

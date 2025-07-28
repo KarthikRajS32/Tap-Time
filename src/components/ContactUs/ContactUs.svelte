@@ -131,7 +131,7 @@
 
   // API call
   const callContactUsCreateAPiData = async (): Promise<void> => {
-    const apiLink = `https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/contact-us/create`;
+    const apiLink = `https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/contact-us/create`;
     const requestID = uuidv4();
     const cid = localStorage.getItem('companyID') || '';
 
@@ -224,7 +224,7 @@
           id="question"
           bind:value={question}
           on:blur={validCQueries}
-          placeholder="Message/Queries"
+          placeholder="Message"
           class="w-full px-4 py-3 border-2 border-[#02066F] rounded-lg font-bold focus:outline-none bg-white min-h-[90px]"
           required
         ></textarea>

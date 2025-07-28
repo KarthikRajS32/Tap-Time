@@ -49,7 +49,7 @@
         <!-- Logo -->
         <div class="flex items-center p-2 pl-1">
             <a href="/">
-            <img class="w-19" src="/app-logo.png" alt="app-logo" />
+            <img class="w-19" src="/tap-time-logo.png" alt="app-logo" />
         </a>
         </div>
 

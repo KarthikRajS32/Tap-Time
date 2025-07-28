@@ -3,7 +3,7 @@
     import { v4 as uuidv4 } from 'uuid';
   
     // Constants
-    const API_URL_BASE = "https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/device";
+    const API_URL_BASE = "https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/device";
     const LOCAL_STORAGE_KEYS = {
       USERNAME: "username",
       COMPANY_ID: "companyID",
@@ -46,7 +46,9 @@
 
       const init = async () => {
         try {
-          await viewDevices();
+
+        await viewDevices();
+      
           document.addEventListener('click', handleOutsideClick);
         } catch (error) {
           console.error('Initialization error:', error);
@@ -101,13 +103,18 @@
         }
   
         const data = await response.json();
-        
+        console.log('viewDevices API response:', data);
+        localStorage.setItem('deviceData', JSON.stringify(data));
+
         if (data.error || data.length === 0) {
+          console.log('No devices found or error:', data.error);
           showTable = false;
           showNoDeviceMessage = true;
+          devices = [];
           if (data.error) errorMessage = data.error;
         } else {
           devices = Array.isArray(data) ? data : [data];
+          console.log('Updated devices array:', devices.length, 'devices');
           showTable = true;
           showNoDeviceMessage = false;
         }
@@ -150,6 +157,7 @@
         AccessKeyGeneratedTime: new Date().toISOString(),
         LastModifiedBy: 'Admin'
       };
+      console.log(newDevice.AccessKey)
   
       try {
         const response = await fetch(`${API_URL_BASE}/create`, {
@@ -194,6 +202,7 @@
       }
   
       try {
+        console.log('Deleting device with AccessKey:', deviceToDelete);
         const response = await fetch(`${API_URL_BASE}/delete/${deviceToDelete}/${companyId}/Admin`, {
           method: 'PUT',
           headers: {
@@ -206,10 +215,17 @@
           throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
         }
   
+        // Optimistically remove device from local array first
+        devices = devices.filter(device => device.AccessKey !== deviceToDelete);
+        console.log('Optimistically removed device, remaining:', devices.length);
+        
+        // Then refresh from server to ensure consistency
         await viewDevices();
       } catch (error) {
         console.error('Error deleting device:', error);
         errorMessage = error instanceof Error ? error.message : 'Failed to delete device';
+        // Refresh devices on error to restore correct state
+        await viewDevices();
       } finally {
         isLoading = false;
         showDeleteModal = false;
@@ -232,9 +248,19 @@
         {/if}
 
         <!-- Device Table -->
-        {#if showTable}
+        {#if devices.length != 0}
+        <div class="max-w-7xl flex justify-end py-5">
+          <button 
+                    class="border border-[#02066F] text-[#02066F] bg-white px-6 py-2 rounded-md transition-colors cursor-pointer"
+                    on:click={addDevice}
+                >
+                    Add device
+                </button> 
+        </div>
             <div class="max-w-5xl mx-auto bg-white rounded-xl  overflow-hidden mb-8 border-1 border-gray-300">
-                <div class="overflow-x-auto">
+              
+              <div class="overflow-x-auto">
+                  
                     <table class="w-full divide-y divide-gray-200">
                         <thead>
                             <tr>
@@ -278,14 +304,14 @@
 
         <!-- No Devices Message -->
         {#if showNoDeviceMessage}
-            <div class="text-center ">
+            <div class="text-center h-[112px]">
                 <p class="text-gray-600 mb-[17px]">No device Added</p>
                 <button 
                     class="border border-[#02066F] text-[#02066F] bg-white px-6 py-2 rounded-md transition-colors cursor-pointer"
                     on:click={addDevice}
                 >
                     Add device
-                </button>
+                </button> 
             </div>
         {/if}
     </main>

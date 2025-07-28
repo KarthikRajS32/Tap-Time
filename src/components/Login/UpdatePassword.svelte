@@ -43,7 +43,7 @@
         };
   
         const response = await fetch(
-          `https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/company/update/${CID}`,
+          `https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/company/update/${CID}`,
           {
             method: 'PUT',
             headers: {
