@@ -8,7 +8,7 @@ import { createEventDispatcher } from 'svelte';
 let sidebarOpen = false;
 let dropdownOpen = false;
 let currentPath = '';
-<<<<<<< HEAD
+let showModal = false; // State for logout modal
 let userType = '';
 let showHomeModal = false; // State for home modal
 let getEmail:string = '';
@@ -20,15 +20,15 @@ onMount(() => {
 	getEmail = localStorage.getItem('adminMail') || '';
 	console.log('getEmail', getEmail);
 	 firstLetter = getEmail.charAt(0).toUpperCase();
-=======
+
 let showModal = false;
 let showHomeModal = false; // State for home modal
-let userType = "";
 
-onMount(() => {
+
+
 	currentPath = get(page).url.pathname;
 	userType = localStorage.getItem('adminType') || '';
->>>>>>> 3b3144bb343dfb379c8e47214c3e6cb470a54890
+
 });
 
 $: currentPath = $page.url.pathname; // reactive update
@@ -68,25 +68,28 @@ function HomePage() {
   showHomeModal = true; 
 }
 
-<<<<<<< HEAD
+
 // function handleLogout() {
 //   localStorage.removeItem("username");
 //   localStorage.removeItem("companyID");
 //   localStorage.removeItem("customId");
 //   localStorage.removeItem("password");
-=======
+
 function handleLogout() {
   localStorage.removeItem("username");
   localStorage.removeItem("companyID");
   localStorage.removeItem("customId");
   localStorage.removeItem("password");
   localStorage.removeItem("adminType");
->>>>>>> 3b3144bb343dfb379c8e47214c3e6cb470a54890
 
-//   setTimeout(() => {
-// 	window.location.href = "/login"; // or use routing if needed
-//   }, 10);
-// }
+   localStorage.clear();
+
+
+  setTimeout(() => {
+	window.location.href = "/login"; // or use routing if needed
+  }, 10);
+}
+
 
 let avatarDropdown = false;
 
@@ -103,10 +106,7 @@ onMount(() => {
     document.addEventListener('click', closeAvatarDropdown);
 });
 
-function handleLogout() {
-    localStorage.clear();
-    window.location.href = "/login";
-}
+
 
 
 
@@ -123,21 +123,21 @@ function handleLogout() {
 		<!-- Desktop Nav -->
 		<nav class="hidden lg:flex items-center gap-10 text-gray-500 text-lg">
 			{#if userType !== 'Admin'}
-<<<<<<< HEAD
+
 				<a href="/device" 
 		class={isActive('/device')
 			? 'text-[#02066F] font-semibold underline decoration-2 underline-offset-12 underline-offset-4'
 			: 'text-gray-500 underline-offset-4 hover:underline hover:decoration-2 hover:underline-offset-12 focus:text-[#02066F] focus:underline focus:decoration-2 focus:underline-offset-12'}
 		>Device</a>
 		{/if}
-=======
+
 			<a href="/device" 
       class={isActive('/device')
 		? 'text-[#02066F] font-semibold underline decoration-2 underline-offset-12 underline-offset-4'
 		: 'text-gray-500 underline-offset-4 hover:underline hover:decoration-2 hover:underline-offset-12 focus:text-[#02066F] focus:underline focus:decoration-2 focus:underline-offset-12'}
     >Device</a>
-	{/if}
->>>>>>> 3b3144bb343dfb379c8e47214c3e6cb470a54890
+	
+
 			<a href="/employeelist" 
       class={isActive('/employeelist')
 		? 'text-[#02066F] font-semibold underline decoration-2 underline-offset-12 underline-offset-4'
