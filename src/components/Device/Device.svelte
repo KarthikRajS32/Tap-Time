@@ -62,7 +62,6 @@
       };
     });
   
-    
   
     // Device Management Functions
     const maskString = (input: string, visibleChars = 4): string => {

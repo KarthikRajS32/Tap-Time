@@ -84,17 +84,17 @@
   let userType = "";
 
   // Initialize component
-<<<<<<< HEAD
+
   onMount(async () => {
     getEmail = localStorage.getItem('adminMail') || "";
     await fetchEmployeeData();
     await fetchDevices();
-=======
+  });
   onMount(() => {
     fetchEmployeeData();
     // userType = localStorage.getItem('userType') || '';
     userType = localStorage.getItem('adminType') || '';
->>>>>>> 3b3144bb343dfb379c8e47214c3e6cb470a54890
+
   });
 
   // Fetch all employee data
@@ -986,12 +986,8 @@
     </div>
 
     <!-- Admin Section (only for SuperAdmin) -->
-<<<<<<< HEAD
-    {#if adminType != "Admin"}
-=======
     <!-- {#if adminType === 'SuperAdmin'} -->
      {#if adminType !== 'Admin'}
->>>>>>> 3b3144bb343dfb379c8e47214c3e6cb470a54890
       <div class="mb-8 pt-4">
         <div
           class="flex flex-row sm:flex-row justify-between items-start sm:items-center mb-4 gap-4"
@@ -1101,11 +1097,7 @@
       {/if}
 
       <!-- SuperAdmin Section -->
-<<<<<<< HEAD
-
-=======
        {#if adminType === "Owner"}
->>>>>>> 3b3144bb343dfb379c8e47214c3e6cb470a54890
       <div class="mb-8 pt-4">
         <div
           class="flex flex-row sm:flex-row justify-between items-start sm:items-center mb-4 gap-4"
@@ -1211,12 +1203,8 @@
           </div>
         </div>
       </div>
-<<<<<<< HEAD
-    {/if}
-=======
       {/if}
     <!-- {/if} -->
->>>>>>> 3b3144bb343dfb379c8e47214c3e6cb470a54890
   </div>
 
   <!-- Employee Modal -->
