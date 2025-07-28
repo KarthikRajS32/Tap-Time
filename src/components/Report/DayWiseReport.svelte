@@ -346,9 +346,13 @@
                             aria-haspopup="true"
                             on:click={() => {
                                 const dropdown = document.getElementById('device-dropdown');
+<<<<<<< HEAD
                                 if (dropdown) {
                                     dropdown.classList.toggle('hidden');
                                 }
+=======
+                                dropdown.classList.toggle('hidden');
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
                             }}
                         >
                             {selectedDevice ? selectedDevice.DeviceName : 'Select Device Name'}
@@ -375,10 +379,14 @@
                                     tabindex="-1"
                                     on:click={() => {
                                         handleDeviceSelection(device);
+<<<<<<< HEAD
                                         const dropdown = document.getElementById('device-dropdown');
                                         if (dropdown) {
                                             dropdown.classList.add('hidden');
                                         }
+=======
+                                        document.getElementById('device-dropdown').classList.add('hidden');
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
                                     }}
                                 >
                                     {device.DeviceName}

@@ -75,10 +75,15 @@
     $: totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
 
      // Combine the two onMount into one
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
     onMount(async () => {
         // Set initial frequency from already loaded availableFrequencies
         selectedFrequency = availableFrequencies[0] || '';
         
+<<<<<<< HEAD
         const selectedValue = localStorage.getItem('reportType');
        // @ts-ignore
         currentReportType = selectedValue;
@@ -90,6 +95,35 @@
         
         // Generate initial date ranges with already loaded frequencies
         if (availableFrequencies.length > 0) {
+=======
+        const selectedValue = localStorage.getItem('reportType');
+       // @ts-ignore
+        currentReportType = selectedValue;
+        reportName = `${selectedFrequency} Report`;
+        reportTypeHeading = `${selectedFrequency} Report`;
+        
+        // Fetch devices first
+        await fetchDevices();
+        
+        // Generate initial date ranges with already loaded frequencies
+        if (availableFrequencies.length > 0) {
+=======
+    onMount(() => {
+        const selectedValue = localStorage.getItem('reportType');
+       // @ts-ignore
+        currentReportType = selectedValue;
+        reportName = `${selectedValue} Report`;
+        reportTypeHeading = `${selectedValue} Report`;
+        
+        // Initialize frequencies
+        const savedFrequencies = localStorage.getItem('reportType');
+        if (savedFrequencies) {
+            availableFrequencies = savedFrequencies.split(',');
+            selectedFrequency = availableFrequencies[0];
+            
+            // Generate initial date ranges
+>>>>>>> 3b3144bb343dfb379c8e47214c3e6cb470a54890
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
             dateRanges = generateDateRanges();
             if (dateRanges.length > 0) {
                 loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
@@ -99,6 +133,10 @@
         toggleSelectors();
     });
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
     // Fetch device data
     async function fetchDevices() {
         try {
@@ -142,6 +180,12 @@
             loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
         }
     };
+<<<<<<< HEAD
+=======
+=======
+    
+>>>>>>> 3b3144bb343dfb379c8e47214c3e6cb470a54890
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
 
      // Function to switch between frequencies
      function switchFrequency(frequency: string) {
@@ -810,9 +854,13 @@
                         aria-haspopup="true"
                         on:click={() => {
                             const dropdown = document.getElementById('device-dropdown-salaried');
+<<<<<<< HEAD
                             if (dropdown) {
                                 dropdown.classList.toggle('hidden');
                             }
+=======
+                            dropdown.classList.toggle('hidden');
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
                         }}
                     >
                         {selectedDevice ? selectedDevice.DeviceName : 'Select Device Name'}
@@ -839,10 +887,14 @@
                                 tabindex="-1"
                                 on:click={() => {
                                     handleDeviceSelection(device);
+<<<<<<< HEAD
                                     const dropdown = document.getElementById('device-dropdown-salaried');
                                     if (dropdown) {
                                         dropdown.classList.add('hidden');
                                     }
+=======
+                                    document.getElementById('device-dropdown-salaried').classList.add('hidden');
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
                                 }}
                             >
                                 {device.DeviceName}

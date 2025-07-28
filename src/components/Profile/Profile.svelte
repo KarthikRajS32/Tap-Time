@@ -39,6 +39,7 @@
     };
 
 let errors = {
+<<<<<<< HEAD
     companyName: '',
     companyStreet: '',
     companyCity: '',
@@ -56,6 +57,24 @@ let errors = {
     EName: ''
   };
 
+=======
+companyName: '',
+companyStreet: '',
+companyCity: '',
+companyState: '',
+companyZip: '',
+firstName: '',
+lastName: '',
+customerStreet: '',
+customerCity: '',
+customerState: '',
+customerZip: '',
+email: '',
+phone: '',
+adminPin: '',
+EName: ''
+};
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
 
     // Local storage data
     let companyId = '';
@@ -411,7 +430,11 @@ phone: adminDetails.PhoneNumber || ''
       if (validateCustomerFields()) {
         callCustomerAPI();
         customerEditMode = false;
+<<<<<<< HEAD
         showSuccessModal = true;
+=======
+        showSuccessModal= true;
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
         setTimeout(() => showSuccessModal = false, 2000);
       }
     } else {

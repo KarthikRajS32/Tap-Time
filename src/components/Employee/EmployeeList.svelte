@@ -81,11 +81,26 @@
   let pageSizeOptions = [10, 25, 50, 100];
   let paginatedEmployees: Employee[] = [];
 
+  let userType = "";
+
   // Initialize component
+<<<<<<< HEAD
+=======
+
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
   onMount(async () => {
     getEmail = localStorage.getItem('adminMail') || "";
     await fetchEmployeeData();
     await fetchDevices();
+<<<<<<< HEAD
+=======
+  });
+  onMount(() => {
+    fetchEmployeeData();
+    // userType = localStorage.getItem('userType') || '';
+    userType = localStorage.getItem('adminType') || '';
+
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
   });
 
   // Fetch all employee data
@@ -666,8 +681,12 @@
     if (
       dropdown &&
       !dropdown.contains(event.target as Node) &&
+<<<<<<< HEAD
       button &&
       !button.contains(event.target as Node)
+=======
+      (!button || !button.contains(event.target as Node))
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
     ) {
       dropdownOpen = false;
     }
@@ -978,7 +997,12 @@
     </div>
 
     <!-- Admin Section (only for SuperAdmin) -->
+<<<<<<< HEAD
     {#if adminType != "Admin"}
+=======
+    <!-- {#if adminType === 'SuperAdmin'} -->
+     {#if adminType !== 'Admin'}
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
       <div class="mb-8 pt-4">
         <div
           class="flex flex-row sm:flex-row justify-between items-start sm:items-center mb-4 gap-4"
@@ -1085,9 +1109,14 @@
           </div>
         </div>
       </div>
+      {/if}
 
       <!-- SuperAdmin Section -->
+<<<<<<< HEAD
 
+=======
+       {#if adminType === "Owner"}
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
       <div class="mb-8 pt-4">
         <div
           class="flex flex-row sm:flex-row justify-between items-start sm:items-center mb-4 gap-4"
@@ -1193,7 +1222,12 @@
           </div>
         </div>
       </div>
+<<<<<<< HEAD
     {/if}
+=======
+      {/if}
+    <!-- {/if} -->
+>>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
   </div>
 
   <!-- Employee Modal -->

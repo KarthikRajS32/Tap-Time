@@ -62,7 +62,6 @@
       };
     });
   
-    
   
     // Device Management Functions
     const maskString = (input: string, visibleChars = 4): string => {
@@ -304,7 +303,7 @@
 
         <!-- No Devices Message -->
         {#if showNoDeviceMessage}
-            <div class="text-center ">
+            <div class="text-center h-[112px]">
                 <p class="text-gray-600 mb-[17px]">No device Added</p>
                 <button 
                     class="border border-[#02066F] text-[#02066F] bg-white px-6 py-2 rounded-md transition-colors cursor-pointer"
