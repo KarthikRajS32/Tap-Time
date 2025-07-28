@@ -39,13 +39,6 @@
         return [];
     }
 
-
-
-
-
-
-
-
      let currentReportType = '';
 
     // Computed properties
@@ -77,63 +70,10 @@
      // Combine the two onMount into one
 
 
-
-
     // Fetch device data
-    async function fetchDevices() {
-        try {
-            const cid = localStorage.getItem("companyID");
-            const response = await fetch(`${deviceApiUrl}/getAll/${cid}`);
-            if (!response.ok) throw new Error(`Error: ${response.status}`);
-            
-            const data = await response.json();
-            // Filter out devices with "Not Registered" names
-            const allDevices = Array.isArray(data) ? data : [data];
-            devices = allDevices.filter(device => 
-                device.DeviceName && 
-                device.DeviceName !== "Not Registered" && 
-                device.DeviceName.trim() !== ""
-            );
-            
-            // Set first valid device as default selection
-            if (devices.length > 0) {
-                selectedDevice = devices[0];
-                console.log('Default selected device:', selectedDevice);
-            }
-        } catch (error) {
-            console.error('Error fetching devices:', error);
-        }
-    }
+    // (duplicate removed)
 
-    onMount(async () => {
-        // Set initial frequency from already loaded availableFrequencies
-        selectedFrequency = availableFrequencies[0] || '';
-        
-
-        const selectedValue = localStorage.getItem('reportType');
-       // @ts-ignore
-        currentReportType = selectedValue;
-        reportName = `${selectedFrequency} Report`;
-        reportTypeHeading = `${selectedFrequency} Report`;
-        
-        // Fetch devices first
-        await fetchDevices();
-        
-        // Generate initial date ranges with already loaded frequencies
-        if (availableFrequencies.length > 0) {
-
-        const selectedValue = localStorage.getItem('reportType');
-       // @ts-ignore
-        currentReportType = selectedValue;
-        reportName = `${selectedFrequency} Report`;
-        reportTypeHeading = `${selectedFrequency} Report`;
-        
-        // Fetch devices first
-        await fetchDevices();
-        
-        // Generate initial date ranges with already loaded frequencies
-        if (availableFrequencies.length > 0) {
-
+  
     onMount(() => {
         const selectedValue = localStorage.getItem('reportType');
        // @ts-ignore
