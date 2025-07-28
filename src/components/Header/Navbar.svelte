@@ -8,10 +8,10 @@ import { createEventDispatcher } from 'svelte';
 let sidebarOpen = false;
 let dropdownOpen = false;
 let currentPath = '';
-<<<<<<< HEAD
-=======
+
+
 let showModal = false; // State for logout modal
->>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
+
 let userType = '';
 let showHomeModal = false; // State for home modal
 let getEmail:string = '';
@@ -23,8 +23,8 @@ onMount(() => {
 	getEmail = localStorage.getItem('adminMail') || '';
 	console.log('getEmail', getEmail);
 	 firstLetter = getEmail.charAt(0).toUpperCase();
-<<<<<<< HEAD
-=======
+
+
 
 let showModal = false;
 let showHomeModal = false; // State for home modal
@@ -33,9 +33,9 @@ let showHomeModal = false; // State for home modal
 
 	currentPath = get(page).url.pathname;
 	userType = localStorage.getItem('adminType') || '';
-
->>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
 });
+
+
 
 $: currentPath = $page.url.pathname; // reactive update
 
@@ -74,17 +74,15 @@ function HomePage() {
   showHomeModal = true; 
 }
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
+
+
 // function handleLogout() {
 //   localStorage.removeItem("username");
 //   localStorage.removeItem("companyID");
 //   localStorage.removeItem("customId");
 //   localStorage.removeItem("password");
-<<<<<<< HEAD
-=======
+
 
 function handleLogout() {
   localStorage.removeItem("username");
@@ -95,31 +93,20 @@ function handleLogout() {
 
    localStorage.clear();
 
->>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
 
-//   setTimeout(() => {
-// 	window.location.href = "/login"; // or use routing if needed
-//   }, 10);
-// }
+
+  setTimeout(() => {
+	window.location.href = "/login"; // or use routing if needed
+  }, 10);
+}
 
 let avatarDropdown = false;
 
 function toggleAvatarDropdown(event: MouseEvent) {
-    event.stopPropagation();
-    avatarDropdown = !avatarDropdown;
+	event.stopPropagation();
+	avatarDropdown = !avatarDropdown;
 }
 
-<<<<<<< HEAD
-=======
-
-let avatarDropdown = false;
-
-function toggleAvatarDropdown(event: MouseEvent) {
-    event.stopPropagation();
-    avatarDropdown = !avatarDropdown;
-}
-
->>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
 function closeAvatarDropdown() {
     avatarDropdown = false;
 }
@@ -128,14 +115,14 @@ onMount(() => {
     document.addEventListener('click', closeAvatarDropdown);
 });
 
-<<<<<<< HEAD
-function handleLogout() {
-    localStorage.clear();
-    window.location.href = "/login";
-}
-=======
 
->>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
+// function handleLogout() {
+//     localStorage.clear();
+//     window.location.href = "/login";
+// }
+
+
+
 
 
 
@@ -152,27 +139,14 @@ function handleLogout() {
 		<!-- Desktop Nav -->
 		<nav class="hidden lg:flex items-center gap-10 text-gray-500 text-lg">
 			{#if userType !== 'Admin'}
-<<<<<<< HEAD
-=======
-
->>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
 				<a href="/device" 
 		class={isActive('/device')
 			? 'text-[#02066F] font-semibold underline decoration-2 underline-offset-12 underline-offset-4'
 			: 'text-gray-500 underline-offset-4 hover:underline hover:decoration-2 hover:underline-offset-12 focus:text-[#02066F] focus:underline focus:decoration-2 focus:underline-offset-12'}
 		>Device</a>
 		{/if}
-<<<<<<< HEAD
-=======
 
-			<a href="/device" 
-      class={isActive('/device')
-		? 'text-[#02066F] font-semibold underline decoration-2 underline-offset-12 underline-offset-4'
-		: 'text-gray-500 underline-offset-4 hover:underline hover:decoration-2 hover:underline-offset-12 focus:text-[#02066F] focus:underline focus:decoration-2 focus:underline-offset-12'}
-    >Device</a>
 	
-
->>>>>>> 365c5d41b5ba8073650e2fbee82f198cb7eab9f6
 			<a href="/employeelist" 
       class={isActive('/employeelist')
 		? 'text-[#02066F] font-semibold underline decoration-2 underline-offset-12 underline-offset-4'
