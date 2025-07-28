@@ -126,7 +126,7 @@
       };
 
       try {
-        const apiLink = `https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/web_contact_us/create`;
+        const apiLink = `https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/web_contact_us/create`;
 
         const response = await fetch(apiLink, {
           method: "POST",
@@ -229,7 +229,7 @@
 
 <!-- Features Section -->
 <section id="whatWeProvide" class="flex flex-col lg:flex-row p-4 pt-10 gap-12 items-center">
-<img src="/main image.jpeg" alt="Main Feature" class="w-full lg:w-1/2 shadow-md" />
+<img src="/tap-time-logo.png" alt="Main Feature" class="w-full lg:w-1/2 shadow-md" />
 
 <div class="space-y-8 w-full lg:w-1/2">
   {#each features as { icon, title, desc }}

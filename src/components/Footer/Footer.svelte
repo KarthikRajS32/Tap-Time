@@ -4,7 +4,7 @@
     <!-- Logo & Social -->
     <div class="flex flex-col items-center md:items-start w-full md:w-auto">
       <div class="flex items-center justify-center md:justify-start">
-        <img src="/logo.png" alt="Tap Time Logo" class="w-24 sm:w-28 md:w-30 pb-2" />
+        <img src="/icode logo white.png" alt="Tap Time Logo" class="w-24 sm:w-28 md:w-30 pb-2" />
       </div>
       <p class="text-center md:text-left text-sm sm:text-base mt-4 font-bold text-lg">
         Powered by<br />Arjava Technologies

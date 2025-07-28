@@ -4,7 +4,8 @@
     // Import autoTable like this:
     import autoTable from 'jspdf-autotable';
 
-    const apiUrlBase = 'https://vnnex1njb9.execute-api.ap-south-1.amazonaws.com/test/report/dateRangeReportGet';
+    const apiUrlBase = 'https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/report/dateRangeReportGet';
+    const deviceApiUrl = 'https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/device';
 
     // State
     let startDateHeader = '';
@@ -18,10 +19,34 @@
     let sortConfig = { key: 'name', direction: 'asc' };
     let currentPage = 1;
     let itemsPerPage = 10;
+    
+    // Device dropdown state
+    let devices: any[] = [];
+    let selectedDevice: any = null;
+
+    const adminType = localStorage.getItem('adminType');
+    const deviceID = localStorage.getItem('DeviceID');
 
     let selectedFrequency: string = ''; // Currently selected frequency
-    let availableFrequencies: string[] = []; // All frequencies from settings
+    let availableFrequencies: string[] = loadFrequenciesSync(); // Load immediately, not async
+    
+    // Synchronous function to load frequencies immediately
+    function loadFrequenciesSync(): string[] {
+        const savedFrequencies = localStorage.getItem('reportType');
+        if (savedFrequencies) {
+            return savedFrequencies.split(',').filter(f => f.trim() !== '');
+        }
+        return [];
+    }
 
+
+
+
+
+
+
+
+     let currentReportType = '';
 
     // Computed properties
     // @ts-ignore
@@ -49,42 +74,97 @@
 
     $: totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
 
-    onMount(() => {
+     // Combine the two onMount into one
+    onMount(async () => {
+        // Set initial frequency from already loaded availableFrequencies
+        selectedFrequency = availableFrequencies[0] || '';
+        
         const selectedValue = localStorage.getItem('reportType');
-        reportName = `${selectedValue} Report`;
-        reportTypeHeading = `${selectedValue} Report`;
-        loadReportData();
-    });
-
-       onMount(() => {
-        // Get all selected frequencies from settings
-        const savedFrequencies = localStorage.getItem('reportType');
-        if (savedFrequencies) {
-            availableFrequencies = savedFrequencies.split(',');
-            // Default to first frequency if multiple exist
-            selectedFrequency = availableFrequencies[0];
-            reportName = `${selectedFrequency} Report`;
-            reportTypeHeading = `${selectedFrequency} Report`;
-            
-            // Generate date ranges based on selected frequency
+       // @ts-ignore
+        currentReportType = selectedValue;
+        reportName = `${selectedFrequency} Report`;
+        reportTypeHeading = `${selectedFrequency} Report`;
+        
+        // Fetch devices first
+        await fetchDevices();
+        
+        // Generate initial date ranges with already loaded frequencies
+        if (availableFrequencies.length > 0) {
             dateRanges = generateDateRanges();
             if (dateRanges.length > 0) {
                 loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
             }
         }
+        
+        toggleSelectors();
     });
 
+    // Fetch device data
+    async function fetchDevices() {
+        try {
+            const cid = localStorage.getItem("companyID");
+            const response = await fetch(`${deviceApiUrl}/getAll/${cid}`);
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
+            
+            const data = await response.json();
+            // Filter out devices with "Not Registered" names
+            const allDevices = Array.isArray(data) ? data : [data];
+            devices = allDevices.filter(device => 
+                device.DeviceName && 
+                device.DeviceName !== "Not Registered" && 
+                device.DeviceName.trim() !== ""
+            );
+            
+            // Set first valid device as default selection
+            if (devices.length > 0) {
+                selectedDevice = devices[0];
+                console.log('Default selected device:', selectedDevice);
+            }
+        } catch (error) {
+            console.error('Error fetching devices:', error);
+        }
+    }
+
+    // Handle device selection
+    const handleDeviceSelection = (device: any) => {
+        selectedDevice = device;
+        console.log('Selected device for salaried reports:', device);
+        
+        // Refresh report with new device filter using currently selected date range
+        if (dateRanges.length > 0 && selectedRangeIndex < dateRanges.length) {
+            const currentRange = dateRanges[selectedRangeIndex];
+            console.log(`Refreshing report for device ${device.DeviceName}, range: ${currentRange.startRange} to ${currentRange.endRange}`);
+            loadReportTable(currentRange.startRange, currentRange.endRange);
+        } else if (dateRanges.length > 0) {
+            // Fallback to first range if selectedRangeIndex is invalid
+            console.log(`Using first range for device ${device.DeviceName}, range: ${dateRanges[0].startRange} to ${dateRanges[0].endRange}`);
+            selectedRangeIndex = 0;
+            loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
+        }
+    };
+
      // Function to switch between frequencies
-    function switchFrequency(frequency: string) {
+     function switchFrequency(frequency: string) {
         selectedFrequency = frequency;
         reportName = `${frequency} Report`;
         reportTypeHeading = `${frequency} Report`;
+        currentReportType = frequency;
         
-        // Regenerate date ranges for the new frequency
+        // Reset to current year/month when switching frequencies
+        year = new Date().getFullYear();
+        month = new Date().getMonth() + 1;
+        week = 1;
+        half = 'first';
+        
+        // Regenerate date ranges
         dateRanges = generateDateRanges();
         if (dateRanges.length > 0) {
             loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
         }
+        
+        // Update UI selectors
+        toggleSelectors();
+        updateDates();
     }
 
     // @ts-ignore
@@ -127,13 +207,89 @@
         }
     }
 
+    // function getDateRange(frequency: string) {
+    //     switch (frequency) {
+    //         case "Weekly": return getLastWeekDateRange();
+    //         case "Monthly": return getLastMonthStartAndEndDates();
+    //         case "Bimonthly": return getLastMonthStartAndEndDates();
+    //         case "Biweekly": return getLastTwoWeeksDateRange();
+    //         default: return { startRange: '', endRange: '' };
+    //     }
+    // }
+
+
+
     function getDateRange(frequency: string) {
+        // Get first and last day of selected month
+        const firstDay = new Date(year, month - 1, 1);
+        const lastDay = new Date(year, month, 0);
+        
         switch (frequency) {
-            case "Weekly": return getLastWeekDateRange();
-            case "Monthly": return getLastMonthStartAndEndDates();
-            case "Bimonthly": return getLastMonthStartAndEndDates();
-            case "Biweekly": return getLastTwoWeeksDateRange();
-            default: return { startRange: '', endRange: '' };
+            case "Weekly":
+                // Calculate weeks for selected month
+                const weeksInMonth = Math.ceil((lastDay.getDate() - firstDay.getDay() + 1) / 7);
+                const selectedWeek = Math.min(week, weeksInMonth);
+                
+                const weekStart = new Date(year, month - 1, 1 + (selectedWeek - 1) * 7 - firstDay.getDay());
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                
+                // Ensure dates stay within month
+                if (weekStart < firstDay) weekStart.setDate(1);
+                if (weekEnd > lastDay) weekEnd.setDate(lastDay.getDate());
+                
+                return {
+                    startRange: formatDate(weekStart),
+                    endRange: formatDate(weekEnd)
+                };
+                
+            case "Biweekly":
+                // Find first Sunday of month
+                let firstSunday = new Date(firstDay);
+                firstSunday.setDate(firstDay.getDate() + (7 - firstDay.getDay()) % 7);
+                
+                // Calculate selected period
+                let periodStart = new Date(firstSunday);
+                if (week === 2) {
+                    periodStart.setDate(firstSunday.getDate() + 14);
+                }
+                
+                const periodEnd = new Date(periodStart);
+                periodEnd.setDate(periodStart.getDate() + 13);
+                
+                // Ensure dates stay within month
+                if (periodStart < firstDay) periodStart = new Date(firstDay);
+                if (periodEnd > lastDay) periodEnd.setDate(lastDay.getDate());
+                
+                return {
+                    startRange: formatDate(periodStart),
+                    endRange: formatDate(periodEnd)
+                };
+                
+            case "Bimonthly":
+                const daysInMonth = lastDay.getDate();
+                const mid = Math.ceil(daysInMonth / 2);
+                
+                if (half === 'first') {
+                    return {
+                        startRange: `${year}-${pad(month)}-01`,
+                        endRange: `${year}-${pad(month)}-${pad(mid)}`
+                    };
+                } else {
+                    return {
+                        startRange: `${year}-${pad(month)}-${pad(mid + 1)}`,
+                        endRange: `${year}-${pad(month)}-${pad(daysInMonth)}`
+                    };
+                }
+                
+            case "Monthly":
+                return {
+                    startRange: `${year}-${pad(month)}-01`,
+                    endRange: `${year}-${pad(month)}-${pad(lastDay.getDate())}`
+                };
+                
+            default: 
+                return { startRange: '', endRange: '' };
         }
     }
 
@@ -358,7 +514,7 @@
 
     function generateDateRanges(): DateRange[] {
         const ranges: DateRange[] = [];
-        const reportType = localStorage.getItem('reportType');
+          const reportType = currentReportType || localStorage.getItem('reportType');
         
         // if (reportType === "Weekly") {
         //     const daysInMonth = new Date(year, month, 0).getDate(); // Jan = 1
@@ -410,7 +566,7 @@
                 ranges.push({
                     startRange: formatDate(startDate),
                     endRange: formatDate(endDate),
-                    label: `Week ${i+1}: ${formatShortDate(startDate)} - ${formatShortDate(endDate)}`
+                    label: `${formatShortDate(startDate)} to ${formatShortDate(endDate)}`
                 });
             }
         }
@@ -486,42 +642,45 @@
 }
 
     async function loadReportTable(startVal: string, endVal: string) {
-        isLoading = false;
+        isLoading = true;
         startDateHeader = startVal;
         endDateHeader = endVal;
         
         const cid = localStorage.getItem("companyID");
-        const localStorageKey = `report_${cid}_${startVal}_${endVal}`;
-        const cachedDataRaw = localStorage.getItem(localStorageKey);
-
-        if (cachedDataRaw) {
-            try {
-                reportData = JSON.parse(cachedDataRaw);
-                employees = Object.entries(calculateTotalTimeWorked(reportData))
-                    .map(([pin, empData]) => {
-                        const { name, totalHoursWorked } = empData as EmployeeTimeData;
-                        return {
-                            pin,
-                            name,
-                            hoursWorked: totalHoursWorked || '0:00'
-                        };
-                    });
-                showDownloadButtons = reportData.length > 0;
-                isLoading = false;
-                return;
-            } catch (e) {
-                console.error("Error parsing cached data", e);
-            }
-        }
+        const deviceId = selectedDevice ? selectedDevice.DeviceID : 'all';
+        
+        console.log(`Making fresh API call for ${startVal} to ${endVal}, device: ${deviceId}`);
 
         try {
             const response = await fetch(`${apiUrlBase}/${cid}/${startVal}/${endVal}`);
             const data = await response.json();
             
             if (Array.isArray(data)) {
-                reportData = data;
-                localStorage.setItem(localStorageKey, JSON.stringify(data));
-                employees = Object.entries(calculateTotalTimeWorked(data))
+                let filteredData = data;
+
+                if(adminType != 'Owner')
+                {
+                    filteredData = data.filter(item => {
+                        console.log(`Record DeviceID: ${item.DeviceID}, matches: ${item.DeviceID === deviceID}`);
+                        return item.DeviceID === deviceID;
+                    });
+                }
+                
+                // Filter by selected device if available
+                else if (selectedDevice && selectedDevice.DeviceID) {
+                   
+                    filteredData = data.filter(item => {
+                        console.log(`Record DeviceID: ${item.DeviceID}, matches: ${item.DeviceID === selectedDevice.DeviceID}`);
+                        return item.DeviceID === selectedDevice.DeviceID;
+                    });
+                    
+                } else {
+                    console.log(`No device selected, showing all records:`, data.length);
+                }
+                
+                reportData = filteredData;
+                console.log(`API call completed for ${startVal} to ${endVal}, device: ${deviceId}:`, filteredData.length, 'records');
+                employees = Object.entries(calculateTotalTimeWorked(filteredData))
                     .map(([pin, empData]) => {
                         const { name, totalHoursWorked } = empData as EmployeeTimeData;
                         return {
@@ -530,7 +689,7 @@
                             hoursWorked: totalHoursWorked || '0:00'
                         };
                     });
-                showDownloadButtons = true;
+                showDownloadButtons = filteredData.length > 0;
             } else {
                 reportData = [];
                 employees = [];
@@ -569,16 +728,13 @@
     }
 
     // Modify viewDateRangewiseReport to call updateDates
-    function viewDateRangewiseReport() {
-        const reportType = localStorage.getItem('reportType');
+     function viewDateRangewiseReport() {
         dateRanges = generateDateRanges();
         
-        if (reportType === 'Monthly' || reportType === 'Biweekly') {
-            if (dateRanges.length > 0) {
-                loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
-            }
+        if (dateRanges.length > 0) {
+            loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
         }
-        updateDates(); // Add this line
+        updateDates();
     }
 
     // Modify selectDateRange to call updateDates
@@ -639,6 +795,66 @@
         </div>
     </div>
 </nav>
+
+    <!-- Device Dropdown Section -->
+    <div class="max-w-5xl mx-auto mb-6 px-4">
+        <div class="flex justify-center">
+            <div class="relative inline-block text-left">
+                {#if adminType == 'Owner'}
+                <div>
+                    <button
+                        type="button"
+                        class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                        id="device-menu-button-salaried"
+                        aria-expanded="true"
+                        aria-haspopup="true"
+                        on:click={() => {
+                            const dropdown = document.getElementById('device-dropdown-salaried');
+                            if (dropdown) {
+                                dropdown.classList.toggle('hidden');
+                            }
+                        }}
+                    >
+                        {selectedDevice ? selectedDevice.DeviceName : 'Select Device Name'}
+                        <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+                {/if}
+                <div 
+                    id="device-dropdown-salaried"
+                    class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden"
+                    role="menu" 
+                    aria-orientation="vertical" 
+                    aria-labelledby="device-menu-button-salaried" 
+                    tabindex="-1"
+                >
+                    <div class="py-1" role="none">
+                        {#each devices as device}
+                            <button
+                                type="button"
+                                class="text-gray-700 block w-full px-4 py-2 text-left text-sm hover:bg-gray-100 hover:text-gray-900"
+                                role="menuitem"
+                                tabindex="-1"
+                                on:click={() => {
+                                    handleDeviceSelection(device);
+                                    const dropdown = document.getElementById('device-dropdown-salaried');
+                                    if (dropdown) {
+                                        dropdown.classList.add('hidden');
+                                    }
+                                }}
+                            >
+                                {device.DeviceName}
+                            </button>
+                        {:else}
+                            <div class="text-gray-500 block px-4 py-2 text-sm">No devices available</div>
+                        {/each}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
    
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
@@ -688,24 +904,22 @@
             <div class="flex items-center">
                 <label for="monthInput" class="mr-2 text-base font-semibold text-gray-800">Month:</label>
                 <select 
-                    id="monthInput" 
-                    bind:value={month}
-                    class="bg-white border border-[#02066F] rounded px-3 py-1 text-[#02066F] font-medium focus:outline-none"
-                    on:change={() => {
-                        toggleSelectors();
-                        // When month changes, select the first week/report automatically
-                        if (showWeekSelector) {
-                            week = 1;
-                            selectedRangeIndex = 0;
-                        }
-                        viewDateRangewiseReport();
-                        updateDates(); // Add this line
-                    }}
-                >
-                    {#each months as monthName, index}
-                        <option value={index + 1}>{monthName}</option>
-                    {/each}
-                </select>
+        id="monthInput" 
+        bind:value={month}
+        class="bg-white border border-[#02066F] rounded px-3 py-1 text-[#02066F] font-medium focus:outline-none"
+        on:change={() => {
+            toggleSelectors();
+            // Always reset to week 1 when month changes
+            week = 1;
+            selectedRangeIndex = 0;
+            viewDateRangewiseReport();
+            updateDates();
+        }}
+    >
+        {#each months as monthName, index}
+            <option value={index + 1}>{monthName}</option>
+        {/each}
+    </select>
             </div>
 
             <!-- {#if showWeekSelector}

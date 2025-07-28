@@ -9,12 +9,10 @@
   let companyCity = '';
   let companyState = '';
   let companyZip = '';
-  let username = '';
-  let password = '';
+  let NoOfDevices = '';
+  let NoOfEmployees = '';
   
   let errorCompanyName = '';
-  let errorUsername = '';
-  let errorPassword = '';
   let totalError = '';
   let overlayVisible = false;
   let fileName = '';
@@ -35,34 +33,15 @@
     return true;
   }
   
-  function validateUsername() {
-    if (username.trim() === '') {
-      errorUsername = '';
-      return false;
-    } else if (!isAlpha.test(username)) {
-      errorUsername = "Only use letters, don't use digits";
-      return false;
-    }
-    errorUsername = '';
-    return true;
-  }
-  
-  function validatePassword() {
-    if (password.trim() === '') {
-      errorPassword = '';
-      return false;
-    } else if (password.length < 8) {
-      errorPassword = 'Password must be at least 8 characters';
-      return false;
-    }
-    errorPassword = '';
-    return true;
-  }
-  
   function validateRequiredFields() {
-    let required = [companyName, companyStreet, companyCity, companyState, companyZip, username, password];
-    return required.every(val => val.trim() !== '');
-  }
+  let requiredStrings = [companyName, companyStreet, companyCity, companyState, companyZip];
+  let requiredNumbers = [NoOfDevices, NoOfEmployees];
+
+  const areStringsValid = requiredStrings.every(val => typeof val === 'string' && val.trim() !== '');
+  const areNumbersValid = requiredNumbers.every(val => typeof val === 'number' && !isNaN(val));
+
+  return areStringsValid && areNumbersValid;
+}
   
   function handleFileInputChange(event) {
     const files = event.target.files;
@@ -81,11 +60,11 @@
     totalError = '';
   
     const isCompanyNameValid = validateCompanyName();
-    const isUsernameValid = validateUsername();
-    const isPasswordValid = validatePassword();
+    // const isUsernameValid = validateUsername();
+    // const isPasswordValid = validatePassword();
     const isRequiredFieldsValid = validateRequiredFields();
   
-    if (isCompanyNameValid && isUsernameValid && isPasswordValid && isRequiredFieldsValid) {
+    if (isCompanyNameValid && isRequiredFieldsValid) {
       // Update progress bar
       const progressBar = document.querySelector('.progress-bar');
       if (progressBar) {
@@ -98,8 +77,8 @@
       localStorage.setItem('companyCity', companyCity);
       localStorage.setItem('companyState', companyState);
       localStorage.setItem('companyZip', companyZip);
-      localStorage.setItem('username', username);
-      localStorage.setItem('password', password);
+      localStorage.setItem('noOfDevices', NoOfDevices);
+      localStorage.setItem('noOfEmployees', NoOfEmployees);
   
       // Handle logo upload
       if (fileInput) {
@@ -132,7 +111,7 @@
     <!-- Left Section -->
     <div class="hidden md:flex md:w-1/2 bg-blue-100 flex-col justify-center items-center p-5  ">
       <!-- <img src="/icode-logo.png" alt="icode-logo" class="w-18 mb-4" /> -->
-       <img src="/icode-logo.png" alt="icode-logo" class="w-44 xl:w-94 md:w-32 md:pt-2 xl:pt-8 ">
+       <img src="/tap-time-logo.png" alt="icode-logo" class="w-44 xl:w-94 md:w-32 md:pt-2 xl:pt-8 ">
       <div>
        <h3 class="text-center text-3xl xl:text-3xl md:text-2xl text-gray-800 font-semibold xl:pt-20 md:pt-18">Join Us Today</h3>
       <p class="text-center text-gray-700 mt-2 ">
@@ -238,32 +217,24 @@
           <!-- Username -->
           <div class="border-2 border-[#02066F] rounded-lg mb-4">
             <input
-              type="text"
-              bind:value={username}
-              on:blur={validateUsername}
-              placeholder="Username"
+              type="number"
+              bind:value={NoOfDevices}
+              placeholder="No Of Devices"
               class="w-full outline-none font-bold p-2 xl:p-6 md:p-3"
               required
             />
           </div>
-          {#if errorUsername}
-            <p class="text-red-600 text-sm mb-2">{errorUsername}</p>
-          {/if}
       
           <!-- Password -->
           <div class="border-2 border-[#02066F] rounded-lg mb-4">
             <input
-              type="password"
-              bind:value={password}
-              on:blur={validatePassword}
-              placeholder="Password"
+              type="number"
+              bind:value={NoOfEmployees}
+              placeholder="No Of Employees"
               class="w-full outline-none font-bold p-2 xl:p-6 md:p-3"
               required
             />
           </div>
-          {#if errorPassword}
-            <p class="text-red-600 text-sm mb-2">{errorPassword}</p>
-          {/if}
       
           <!-- Submit Button -->
           <button
