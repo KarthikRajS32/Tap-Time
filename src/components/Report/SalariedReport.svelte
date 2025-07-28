@@ -75,6 +75,7 @@
     $: totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
 
      // Combine the two onMount into one
+<<<<<<< HEAD
     onMount(async () => {
         // Set initial frequency from already loaded availableFrequencies
         selectedFrequency = availableFrequencies[0] || '';
@@ -90,6 +91,22 @@
         
         // Generate initial date ranges with already loaded frequencies
         if (availableFrequencies.length > 0) {
+=======
+    onMount(() => {
+        const selectedValue = localStorage.getItem('reportType');
+       // @ts-ignore
+        currentReportType = selectedValue;
+        reportName = `${selectedValue} Report`;
+        reportTypeHeading = `${selectedValue} Report`;
+        
+        // Initialize frequencies
+        const savedFrequencies = localStorage.getItem('reportType');
+        if (savedFrequencies) {
+            availableFrequencies = savedFrequencies.split(',');
+            selectedFrequency = availableFrequencies[0];
+            
+            // Generate initial date ranges
+>>>>>>> 3b3144bb343dfb379c8e47214c3e6cb470a54890
             dateRanges = generateDateRanges();
             if (dateRanges.length > 0) {
                 loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
@@ -99,6 +116,7 @@
         toggleSelectors();
     });
 
+<<<<<<< HEAD
     // Fetch device data
     async function fetchDevices() {
         try {
@@ -142,6 +160,9 @@
             loadReportTable(dateRanges[0].startRange, dateRanges[0].endRange);
         }
     };
+=======
+    
+>>>>>>> 3b3144bb343dfb379c8e47214c3e6cb470a54890
 
      // Function to switch between frequencies
      function switchFrequency(frequency: string) {
