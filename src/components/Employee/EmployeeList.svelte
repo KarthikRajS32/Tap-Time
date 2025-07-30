@@ -698,7 +698,8 @@
     handleDeviceSelection(device);
     dropdownOpen = false;
   }
-  //END DROPDOWN DEVICE CLICK BODY ACTION 
+  //END DROPDOWN DEVICE CLICK BODY ACTION
+  
 </script>
 
 <div class="min-h-screen bg-gray-100 pt-30 pb-10 px-4 sm:px-6">

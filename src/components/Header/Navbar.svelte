@@ -123,8 +123,19 @@ onMount(() => {
 
 
 
+let showProfileSidebar = false;
 
+ 
 
+  function toggleProfileSidebar() {
+    showProfileSidebar = !showProfileSidebar;
+  }
+
+  
+const firstName = localStorage.getItem('firstName');
+const lastName = localStorage.getItem('lastName');
+
+let Name = `${firstName} ${lastName}`;
 
 </script>
 
@@ -193,41 +204,68 @@ onMount(() => {
 	Logout
   </button> -->
 
-  <div class="relative">
-    <!-- Avatar Icon -->
-    <button 
-        class="w-10 h-10 rounded-full bg-[#02066F] text-white flex items-center justify-center font-bold uppercase"
-        on:click={toggleAvatarDropdown}
-    >
-        {firstLetter}
-    </button>
-
-    <!-- Dropdown Menu -->
-    {#if avatarDropdown}
-        <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-20 overflow-hidden">
-            <!-- User Info -->
-            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
-                <p class="text-sm font-medium text-gray-800">Hello,</p>
-                <p class="text-sm text-gray-600 truncate">{getEmail}</p>
-            </div>
-            
-            <!-- Actions -->
-            <ul class="py-2 text-sm text-[#02066F]">
-                <li>
-                    <a href="/profile" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-                </li>
-                <li>
-                    <button 
-                        class="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                        on:click={logOutAction}
-                    >
-                        Logout
-                    </button>
-                </li>
-            </ul>
-        </div>
-    {/if}
+  <div class="relative z-50">
+  <button
+    class="w-10 h-10 rounded-full bg-[#02066F] text-white flex items-center justify-center font-bold uppercase cursor-pointer"
+    on:click={toggleProfileSidebar}
+  >
+    {firstLetter}
+  </button>
 </div>
+
+<!-- ✅ Sidebar Modal -->
+{#if showProfileSidebar}
+  <!-- Overlay -->
+  <div class="fixed inset-0 bg-opacity-50 z-40"
+    on:click={toggleProfileSidebar}
+  ></div>
+
+  <!-- Sidebar -->
+  <div
+    class="fixed top-0 right-0 h-full w-72 bg-[#02066F] text-white shadow-lg z-50 transition-transform duration-300"
+  >
+    <!-- Header -->
+    <div class="flex justify-between items-center px-4 py-4 border-b border-white">
+      <h2 class="text-lg font-bold">Profile</h2>
+      <button on:click={toggleProfileSidebar} class="text-white text-3xl cursor-pointer hover:text-gray-300">&times;</button>
+    </div>
+
+    <!-- User Info -->
+    <div class="px-4 py-4 flex flex-col gap-4 justify-center text-center items-center">
+		<span class="w-20 h-20 rounded-full bg-white text-[#02066F] text-3xl flex text-center items-center justify-center font-bold uppercase border-3 border-yellow-600">
+		{firstLetter}
+	</span>
+	  <p class="text-base text-white font-bold">{Name}</p>
+      <p class="text-base text-gray-200">{getEmail}</p>
+    </div>
+
+    <!-- Actions -->
+    <div class="px-4 py-4 flex flex-col gap-2 justify-center text-center">
+
+		<div class="flex flex-row bg-[red] text-white rounded hover:opacity-90 font-semibold cursor-pointer mt-4 px-20 py-2 items-center text-center gap-2"
+		on:click={() => {
+				logOutAction();
+				toggleProfileSidebar();
+				}}>
+			<img src="/logout.png" alt="logout" class="w-6 h-5">
+			<button
+				class=" cursor-pointer"
+				
+			>
+			<!-- <img src="/logout.png" alt="logout" class="w-6 flex"> -->
+				Logout
+			</button>
+	  	</div>
+
+    </div>
+	<div class="pt-6 flex justify-center items-center text-center">
+		<span class="text-base flex gap-2">
+			<p class="text-gray-100">Need help?</p> 
+			<a href="/contact"><p class="text-[yellow] hover:underline">Contact Support</p></a>
+		</span>
+  	</div>
+  </div>
+{/if}
 
 
 

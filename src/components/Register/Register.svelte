@@ -184,7 +184,7 @@
               <input
                 type="text"
                 bind:value={companyStreet}
-                placeholder="Company Street"
+                placeholder="Company Address Line 1"
                 class="w-full border-2 border-[#02066F] rounded-lg p-2 xl:p-6 md:p-3 font-bold focus:outline-none"
                 required
               />

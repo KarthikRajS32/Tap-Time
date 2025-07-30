@@ -556,11 +556,11 @@ phone: adminDetails.PhoneNumber || ''
                             {/if}
                         </div>
                         <div>
-                            <label class="block text-base font-bold text-gray-900 mb-1">Company Street:</label>
+                            <label class="block text-base font-bold text-gray-900 mb-1">Company Address Line 1:</label>
                             <input
                                 bind:value={formData.companyStreet}
                                 type="text"
-                                placeholder="Company Street"
+                                placeholder="Company Address Line 1"
                                 class={`w-full px-4 py-3 rounded-lg border border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 focus:ring-black ${!companyEditMode ? 'bg-gray-200 text-gray-500' : ''}`}
                                 disabled={!companyEditMode}
                                 required
@@ -741,11 +741,11 @@ phone: adminDetails.PhoneNumber || ''
                             {/if}
                         </div>
                         <div>
-                            <label class="block text-base font-bold text-gray-900 mb-1">Customer Street:</label>
+                            <label class="block text-base font-bold text-gray-900 mb-1">Customer Address Line 1:</label>
                             <input
                                 bind:value={formData.customerStreet}
                                 type="text"
-                                placeholder="Customer Street"
+                                placeholder="Customer Address Line 1"
                                 class={`w-full px-4 py-3 rounded-lg border border-[#02066F] text-[#02066F] font-bold focus:outline-none focus:ring-1 focus:ring-black ${!customerEditMode ? 'bg-gray-200 text-gray-500' : ''}`}
                                 disabled={!customerEditMode}
                                 required

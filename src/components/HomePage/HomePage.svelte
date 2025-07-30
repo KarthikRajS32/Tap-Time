@@ -286,7 +286,7 @@
       />
       <input
         type="text"
-        placeholder="Street"
+        placeholder="Address Line 1"
         bind:this={streetInput}
         class="border-2 border-[#02066F] rounded-[10px] w-full p-3 font-bold text-center focus:outline-none"
         required
