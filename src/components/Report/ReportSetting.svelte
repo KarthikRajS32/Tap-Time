@@ -55,8 +55,8 @@
     let devices: Device[] = [];
     let selectedDevice: Device | null = null;
     let showDeviceDropdown = false;
-    let storedDeviceID: string | null = localStorage.getItem('DeviceID');
-    const adminType = localStorage.getItem('adminType');
+    let storedDeviceID: string | null = localStorage.getItem("DeviceID");
+    const adminType = localStorage.getItem("adminType");
 
     let viewFrequencies: ReportFrequency[] = [];
     let showViewFrequencyDropdown = false;
@@ -90,60 +90,67 @@
 
     async function loadDevices() {
         try {
-            const companyId = localStorage.getItem('companyID');
-            const response = await fetch(`https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/device/getAll/${companyId}`);
-            
+            const companyId = localStorage.getItem("companyID");
+            const response = await fetch(
+                `https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/device/getAll/${companyId}`,
+            );
+
             if (!response.ok) {
                 throw new Error(`Error: ${response.status}`);
             }
-            
+
             const data = await response.json();
             // Filter out devices with "Not Registered" names
             const allDevices = Array.isArray(data) ? data : [data];
-            devices = allDevices.filter(device => 
-                device.DeviceName && 
-                device.DeviceName !== "Not Registered" && 
-                device.DeviceName.trim() !== ""
-            ).map((device: any) => ({
-                id: device.DeviceID,
-                name: device.DeviceName,
-                deviceId: device.DeviceID
-            }));
-            
-            console.log('Fetched devices (filtered):', devices);
-            
+            devices = allDevices
+                .filter(
+                    (device) =>
+                        device.DeviceName &&
+                        device.DeviceName !== "Not Registered" &&
+                        device.DeviceName.trim() !== "",
+                )
+                .map((device: any) => ({
+                    id: device.DeviceID,
+                    name: device.DeviceName,
+                    deviceId: device.DeviceID,
+                }));
+
             // Set device selection based on localStorage or default to first device
             if (storedDeviceID) {
                 // If DeviceID is in localStorage, find that device
-                const storedDevice = devices.find(device => device.deviceId === storedDeviceID);
+                const storedDevice = devices.find(
+                    (device) => device.deviceId === storedDeviceID,
+                );
                 if (storedDevice) {
                     selectedDevice = storedDevice;
-                    console.log('Using stored DeviceID:', storedDeviceID);
+                    console.log("Using stored DeviceID:", storedDeviceID);
                 }
             } else if (devices.length > 0) {
                 // Set first valid device as default selection if no stored DeviceID
                 selectedDevice = devices[0];
-                console.log('Default selected device:', selectedDevice);
-                console.log('Default Device ID:', selectedDevice.deviceId);
             }
-            
+
             // Filter report settings for selected device
             filterReportSettings();
         } catch (error) {
-            console.error('Error fetching devices:', error);
+            console.error("Error fetching devices:", error);
             devices = [];
         }
     }
 
     // Filter report settings based on selected device or stored DeviceID
     function filterReportSettings() {
-        let deviceIdToFilter = storedDeviceID || (selectedDevice ? selectedDevice.deviceId : null);
-        
+        let deviceIdToFilter =
+            storedDeviceID || (selectedDevice ? selectedDevice.deviceId : null);
+
         if (deviceIdToFilter) {
-            emailSettings = allEmailSettings.filter(setting => 
-                setting.DeviceID === deviceIdToFilter
+            emailSettings = allEmailSettings.filter(
+                (setting) => setting.DeviceID === deviceIdToFilter,
             );
-            console.log(`Filtered report settings for DeviceID ${deviceIdToFilter}:`, emailSettings.length);
+            console.log(
+                `Filtered report settings for DeviceID ${deviceIdToFilter}:`,
+                emailSettings.length,
+            );
         } else {
             emailSettings = allEmailSettings;
         }
@@ -152,8 +159,8 @@
     // Handle device selection
     function handleDeviceSelection(device: Device) {
         selectedDevice = device;
-        console.log('Selected device:', device);
-        console.log('Device ID to pass:', device.deviceId);
+        console.log("Selected device:", device);
+        console.log("Device ID to pass:", device.deviceId);
         filterReportSettings(); // Filter report settings when device changes
     }
 
@@ -164,11 +171,8 @@
     //     }
     // }
 
-
-  
-     function loadViewSetting() {
-        const savedSetting = localStorage.getItem('reportType');
-
+    function loadViewSetting() {
+        const savedSetting = localStorage.getItem("reportType");
 
         // if (savedSetting && ['Daily', 'Weekly', 'Biweekly', 'Monthly', 'Bimonthly'].includes(savedSetting)) {
         //     viewSetting = savedSetting as ReportFrequency;
@@ -182,10 +186,9 @@
                 .split(",")
                 .filter((f) => f.trim() !== "") as ReportFrequency[];
 
-
-
-            viewFrequencies = savedSetting.split(',').filter(f => f.trim() !== '') as ReportFrequency[];
-            
+            viewFrequencies = savedSetting
+                .split(",")
+                .filter((f) => f.trim() !== "") as ReportFrequency[];
 
             // Update viewSetting with the first frequency (for backward compatibility)
             if (viewFrequencies.length > 0) {
@@ -556,6 +559,41 @@
     }
 
     $: displayValue = selectedFrequencies.join(", ") || [...currentFrequencies];
+
+    // DROPDOWN DEVICE CLICK BODY ACTION
+    let dropdownOpen = false;
+
+    function deviceToggleDropdown() {
+        dropdownOpen = !dropdownOpen;
+    }
+
+    // Close dropdown when clicking outside
+    function handleClickOutside(event: MouseEvent) {
+        const dropdown = document.getElementById("device-dropdown-summary");
+        const button = document.getElementById("device-menu-button-summary");
+
+        if (
+            dropdown &&
+            !dropdown.contains(event.target as Node) &&
+            button &&
+            !button.contains(event.target as Node)
+        ) {
+            dropdownOpen = false;
+        }
+    }
+
+    onMount(() => {
+        window.addEventListener("click", handleClickOutside);
+        return () => {
+            window.removeEventListener("click", handleClickOutside);
+        };
+    });
+
+    function selectDevice(device: any) {
+        handleDeviceSelection(device);
+        dropdownOpen = false;
+    }
+    //END DROPDOWN DEVICE CLICK BODY ACTION
 </script>
 
 <div class="min-h-screen bg-gray-100 p-4 md:p-8">
@@ -573,59 +611,68 @@
     <!-- Main Content -->
     <div class="max-w-5xl mx-auto pt-25">
         <!-- Device Dropdown Section - Only show if no DeviceID in localStorage and not Admin/SuperAdmin -->
-        {#if !storedDeviceID && adminType !== 'Admin' && adminType !== 'SuperAdmin'}
-            <div class="max-w-5xl mx-auto mb-6">
+        {#if !storedDeviceID && adminType !== "Admin" && adminType !== "SuperAdmin"}
+            <!-- Device Dropdown Section -->
+            <div class="max-w-5xl mx-auto mb-8 px-4">
                 <div class="flex justify-center">
-                    <div class="relative inline-block text-left">
-                        <div>
+                    <div class="relative inline-block text-left w-64">
+                        {#if adminType === "Owner"}
                             <button
+                                id="device-menu-button-summary"
                                 type="button"
-                                class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                                id="device-menu-button"
-                                aria-expanded="true"
-                                aria-haspopup="true"
-                                on:click={() => {
-                                    const dropdown = document.getElementById('device-dropdown');
-                                    dropdown?.classList.toggle('hidden');
-                                }}
+                                class="inline-flex w-full justify-between items-center rounded-lg bg-white px-4 py-3 text-sm font-semibold text-[#02066F] border border-[#02066F] shadow-sm hover:bg-[#02066F] hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02066F] transition"
+                                on:click={deviceToggleDropdown}
                             >
-                                {selectedDevice ? selectedDevice.name : 'Select Device Name'}
-                                <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                <span
+                                    >{selectedDevice
+                                        ? selectedDevice.name
+                                        : "Select Device Name"}</span
+                                >
+                                <svg
+                                    class="h-5 w-5 text-gray-400 group-hover:text-white transition"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                                        clip-rule="evenodd"
+                                    />
                                 </svg>
                             </button>
-                        </div>
+                        {/if}
 
-                        <div 
-                            id="device-dropdown"
-                            class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden"
-                            role="menu" 
-                            aria-orientation="vertical" 
-                            aria-labelledby="device-menu-button" 
-                            tabindex="-1"
-                        >
-                            <div class="py-1" role="none">
-                                {#each devices as device}
-                                    <button
-                                        type="button"
-                                        class="text-gray-700 block w-full px-4 py-2 text-left text-sm hover:bg-gray-100 hover:text-gray-900"
-                                        role="menuitem"
-                                        tabindex="-1"
-                                        on:click={() => {
-                                            handleDeviceSelection(device);
-                                            document.getElementById('device-dropdown')?.classList.add('hidden');
-                                        }}
-                                    >
-                                        {device.name}
-                                    </button>
-                                {:else}
-                                    <div class="text-gray-500 block px-4 py-2 text-sm">No devices available</div>
-                                {/each}
+                        <!-- Dropdown -->
+                        {#if dropdownOpen}
+                            <div
+                                id="device-dropdown-summary"
+                                class="absolute right-0 z-20 mt-2 w-full origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 animate-fadeIn"
+                            >
+                                <div class="py-1">
+                                    {#each devices as device}
+                                        <button
+                                            type="button"
+                                            class="text-gray-700 block w-full px-4 py-2 text-left text-sm hover:bg-[#02066F] hover:text-white transition"
+                                            on:click={() =>
+                                                selectDevice(device)}
+                                        >
+                                            {device.name}
+                                        </button>
+                                    {:else}
+                                        <div
+                                            class="text-gray-500 block px-4 py-2 text-sm"
+                                        >
+                                            No devices available
+                                        </div>
+                                    {/each}
+                                </div>
                             </div>
-                        </div>
+                        {/if}
                     </div>
                 </div>
             </div>
+            <!-- End Device Dropdown -->
         {/if}
 
         <!-- Report Email Settings Section -->
@@ -758,7 +805,7 @@
                             >
                         </tr>
                     </thead>
-                   
+
                     <tbody class="bg-white divide-y divide-gray-200">
                         <tr class="text-center">
                             <td
@@ -807,9 +854,14 @@
                 <div class="p-6 text-center">
                     <!-- Device Info Display -->
                     {#if storedDeviceID || selectedDevice}
-                        <div class="mb-4 p-2 bg-blue-50 border border-blue-200 rounded-md">
+                        <div
+                            class="mb-4 p-2 bg-blue-50 border border-blue-200 rounded-md"
+                        >
                             <p class="text-sm text-blue-800">
-                                <strong>Device:</strong> {selectedDevice ? selectedDevice.name : `Device ID: ${storedDeviceID}`}
+                                <strong>Device:</strong>
+                                {selectedDevice
+                                    ? selectedDevice.name
+                                    : `Device ID: ${storedDeviceID}`}
                             </p>
                         </div>
                     {/if}

@@ -38,6 +38,9 @@
   let adminCount = 0;
   let superAdminCount = 0;
 
+  const limitEmployees = localStorage.getItem("NoOfEmployees") || "";
+  const maxEmployees = parseInt(limitEmployees); 
+
   // API config
   const apiUrlBase =
     "https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/employee";
@@ -114,7 +117,7 @@
       }
 
       const data = await response.json();
-      employees = data;
+      employees = Array.isArray(data) ? data : [];
       filterEmployees();
     } catch (error) {
       console.error("Error fetching employee data:", error);
@@ -175,9 +178,10 @@
     loading = true;
 
     // Base filter for device selection
-    let deviceFilteredEmployees = employees;
+   let deviceFilteredEmployees = Array.isArray(employees) ? employees : [];
+
     if (selectedDevice && selectedDevice.DeviceID) {
-      deviceFilteredEmployees = employees.filter(
+      deviceFilteredEmployees = deviceFilteredEmployees.filter(
         (emp) => emp.DeviceID === selectedDevice.DeviceID,
       );
       console.log(
@@ -244,7 +248,7 @@
     }
 
     // Base filter for device selection
-    let deviceFilteredEmployees = employees;
+     let deviceFilteredEmployees = Array.isArray(employees) ? employees : [];
     if (selectedDevice && selectedDevice.DeviceID) {
       deviceFilteredEmployees = employees.filter(
         (emp) =>
@@ -801,9 +805,10 @@
           Employee Details
         </h2>
         <button
-          on:click={openAddEmployee}
-          class="px-2 py-1 md:px-2 md:py-1 w-24 h-10 md:w-26 text-center items-center bg-white text-base md:text-lg border border-[#02066F] text-[#02066F] rounded-md cursor-pointer transition-colors"
-        >
+        class="px-2 py-1 md:px-2 md:py-1 w-24 h-10 md:w-26 text-center items-center bg-white text-base md:text-lg border border-[#02066F] text-[#02066F] rounded-md cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        on:click={openAddEmployee}
+        disabled = {employees.length >= maxEmployees || !selectedDevice}
+          >
           Add Entry
         </button>
       </div>
@@ -1006,9 +1011,9 @@
             Admin Details
           </h2>
           <button
-            on:click={openAddAdmin}
-            disabled={adminCount >= 3}
             class="px-2 py-1 md:px-2 md:py-1 w-24 h-10 md:w-26 text-center items-center bg-white text-base md:text-lg border border-[#02066F] text-[#02066F] rounded-md cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            on:click={openAddAdmin}
+            disabled={adminCount >= 3 || !selectedDevice}
           >
             Add Entry {adminCount >= 3 ? "(Max Reached)" : ""}
           </button>
@@ -1120,9 +1125,10 @@
             SuperAdmin Details
           </h2>
           <button
+            class="px-2 py-1 md:px-2 md:py-1 w-26 h-10 md:w-26 text-center items-center bg-white text-base md:text-lg border border-[#02066F] text-[#02066F] rounded-md cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             on:click={openAddSuperAdmin}
-            class="px-2 py-1 md:px-2 md:py-1 w-26 h-10 md:w-26 text-center items-center bg-white text-base md:text-lg border border-[#02066F] text-[#02066F] rounded-md cursor-pointer transition-colors"
-          >
+            disabled={!selectedDevice}
+            >
             Add Entry
           </button>
         </div>

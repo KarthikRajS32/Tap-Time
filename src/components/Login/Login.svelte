@@ -107,6 +107,9 @@
     try {
       const userObject = decodeJwtResponse(response.credential);
       const email = userObject.email;
+
+      console.log("Google Sign-In user object:", userObject);
+      
       localStorage.clear();
 
       const res = await fetch(`https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/login_check/${email}`);
@@ -132,6 +135,10 @@
         localStorage.setItem('reportType', data["ReportType"]);
         localStorage.setItem('adminMail', data["Email"]);
         localStorage.setItem('adminType', data["AdminType"]);
+
+         localStorage.setItem('userName', userObject.name); // or userObject.given_name if you prefer just the first name
+        localStorage.setItem('userPicture', userObject.picture);
+
         if("DeviceID" in data)
         {
           localStorage.setItem("DeviceID", data["DeviceID"]);

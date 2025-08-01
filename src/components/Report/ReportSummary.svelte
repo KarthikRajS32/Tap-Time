@@ -4,6 +4,10 @@
   import flatpickr from "flatpickr";
   import "flatpickr/dist/flatpickr.min.css";
   import DataTable from "datatables.net-dt";
+  // Example: in your +page.js or +page.svelte
+  import { page } from "$app/stores";
+
+  $: selectedType = $page.url.searchParams.get("type"); // 'monthly' or 'biweekly'
 
   // Types
   type Employee = { FName: string; EmpID: string; [key: string]: any };
@@ -84,6 +88,7 @@
     "https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/device";
 
   onMount(async () => {
+    console.log("available frequency", availableFrequencies);
     const today = new Date().toISOString().substring(0, 10);
     currentDate = today;
     formData.date = today;
@@ -345,8 +350,7 @@
     // Rest of your onMount code...
   });
 
-
-  // DROPDOWN DEVICE CLICK BODY ACTION 
+  // DROPDOWN DEVICE CLICK BODY ACTION
   let dropdownOpen = false;
 
   function toggleDropdown() {
@@ -358,7 +362,11 @@
     const dropdown = document.getElementById("device-dropdown-summary");
     const button = document.getElementById("device-menu-button-summary");
 
-    if (dropdown && !dropdown.contains(event.target) && !button.contains(event.target)) {
+    if (
+      dropdown &&
+      !dropdown.contains(event.target) &&
+      !button.contains(event.target)
+    ) {
       dropdownOpen = false;
     }
   }
@@ -374,7 +382,7 @@
     handleDeviceSelection(device);
     dropdownOpen = false;
   }
-  //END DROPDOWN DEVICE CLICK BODY ACTION 
+  //END DROPDOWN DEVICE CLICK BODY ACTION
 </script>
 
 <div class="pt-16 md:pt-18 sm:pt-2">
@@ -410,12 +418,15 @@
             >Day Wise Report</a
           >
 
-          <!-- Show separate frequency tabs -->
+          <!-- Frequency Tabs -->
           {#if availableFrequencies.length > 1}
             {#each availableFrequencies as frequency}
               <a
                 href="/salariedreport"
                 class="px-4 py-2 text-[#02066F] font-semibold rounded-full"
+                on:click={() => {
+                  localStorage.setItem("selectedFrequency", frequency);
+                }}
               >
                 {frequency} Report
               </a>
@@ -424,6 +435,12 @@
             <a
               href="/salariedreport"
               class="px-4 py-2 text-[#02066F] font-semibold rounded-full"
+              on:click={() => {
+                localStorage.setItem(
+                  "selectedFrequency",
+                  availableFrequencies[0],
+                );
+              }}
             >
               {availableFrequencies[0]} Report
             </a>

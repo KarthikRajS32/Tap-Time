@@ -17,23 +17,44 @@ let showHomeModal = false; // State for home modal
 let getEmail:string = '';
 let firstLetter:string = '';
 
+ let userPicture: string | null = null;
+
+
+ let userProfile = {
+    name: '',
+    email: '',
+    picture: '',
+    fallback: ''
+  };
+
 onMount(() => {
 	currentPath = get(page).url.pathname;
 	userType = localStorage.getItem('adminType') as 'Owner' | 'Admin' | 'SuperAdmin' || 'Owner';
 	getEmail = localStorage.getItem('adminMail') || '';
 	console.log('getEmail', getEmail);
-	 firstLetter = getEmail.charAt(0).toUpperCase();
+	const userPictureUrl = localStorage.getItem('userPicture');
+	
+	// Fix Google image URL if needed
+	const fixedPictureUrl = userPictureUrl && !userPictureUrl.startsWith('http') 
+	  ? `https:${userPictureUrl}` 
+	  : userPictureUrl;
 
+	userProfile = {
+	  name: localStorage.getItem('userName') || '',
+	  email: getEmail,
+	  picture: fixedPictureUrl || '',
+	  fallback: getEmail.charAt(0).toUpperCase()
+	};
 
-
-let showModal = false;
-let showHomeModal = false; // State for home modal
-
-
-
-	currentPath = get(page).url.pathname;
-	userType = localStorage.getItem('adminType') || '';
+   console.log('User Profile:', userProfile); // Debugging
+	// currentPath = get(page).url.pathname;
+	// userType = localStorage.getItem('adminType') || '';
 });
+
+ $: {
+    const email = localStorage.getItem('adminMail') || '';
+    userProfile.fallback = email.charAt(0).toUpperCase();
+  }
 
 
 
@@ -132,10 +153,18 @@ let showProfileSidebar = false;
   }
 
   
-const firstName = localStorage.getItem('firstName');
-const lastName = localStorage.getItem('lastName');
+const userName = localStorage.getItem('userName');
+// const userProfile = localStorage.getItem('userPicture');
 
-let Name = `${firstName} ${lastName}`;
+// let userProfile = localStorage.getItem('userPicture');
+
+console.log('Profile URL:', localStorage.getItem('userPicture'));
+
+
+
+
+
+// let avatarFallback = typeof userProfile === 'string' && userProfile ? userProfile.charAt(0).toUpperCase() : '';
 
 </script>
 
@@ -209,7 +238,18 @@ let Name = `${firstName} ${lastName}`;
     class="w-10 h-10 rounded-full bg-[#02066F] text-white flex items-center justify-center font-bold uppercase cursor-pointer"
     on:click={toggleProfileSidebar}
   >
-    {firstLetter}
+   {#if userProfile.picture}
+      <img 
+        src={userProfile.picture} 
+        alt="Profile" 
+        class="w-full h-full object-cover rounded-full"
+        on:error={() => userProfile.picture = ''}
+      />
+    {:else}
+      <span class="text-white font-bold text-lg">
+        {userProfile.fallback}
+      </span>
+    {/if}
   </button>
 </div>
 
@@ -232,11 +272,20 @@ let Name = `${firstName} ${lastName}`;
 
     <!-- User Info -->
     <div class="px-4 py-4 flex flex-col gap-4 justify-center text-center items-center">
-		<span class="w-20 h-20 rounded-full bg-white text-[#02066F] text-3xl flex text-center items-center justify-center font-bold uppercase border-3 border-yellow-600">
-		{firstLetter}
-	</span>
-	  <p class="text-base text-white font-bold">{Name}</p>
-      <p class="text-base text-gray-200">{getEmail}</p>
+		 {#if userProfile.picture}
+      <img 
+        src={userProfile.picture} 
+        alt="Profile" 
+        class="w-20 h-20 rounded-full object-cover border-3 border-yellow-600"
+        on:error={() => userProfile.picture = ''}
+      />
+    {:else}
+      <div class="w-20 h-20 rounded-full bg-white text-[#02066F] flex items-center justify-center text-3xl font-bold border-3 border-yellow-600">
+        {userProfile.fallback}
+      </div>
+    {/if}
+	  <p class="text-base text-white font-bold">{userProfile.name}</p>
+      <p class="text-base text-gray-200">{userProfile.email}</p>
     </div>
 
     <!-- Actions -->

@@ -289,6 +289,35 @@
         });
     };
 
+// DROPDOWN DEVICE CLICK BODY ACTION 
+  let dropdownOpen = false;
+
+  function toggleDropdown() {
+    dropdownOpen = !dropdownOpen;
+  }
+
+  // Close dropdown when clicking outside
+  function handleClickOutside(event) {
+    const dropdown = document.getElementById("device-dropdown-summary");
+    const button = document.getElementById("device-menu-button-summary");
+
+    if (dropdown && !dropdown.contains(event.target) && !button.contains(event.target)) {
+      dropdownOpen = false;
+    }
+  }
+
+  onMount(() => {
+    window.addEventListener("click", handleClickOutside);
+    return () => {
+      window.removeEventListener("click", handleClickOutside);
+    };
+  });
+
+  function selectDevice(device) {
+    handleDeviceSelection(device);
+    dropdownOpen = false;
+  }
+  //END DROPDOWN DEVICE CLICK BODY ACTION 
 </script>
 
 
@@ -333,73 +362,63 @@
         </nav>
 
         <!-- Device Dropdown Section -->
-        <div class="max-w-5xl mx-auto mb-6 px-4">
-            <div class="flex justify-center">
-                <div class="relative inline-block text-left">
-                    {#if adminType == 'Owner'}
-                    <div>
-                        <button
-                            type="button"
-                            class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                            id="device-menu-button"
-                            aria-expanded="true"
-                            aria-haspopup="true"
-                            on:click={() => {
-                                const dropdown = document.getElementById('device-dropdown');
+    <div class="max-w-5xl mx-auto mt-5 px-4">
+      <div class="flex justify-center">
+        <div class="relative inline-block text-left w-64">
+          {#if adminType === "Owner"}
+            <button
+              id="device-menu-button-summary"
+              type="button"
+              class="inline-flex w-full justify-between items-center rounded-lg bg-white px-4 py-3 text-sm font-semibold text-[#02066F] border border-[#02066F] shadow-sm hover:bg-[#02066F] hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02066F] transition"
+              on:click={toggleDropdown}
+            >
+              <span
+                >{selectedDevice
+                  ? selectedDevice.DeviceName
+                  : "Select Device Name"}</span
+              >
+              <svg
+                class="h-5 w-5 text-gray-400 group-hover:text-white transition"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </button>
+          {/if}
 
-                                if (dropdown) {
-                                    dropdown.classList.toggle('hidden');
-                                }
-
-                            }}
-                        >
-                            {selectedDevice ? selectedDevice.DeviceName : 'Select Device Name'}
-                            <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>
-                    {/if}
-                    <div 
-                        id="device-dropdown"
-                        class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none hidden"
-                        role="menu" 
-                        aria-orientation="vertical" 
-                        aria-labelledby="device-menu-button" 
-                        tabindex="-1"
-                    >
-                        <div class="py-1" role="none">
-                            {#each devices as device}
-                                <button
-                                    type="button"
-                                    class="text-gray-700 block w-full px-4 py-2 text-left text-sm hover:bg-gray-100 hover:text-gray-900"
-                                    role="menuitem"
-                                    tabindex="-1"
-                                    on:click={() => {
-                                        handleDeviceSelection(device);
-
-                                        const dropdown = document.getElementById('device-dropdown');
-                                        if (dropdown) {
-                                            dropdown.classList.add('hidden');
-                                        }
-
-                                        const dropdownEl = document.getElementById('device-dropdown');
-                                        if (dropdownEl) {
-                                            dropdownEl.classList.add('hidden');
-                                        }
-
-                                    }}
-                                >
-                                    {device.DeviceName}
-                                </button>
-                            {:else}
-                                <div class="text-gray-500 block px-4 py-2 text-sm">No devices available</div>
-                            {/each}
-                        </div>
-                    </div>
-                </div>
+          <!-- Dropdown -->
+          {#if dropdownOpen}
+            <div
+              id="device-dropdown-summary"
+              class="absolute right-0 z-20 mt-2 w-full origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 animate-fadeIn"
+            >
+              <div class="py-1">
+                {#each devices as device}
+                  <button
+                    type="button"
+                    class="text-gray-700 block w-full px-4 py-2 text-left text-sm hover:bg-[#02066F] hover:text-white transition"
+                    on:click={() => selectDevice(device)}
+                  >
+                    {device.DeviceName}
+                  </button>
+                {:else}
+                  <div class="text-gray-500 block px-4 py-2 text-sm">
+                    No devices available
+                  </div>
+                {/each}
+              </div>
             </div>
+          {/if}
         </div>
+      </div>
+    </div>
+    <!-- End Device Dropdown -->
 
         <!-- Date Picker and Download Buttons -->
         <div class="flex flex-col md:flex-row justify-center items-center my-8 gap-4 px-4">
