@@ -107,6 +107,7 @@
     try {
       const userObject = decodeJwtResponse(response.credential);
       const email = userObject.email;
+      
 
       console.log("Google Sign-In user object:", userObject);
       
@@ -180,7 +181,7 @@
       const encryptedData = buffer.slice(12);
 
       const algorithm = { name: 'AES-GCM', iv };
-      const cryptoKey = await crypto.subtle.importKey('raw', key, algorithm, false, ['decrypt']);
+      const cryptoKey = await crypto.subtle.importKey('raw', buffer, algorithm, false, ['decrypt']);
 
       const decryptedData = await crypto.subtle.decrypt(algorithm, cryptoKey, encryptedData);
       return new TextDecoder().decode(decryptedData);

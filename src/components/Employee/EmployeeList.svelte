@@ -26,6 +26,7 @@
   let searchTerms: string = "";
   let searchSuperAdminTerm: string = "";
   let getEmail: string = "";
+  let employeesCount = 0;
 
   // UI state
   let showEmployeeModal = false;
@@ -39,7 +40,7 @@
   let superAdminCount = 0;
 
   const limitEmployees = localStorage.getItem("NoOfEmployees") || "";
-  const maxEmployees = parseInt(limitEmployees); 
+  const maxEmployees = parseInt(limitEmployees);
 
   // API config
   const apiUrlBase =
@@ -88,21 +89,15 @@
 
   // Initialize component
 
-
-
   onMount(async () => {
-    getEmail = localStorage.getItem('adminMail') || "";
+    getEmail = localStorage.getItem("adminMail") || "";
     await fetchEmployeeData();
     await fetchDevices();
-
-
   });
   onMount(() => {
     fetchEmployeeData();
     // userType = localStorage.getItem('userType') || '';
-    userType = localStorage.getItem('adminType') || '';
-
-
+    userType = localStorage.getItem("adminType") || "";
   });
 
   // Fetch all employee data
@@ -118,6 +113,7 @@
 
       const data = await response.json();
       employees = Array.isArray(data) ? data : [];
+      employeesCount = employees.length;
       filterEmployees();
     } catch (error) {
       console.error("Error fetching employee data:", error);
@@ -178,7 +174,7 @@
     loading = true;
 
     // Base filter for device selection
-   let deviceFilteredEmployees = Array.isArray(employees) ? employees : [];
+    let deviceFilteredEmployees = Array.isArray(employees) ? employees : [];
 
     if (selectedDevice && selectedDevice.DeviceID) {
       deviceFilteredEmployees = deviceFilteredEmployees.filter(
@@ -207,7 +203,7 @@
     let matchedEmployee = null;
     const cleanEmail = getEmail.trim().toLowerCase();
 
-    console.log("okay",admins);
+    console.log("okay", admins);
 
     if (adminType === "Admin") {
       for (const emp of admins) {
@@ -248,7 +244,7 @@
     }
 
     // Base filter for device selection
-     let deviceFilteredEmployees = Array.isArray(employees) ? employees : [];
+    let deviceFilteredEmployees = Array.isArray(employees) ? employees : [];
     if (selectedDevice && selectedDevice.DeviceID) {
       deviceFilteredEmployees = employees.filter(
         (emp) =>
@@ -669,7 +665,7 @@
     }
   }
 
-  // DROPDOWN DEVICE CLICK BODY ACTION 
+  // DROPDOWN DEVICE CLICK BODY ACTION
   let dropdownOpen = false;
 
   function toggleDropdown() {
@@ -703,7 +699,6 @@
     dropdownOpen = false;
   }
   //END DROPDOWN DEVICE CLICK BODY ACTION
-  
 </script>
 
 <div class="min-h-screen bg-gray-100 pt-30 pb-10 px-4 sm:px-6">
@@ -736,64 +731,64 @@
     </div>
   {/if}
 
-   <!-- Device Dropdown Section -->
-    <div class="max-w-5xl mx-auto mb-8 px-4">
-      <div class="flex justify-center">
-        <div class="relative inline-block text-left w-64">
-          {#if adminType === "Owner"}
-            <button
-              id="device-menu-button-summary"
-              type="button"
-              class="inline-flex w-full justify-between items-center rounded-lg bg-white px-4 py-3 text-sm font-semibold text-[#02066F] border border-[#02066F] shadow-sm hover:bg-[#02066F] hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02066F] transition"
-              on:click={toggleDropdown}
+  <!-- Device Dropdown Section -->
+  <div class="max-w-5xl mx-auto mb-8 px-4">
+    <div class="flex justify-center">
+      <div class="relative inline-block text-left w-64">
+        {#if adminType === "Owner"}
+          <button
+            id="device-menu-button-summary"
+            type="button"
+            class="inline-flex w-full justify-between items-center rounded-lg bg-white px-4 py-3 text-sm font-semibold text-[#02066F] border border-[#02066F] shadow-sm hover:bg-[#02066F] hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02066F] transition"
+            on:click={toggleDropdown}
+          >
+            <span
+              >{selectedDevice
+                ? selectedDevice.DeviceName
+                : "Select Device Name"}</span
             >
-              <span
-                >{selectedDevice
-                  ? selectedDevice.DeviceName
-                  : "Select Device Name"}</span
-              >
-              <svg
-                class="h-5 w-5 text-gray-400 group-hover:text-white transition"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </button>
-          {/if}
+            <svg
+              class="h-5 w-5 text-gray-400 group-hover:text-white transition"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+        {/if}
 
-          <!-- Dropdown -->
-          {#if dropdownOpen}
-            <div
-              id="device-dropdown-summary"
-              class="absolute right-0 z-20 mt-2 w-full origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 animate-fadeIn"
-            >
-              <div class="py-1">
-                {#each devices as device}
-                  <button
-                    type="button"
-                    class="text-gray-700 block w-full px-4 py-2 text-left text-sm hover:bg-[#02066F] hover:text-white transition"
-                    on:click={() => selectDevice(device)}
-                  >
-                    {device.DeviceName}
-                  </button>
-                {:else}
-                  <div class="text-gray-500 block px-4 py-2 text-sm">
-                    No devices available
-                  </div>
-                {/each}
-              </div>
+        <!-- Dropdown -->
+        {#if dropdownOpen}
+          <div
+            id="device-dropdown-summary"
+            class="absolute right-0 z-20 mt-2 w-full origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 animate-fadeIn"
+          >
+            <div class="py-1">
+              {#each devices as device}
+                <button
+                  type="button"
+                  class="text-gray-700 block w-full px-4 py-2 text-left text-sm hover:bg-[#02066F] hover:text-white transition"
+                  on:click={() => selectDevice(device)}
+                >
+                  {device.DeviceName}
+                </button>
+              {:else}
+                <div class="text-gray-500 block px-4 py-2 text-sm">
+                  No devices available
+                </div>
+              {/each}
             </div>
-          {/if}
-        </div>
+          </div>
+        {/if}
       </div>
     </div>
-    <!-- End Device Dropdown -->
+  </div>
+  <!-- End Device Dropdown -->
 
   <!-- Employee Section -->
   <div class="max-w-5xl mx-auto">
@@ -804,13 +799,31 @@
         <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">
           Employee Details
         </h2>
-        <button
-        class="px-2 py-1 md:px-2 md:py-1 w-24 h-10 md:w-26 text-center items-center bg-white text-base md:text-lg border border-[#02066F] text-[#02066F] rounded-md cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        on:click={openAddEmployee}
-        disabled = {employees.length >= maxEmployees || !selectedDevice}
+
+        <!-- Wrap the button in a group container -->
+        <div class="relative group w-fit">
+          <button
+            class="px-2 py-1 md:px-2 md:py-1 w-24 h-10 md:w-26 text-center items-center bg-white text-base md:text-lg border border-[#02066F] text-[#02066F] rounded-md cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            on:click={openAddEmployee}
+            disabled={employees.length >= maxEmployees || !selectedDevice}
           >
-          Add Entry
-        </button>
+            Add Entry
+          </button>
+
+          {#if employees.length >= maxEmployees}
+            <div
+              class="absolute -top-16 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm rounded py-2 px-3 shadow-lg w-64 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 pointer-events-none"
+            >
+              <p>
+                You have reached the Employee registration limit. If you need to
+                add more Employee, please
+                <a href="/contact" class="text-yellow-400 hover:underline"
+                  >contact!</a
+                >
+              </p>
+            </div>
+          {/if}
+        </div>
       </div>
 
       <div
@@ -1000,234 +1013,261 @@
     <!-- Admin Section (only for SuperAdmin) -->
 
     {#if adminType != "Admin"}
-
-    <!-- {#if adminType === 'SuperAdmin'} -->
-     {#if adminType !== 'Admin'}
-      <div class="mb-8 pt-4">
-        <div
-          class="flex flex-row sm:flex-row justify-between items-start sm:items-center mb-4 gap-4"
-        >
-          <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">
-            Admin Details
-          </h2>
-          <button
-            class="px-2 py-1 md:px-2 md:py-1 w-24 h-10 md:w-26 text-center items-center bg-white text-base md:text-lg border border-[#02066F] text-[#02066F] rounded-md cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            on:click={openAddAdmin}
-            disabled={adminCount >= 3 || !selectedDevice}
+      <!-- {#if adminType === 'SuperAdmin'} -->
+      {#if adminType !== "Admin"}
+        <div class="mb-8 pt-4">
+          <div
+            class="flex flex-row sm:flex-row justify-between items-start sm:items-center mb-4 gap-4"
           >
-            Add Entry {adminCount >= 3 ? "(Max Reached)" : ""}
-          </button>
-        </div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">
+              Admin Details
+            </h2>
 
-        <div
-          class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-300"
-        >
-          <div class="p-4 sm:p-6 overflow-x-auto">
-            <div
-              class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2"
-            >
-              <label class="text-base font-semibold text-gray-800"
-                >Search:</label
+            <div class="relative group w-fit">
+              <button
+                class="px-2 py-1 md:px-2 md:py-1 w-24 h-10 md:w-26 text-center items-center bg-white text-base md:text-lg border border-[#02066F] text-[#02066F] rounded-md cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                on:click={openAddAdmin}
+                disabled={employees.length >= maxEmployees ||
+                  adminCount >= 3 ||
+                  !selectedDevice}
               >
-              <input
-                type="text"
-                bind:value={searchTerm}
-                on:input={searchAdmins}
-                class="w-full sm:w-64 px-2 py-1 border border-gray-500 rounded-md focus:outline-none focus:ring-1 focus:ring-[#02066F]"
-                placeholder=""
-              />
-            </div>
+                Add Entry
+              </button>
 
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-[#02066F] text-white">
-                  <tr>
-                    <th
-                      class="px-4 py-3 text-left text-base font-bold tracking-wider"
-                      >Pin</th
+              {#if adminCount >= 3 || employees.length >= maxEmployees}
+                <div
+                  class="absolute -top-16 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm rounded py-2 px-3 shadow-lg w-64 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 pointer-events-none"
+                >
+                  <p>
+                    You have reached the Admin registration limit. If you need
+                    to add more Admins, please
+                    <a href="/contact" class="text-yellow-400 hover:underline"
+                      >contact!</a
                     >
-                    <th
-                      class="px-4 py-3 text-left text-base font-bold tracking-wider"
-                      >Name</th
-                    >
-                    <th
-                      class="px-4 py-3 text-left text-base font-bold tracking-wider"
-                      >Phone Number</th
-                    >
-                    <th
-                      class="px-4 py-3 text-left text-base font-bold tracking-wider"
-                      >Action</th
-                    >
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  {#each admins as admin (admin.EmpID)}
-                    <tr class="hover:bg-gray-50">
-                      <td
-                        class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center"
-                        >{admin.Pin}</td
-                      >
-                      <td
-                        class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
-                        >{admin.FName} {admin.LName}</td
-                      >
-                      <td
-                        class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
-                        >{formatPhoneNumber(admin.PhoneNumber)}</td
-                      >
-                      <td
-                        class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
-                      >
-                        <div class="flex justify-center space-x-2">
-                          <button
-                            on:click={() => openEditEmployee(admin)}
-                            class="text-[#02066F] p-1 cursor-pointer"
-                          >
-                            <i class="fas fa-pencil-alt"></i>
-                          </button>
-                          <button
-                            on:click={() => openDeleteModal(admin)}
-                            class="text-[#02066F] p-1 cursor-pointer"
-                          >
-                            <i class="fas fa-trash"></i>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  {:else}
+                  </p>
+                </div>
+              {/if}
+            </div>
+          </div>
+
+          <div
+            class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-300"
+          >
+            <div class="p-4 sm:p-6 overflow-x-auto">
+              <div
+                class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2"
+              >
+                <label class="text-base font-semibold text-gray-800"
+                  >Search:</label
+                >
+                <input
+                  type="text"
+                  bind:value={searchTerm}
+                  on:input={searchAdmins}
+                  class="w-full sm:w-64 px-2 py-1 border border-gray-500 rounded-md focus:outline-none focus:ring-1 focus:ring-[#02066F]"
+                  placeholder=""
+                />
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-[#02066F] text-white">
                     <tr>
-                      <td
-                        colspan="4"
-                        class="px-4 py-4 text-center text-sm text-gray-500"
-                        >No admins found</td
+                      <th
+                        class="px-4 py-3 text-left text-base font-bold tracking-wider"
+                        >Pin</th
+                      >
+                      <th
+                        class="px-4 py-3 text-left text-base font-bold tracking-wider"
+                        >Name</th
+                      >
+                      <th
+                        class="px-4 py-3 text-left text-base font-bold tracking-wider"
+                        >Phone Number</th
+                      >
+                      <th
+                        class="px-4 py-3 text-left text-base font-bold tracking-wider"
+                        >Action</th
                       >
                     </tr>
-                  {/each}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    {#each admins as admin (admin.EmpID)}
+                      <tr class="hover:bg-gray-50">
+                        <td
+                          class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center"
+                          >{admin.Pin}</td
+                        >
+                        <td
+                          class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
+                          >{admin.FName} {admin.LName}</td
+                        >
+                        <td
+                          class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
+                          >{formatPhoneNumber(admin.PhoneNumber)}</td
+                        >
+                        <td
+                          class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
+                        >
+                          <div class="flex justify-center space-x-2">
+                            <button
+                              on:click={() => openEditEmployee(admin)}
+                              class="text-[#02066F] p-1 cursor-pointer"
+                            >
+                              <i class="fas fa-pencil-alt"></i>
+                            </button>
+                            <button
+                              on:click={() => openDeleteModal(admin)}
+                              class="text-[#02066F] p-1 cursor-pointer"
+                            >
+                              <i class="fas fa-trash"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    {:else}
+                      <tr>
+                        <td
+                          colspan="4"
+                          class="px-4 py-4 text-center text-sm text-gray-500"
+                          >No admins found</td
+                        >
+                      </tr>
+                    {/each}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
-      </div>
       {/if}
 
       <!-- SuperAdmin Section -->
 
+      {#if adminType === "Owner"}
+        <div class="mb-8 pt-4">
+          <div
+  class="flex flex-row sm:flex-row justify-between items-start sm:items-center mb-4 gap-4"
+>
+  <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">
+    SuperAdmin Details
+  </h2>
+
+  <div class="relative group w-fit">
+    <button
+      class="px-2 py-1 md:px-2 md:py-1 w-26 h-10 md:w-26 text-center items-center bg-white text-base md:text-lg border border-[#02066F] text-[#02066F] rounded-md cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      on:click={openAddSuperAdmin}
+      disabled={employees.length >= maxEmployees || !selectedDevice}
+    >
+      Add Entry
+    </button>
+
+    {#if superAdminCount >= 1 || employees.length >= maxEmployees}
+      <div
+        class="absolute -top-16 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm rounded py-2 px-3 shadow-lg w-64 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 pointer-events-none"
+      >
+        <p>
+          You have reached the SuperAdmin registration limit. Please
+          <a href="/contact" class="text-yellow-400 hover:underline">contact!</a>
+        </p>
+      </div>
+    {/if}
+  </div>
+</div>
 
 
-       {#if adminType === "Owner"}
-
-      <div class="mb-8 pt-4">
-        <div
-          class="flex flex-row sm:flex-row justify-between items-start sm:items-center mb-4 gap-4"
-        >
-          <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">
-            SuperAdmin Details
-          </h2>
-          <button
-            class="px-2 py-1 md:px-2 md:py-1 w-26 h-10 md:w-26 text-center items-center bg-white text-base md:text-lg border border-[#02066F] text-[#02066F] rounded-md cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            on:click={openAddSuperAdmin}
-            disabled={!selectedDevice}
-            >
-            Add Entry
-          </button>
-        </div>
-
-        <div
-          class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-300"
-        >
-          <div class="p-4 sm:p-6 overflow-x-auto">
-            <div
-              class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2"
-            >
-              <label class="text-base font-semibold text-gray-800"
-                >Search:</label
+          <div
+            class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-300"
+          >
+            <div class="p-4 sm:p-6 overflow-x-auto">
+              <div
+                class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2"
               >
-              <input
-                type="text"
-                bind:value={searchSuperAdminTerm}
-                on:input={searchSuperAdmins}
-                class="w-full sm:w-64 px-2 py-1 border border-gray-500 rounded-md focus:outline-none focus:ring-1 focus:ring-[#02066F]"
-                placeholder=""
-              />
-            </div>
+                <label class="text-base font-semibold text-gray-800"
+                  >Search:</label
+                >
+                <input
+                  type="text"
+                  bind:value={searchSuperAdminTerm}
+                  on:input={searchSuperAdmins}
+                  class="w-full sm:w-64 px-2 py-1 border border-gray-500 rounded-md focus:outline-none focus:ring-1 focus:ring-[#02066F]"
+                  placeholder=""
+                />
+              </div>
 
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-[#02066F] text-white">
-                  <tr>
-                    <th
-                      class="px-4 py-3 text-left text-base font-bold tracking-wider"
-                      >Pin</th
-                    >
-                    <th
-                      class="px-4 py-3 text-left text-base font-bold tracking-wider"
-                      >Name</th
-                    >
-                    <th
-                      class="px-4 py-3 text-left text-base font-bold tracking-wider"
-                      >Phone Number</th
-                    >
-                    <th
-                      class="px-4 py-3 text-left text-base font-bold tracking-wider"
-                      >Action</th
-                    >
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  {#each superAdmins as superAdmin (superAdmin.EmpID)}
-                    <tr class="hover:bg-gray-50">
-                      <td
-                        class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center"
-                        >{superAdmin.Pin}</td
-                      >
-                      <td
-                        class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
-                        >{superAdmin.FName} {superAdmin.LName}</td
-                      >
-                      <td
-                        class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
-                        >{formatPhoneNumber(superAdmin.PhoneNumber)}</td
-                      >
-                      <td
-                        class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
-                      >
-                        <div class="flex justify-center space-x-2">
-                          <button
-                            on:click={() => openEditEmployee(superAdmin)}
-                            class="text-[#02066F] p-1 cursor-pointer"
-                          >
-                            <i class="fas fa-pencil-alt"></i>
-                          </button>
-                          <button
-                            on:click={() => openDeleteModal(superAdmin)}
-                            class="text-[#02066F] p-1 cursor-pointer"
-                          >
-                            <i class="fas fa-trash"></i>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  {:else}
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-[#02066F] text-white">
                     <tr>
-                      <td
-                        colspan="4"
-                        class="px-4 py-4 text-center text-sm text-gray-500"
-                        >No SuperAdmins found</td
+                      <th
+                        class="px-4 py-3 text-left text-base font-bold tracking-wider"
+                        >Pin</th
+                      >
+                      <th
+                        class="px-4 py-3 text-left text-base font-bold tracking-wider"
+                        >Name</th
+                      >
+                      <th
+                        class="px-4 py-3 text-left text-base font-bold tracking-wider"
+                        >Phone Number</th
+                      >
+                      <th
+                        class="px-4 py-3 text-left text-base font-bold tracking-wider"
+                        >Action</th
                       >
                     </tr>
-                  {/each}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    {#each superAdmins as superAdmin (superAdmin.EmpID)}
+                      <tr class="hover:bg-gray-50">
+                        <td
+                          class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center"
+                          >{superAdmin.Pin}</td
+                        >
+                        <td
+                          class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
+                          >{superAdmin.FName} {superAdmin.LName}</td
+                        >
+                        <td
+                          class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
+                          >{formatPhoneNumber(superAdmin.PhoneNumber)}</td
+                        >
+                        <td
+                          class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
+                        >
+                          <div class="flex justify-center space-x-2">
+                            <button
+                              on:click={() => openEditEmployee(superAdmin)}
+                              class="text-[#02066F] p-1 cursor-pointer"
+                            >
+                              <i class="fas fa-pencil-alt"></i>
+                            </button>
+                            <button
+                              on:click={() => openDeleteModal(superAdmin)}
+                              class="text-[#02066F] p-1 cursor-pointer"
+                            >
+                              <i class="fas fa-trash"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    {:else}
+                      <tr>
+                        <td
+                          colspan="4"
+                          class="px-4 py-4 text-center text-sm text-gray-500"
+                          >No SuperAdmins found</td
+                        >
+                      </tr>
+                    {/each}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-
       {/if}
     {/if}
-
   </div>
 
   <!-- Employee Modal -->

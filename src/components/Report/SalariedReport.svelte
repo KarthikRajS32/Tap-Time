@@ -27,14 +27,15 @@
     let devices: any[] = [];
     let selectedDevice: any = null;
 
-    const adminType = localStorage.getItem("adminType");
-    const deviceID = localStorage.getItem("DeviceID");
+    let adminType = "";
+    let deviceID = "";
 
     let selectedFrequency: string = ""; // Currently selected frequency
-    let availableFrequencies: string[] = loadFrequenciesSync(); // Load immediately, not async
+    let availableFrequencies: string[] = []; // Load immediately, not async
 
     // Synchronous function to load frequencies immediately
     function loadFrequenciesSync(): string[] {
+        if (typeof window === 'undefined') return [];
         const savedFrequencies = localStorage.getItem("reportType");
         if (savedFrequencies) {
             return savedFrequencies.split(",").filter((f) => f.trim() !== "");
@@ -78,10 +79,16 @@
     // (duplicate removed)
 
    onMount(() => {
-  const selectedValue = localStorage.getItem("reportType");
+  // Initialize browser-specific data
+  adminType = localStorage.getItem("adminType") || "";
+  deviceID = localStorage.getItem("DeviceID") || "";
+  availableFrequencies = loadFrequenciesSync();
+  
+  const selectedValue = localStorage.getItem("reportType") ?? "";
+  let exactSelectedValue = localStorage.getItem("selectedFrequency"); 
   currentReportType = selectedValue;
   reportName = `${selectedValue} Report`;
-  reportTypeHeading = `${selectedValue} Report`;
+  reportTypeHeading = `${exactSelectedValue} Report`;
 
   // Get selected frequency
   const selectedFreq = localStorage.getItem("selectedFrequency");
@@ -106,12 +113,15 @@
   }
 
   toggleSelectors();
+  viewDateRangewiseReport();
+  fetchDevices();
 });
 
 
     // Fetch device data
     async function fetchDevices() {
         try {
+            if (typeof window === 'undefined') return;
             const cid = localStorage.getItem("companyID");
             const response = await fetch(`${deviceApiUrl}/getAll/${cid}`);
             if (!response.ok) throw new Error(`Error: ${response.status}`);
@@ -194,6 +204,7 @@
 
     async function loadReportData() {
         isLoading = true;
+        if (typeof window === 'undefined') return;
         const cid = localStorage.getItem("companyID");
         const dateRange = getDateRange(selectedFrequency); // Pass selected frequency
 
@@ -382,7 +393,7 @@
                 : new Date();
             // @ts-ignore
             const timeDifferenceInMinutes = Math.floor(
-                (checkOutDate - checkInDate) / 1000 / 60,
+                (Number(checkOutDate) - Number(checkInDate)) / 1000 / 60,
             );
 
             // @ts-ignore
@@ -526,16 +537,18 @@
     let week = 1;
     let half = "first";
 
-    onMount(() => {
-        const selectedValue = localStorage.getItem("reportType");
-        reportName = `${selectedValue} Report`;
-        reportTypeHeading = `${selectedValue} Report`;
-        toggleSelectors();
-        viewDateRangewiseReport();
-        fetchDevices();
-    });
+    // This is now handled in the main onMount above
+    // onMount(() => {
+    //     const selectedValue = localStorage.getItem("reportType");
+    //     reportName = `${selectedValue} Report`;
+    //     reportTypeHeading = `${selectedValue} Report`;
+    //     toggleSelectors();
+    //     viewDateRangewiseReport();
+    //     fetchDevices();
+    // });
 
     function toggleSelectors() {
+        if (typeof window === 'undefined') return;
         const reportType = localStorage.getItem("reportType");
         showWeekSelector = reportType === "Weekly";
         showHalfSelector = reportType === "Bimonthly";
@@ -568,7 +581,7 @@
     function generateDateRanges(): DateRange[] {
         const ranges: DateRange[] = [];
         const reportType =
-            currentReportType || localStorage.getItem("reportType");
+            currentReportType || (typeof window !== 'undefined' ? localStorage.getItem("reportType") : '');
 
         // if (reportType === "Weekly") {
         //     const daysInMonth = new Date(year, month, 0).getDate(); // Jan = 1
@@ -749,6 +762,7 @@
         startDateHeader = startVal;
         endDateHeader = endVal;
 
+        if (typeof window === 'undefined') return;
         const cid = localStorage.getItem("companyID");
         const deviceId = selectedDevice ? selectedDevice.DeviceID : "all";
 
@@ -823,6 +837,7 @@
     }
 
     function updateDates() {
+        if (typeof window === 'undefined') return;
         const reportType = localStorage.getItem("reportType");
         const selectedRange = dateRanges[selectedRangeIndex];
 

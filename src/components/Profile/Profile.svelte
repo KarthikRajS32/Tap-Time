@@ -221,48 +221,49 @@ phone: adminDetails.PhoneNumber || ''
   }
 
     // Encrypt functions
-    async function encryptPasswordInput(): Promise<string> {
-        const password = formData.decryptedPassword;
-        const storedPassword = localStorage.getItem('passwordDecryptedValue');
+    // async function encryptPasswordInput(): Promise<string> {
+    //     const password = formData.decryptedPassword;
+    //     const storedPassword = localStorage.getItem('passwordDecryptedValue');
 
-        if (password === storedPassword) {
-            return localStorage.getItem('password') || '';
-        }
+    //     if (password === storedPassword) {
+    //         return localStorage.getItem('password') || '';
+    //     }
 
-        const keyValue = new Uint8Array([16, 147, 220, 113, 166, 142, 22, 93, 241, 91, 13, 252, 112, 122, 119, 95]);
-        return await encryptData(password, keyValue);
-    }
+    //     const keyValue = new Uint8Array([16, 147, 220, 113, 166, 142, 22, 93, 241, 91, 13, 252, 112, 122, 119, 95]);
+    //     return await encryptData(password, keyValue);
+    // }
 
-    async function encryptData(data: string, key: Uint8Array): Promise<string> {
-        const dataBuffer = new TextEncoder().encode(data);
-        const algorithm = { name: 'AES-GCM', iv: generateRandomBytes(12) };
+    // async function encryptData(data: string, key: Uint8Array): Promise<string> {
+    //     const dataBuffer = new TextEncoder().encode(data);
+    //     const algorithm = { name: 'AES-GCM', iv: generateRandomBytes(12) };
 
-        const importedKey = await crypto.subtle.importKey(
-            'raw', key, { name: 'AES-GCM' }, false, ['encrypt']
-        );
+    //     // Ensure key is a plain Uint8Array (not a generic or typed variant)
+    //     const importedKey = await crypto.subtle.importKey(
+    //         'raw', key.buffer, { name: 'AES-GCM' }, false, ['encrypt']
+    //     );
 
-        const encryptedData = await crypto.subtle.encrypt(
-            algorithm, importedKey, dataBuffer
-        );
+    //     const encryptedData = await crypto.subtle.encrypt(
+    //         algorithm, importedKey, dataBuffer
+    //     );
 
-        const iv = algorithm.iv;
-        const encryptedDataWithIV = new Uint8Array(iv.byteLength + encryptedData.byteLength);
-        encryptedDataWithIV.set(iv);
-        encryptedDataWithIV.set(new Uint8Array(encryptedData), iv.byteLength);
+    //     const iv = algorithm.iv;
+    //     const encryptedDataWithIV = new Uint8Array(iv.byteLength + encryptedData.byteLength);
+    //     encryptedDataWithIV.set(iv);
+    //     encryptedDataWithIV.set(new Uint8Array(encryptedData), iv.byteLength);
 
-        return btoa(String.fromCharCode(...new Uint8Array(encryptedDataWithIV)));
-    }
+    //     return btoa(String.fromCharCode(...new Uint8Array(encryptedDataWithIV)));
+    // }
 
-    function generateRandomBytes(length: number): Uint8Array {
-        const randomValues = new Uint8Array(length);
-        crypto.getRandomValues(randomValues);
-        return randomValues;
-    }
+    // function generateRandomBytes(length: number): Uint8Array {
+    //     const randomValues = new Uint8Array(length);
+    //     crypto.getRandomValues(randomValues);
+    //     return randomValues;
+    // }
 
     // API functions
     async function callCompanyAPI() {
         if (!companyId) return;
-        const encryptedPassword = await encryptPasswordInput();
+        // const encryptedPassword = await encryptPasswordInput();
         const passwordEncryptVal = localStorage.getItem('password');
         const unameLocalStorage = localStorage.getItem('username');
         const companyData = {

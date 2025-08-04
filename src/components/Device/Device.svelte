@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  const browser = typeof window !== "undefined";
   import { v4 as uuidv4 } from "uuid";
 
   // Constants
@@ -26,8 +27,7 @@
   let deviceToDelete = "";
   let copiedAccessKey = "";
   let errorMessage = "";
-  const limitStr = localStorage.getItem("NoOfDevices") || "";
-    const maxDevices = parseInt(limitStr, 10);
+  let maxDevices = 0;
 
   // Type Definitions
   type Device = {
@@ -40,10 +40,14 @@
     LastModifiedBy: string;
   };
 
-
-
   // Initialize on component mount
   onMount(() => {
+    if (!browser) return;
+    
+    // Initialize maxDevices from localStorage
+    const limitStr = localStorage.getItem("NoOfDevices") || "";
+    maxDevices = parseInt(limitStr, 10) || 0;
+
     // Handles clicks outside of modals or sidebars (currently a placeholder)
     function handleOutsideClick(event: MouseEvent) {
       // Implement logic if needed, or leave empty if not required
@@ -74,6 +78,7 @@
   };
 
   const copyAccessKey = async (accessKey: string) => {
+    if (!browser) return;
     try {
       await navigator.clipboard.writeText(accessKey);
       copiedAccessKey = accessKey;
@@ -86,6 +91,7 @@
   };
 
   const viewDevices = async (): Promise<void> => {
+    if (!browser) return;
     isLoading = true;
     errorMessage = "";
     const companyId = localStorage.getItem(LOCAL_STORAGE_KEYS.COMPANY_ID);
@@ -106,7 +112,7 @@
 
       const data = await response.json();
       console.log("viewDevices API response:", data);
-      localStorage.setItem("deviceData", JSON.stringify(data));
+      if (browser) localStorage.setItem("deviceData", JSON.stringify(data));
 
       if (data.error || data.length === 0) {
         console.log("No devices found or error:", data.error);
@@ -141,11 +147,11 @@
   };
 
   const addDevice = async (): Promise<void> => {
+    if (!browser) return;
     isLoading = true;
     errorMessage = "";
     showNoDeviceMessage = false;
     showTable = true;
-
 
     const companyId = localStorage.getItem(LOCAL_STORAGE_KEYS.COMPANY_ID);
     if (!companyId) {
@@ -197,7 +203,7 @@
   };
 
   const deleteDevice = async (): Promise<void> => {
-    if (!deviceToDelete) return;
+    if (!browser || !deviceToDelete) return;
 
     showDeleteModal = false;
     isLoading = true;
@@ -252,7 +258,6 @@
 <div class=" bg-gray-100 flex flex-col pt-28 pb-19">
   <!-- Main Content -->
   <main class="flex-grow container mx-auto px-4 py-8">
-
     <!-- Loading Overlay -->
     {#if isLoading}
       <div
@@ -267,24 +272,31 @@
 
     <!-- Device Table -->
     {#if devices.length != 0}
-      <div class="relative group max-w-7xl flex justify-end px-0 md:px-4 xl:px-6 py-5">
-  <button
-    class="border border-[#02066F] text-[#02066F] bg-white px-6 py-2 rounded-md transition-colors cursor-pointer disabled:cursor-not-allowed"
-    on:click={addDevice}
-    disabled={devices.length >= maxDevices}
-  >
-    Add device
-  </button>
+      <div
+        class="relative group max-w-7xl flex justify-end px-0 md:px-4 xl:px-6 py-5"
+      >
+        <button
+          class="border border-[#02066F] text-[#02066F] bg-white px-6 py-2 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          on:click={addDevice}
+          disabled={devices.length >= maxDevices}
+        >
+          Add device
+        </button>
 
-  {#if devices.length >= maxDevices}
-    <div
-      class="absolute -top-10 right-0 bg-gray-800 text-white text-sm rounded py-1 px-3 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-    >
-    <p>You have reached the device registration limit. If you need to add more devices, please <a href="/cantact" class="text-[yellow] hover:underline">contact!</a></p>
-     
-    </div>
-  {/if}
-</div>
+        {#if devices.length >= maxDevices}
+          <div
+            class="absolute -top-10 right-0 bg-gray-800 text-white text-sm rounded py-1 px-3 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+          >
+            <p>
+              You have reached the device registration limit. If you need to add
+              more devices, please <a
+                href="/contact"
+                class="text-[yellow] hover:underline">contact!</a
+              >
+            </p>
+          </div>
+        {/if}
+      </div>
 
       <div
         class="max-w-5xl mx-auto bg-white rounded-xl overflow-hidden mb-8 border-1 border-gray-300"
@@ -369,7 +381,7 @@
       <div class="text-center h-[112px]">
         <p class="text-gray-600 mb-[20px]">No device Added</p>
         <button
-          class="border border-[#02066F] text-[#02066F] bg-white px-6 py-2 rounded-md transition-colors cursor-pointer"
+          class="border border-[#02066F] text-[#02066F] bg-white px-6 py-2 rounded-md transition-colors cursor-pointer "
           on:click={addDevice}
         >
           Add device

@@ -45,14 +45,15 @@
   let selectedDevice: any = null;
 
   // Report frequency state - Load immediately, not async
-  let availableFrequencies: string[] = loadFrequenciesSync();
-  let selectedFrequency: string = availableFrequencies[0] || "";
+  let availableFrequencies: string[] = [];
+  let selectedFrequency: string = "";
 
-  const adminType = localStorage.getItem("adminType");
-  const deviceID = localStorage.getItem("DeviceID");
+  let adminType = "";
+  let deviceID = "";
 
   // Synchronous function to load frequencies immediately
   function loadFrequenciesSync(): string[] {
+    if (typeof window === 'undefined') return [];
     const savedFrequencies = localStorage.getItem("reportType");
     if (savedFrequencies) {
       return savedFrequencies.split(",").filter((f) => f.trim() !== "");
@@ -77,17 +78,34 @@
   };
 
   // Constants
-  const cid = localStorage.getItem("companyID") || "";
-  if (!cid) {
-    alert("Company ID missing. Please login again.");
-    window.location.href = "/login";
-  }
+  let cid = "";
 
   const BASE = "https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test";
   const deviceApiUrl =
     "https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/device";
 
   onMount(async () => {
+    // Initialize browser-specific data
+    availableFrequencies = loadFrequenciesSync();
+    selectedFrequency = availableFrequencies[0] || "";
+    adminType = localStorage.getItem("adminType") || "";
+    deviceID = localStorage.getItem("DeviceID") || "";
+    cid = localStorage.getItem("companyID") || "";
+    
+    if (!cid) {
+      alert("Company ID missing. Please login again.");
+      window.location.href = "/login";
+      return;
+    }
+    
+    // Load employee data from localStorage
+    const data = localStorage.getItem("employeeData");
+    if (data) {
+      employeeList = JSON.parse(data);
+    }
+    const selectedValue = localStorage.getItem("reportType");
+    reportTypeHeading = `${selectedValue} Report`;
+    
     console.log("available frequency", availableFrequencies);
     const today = new Date().toISOString().substring(0, 10);
     currentDate = today;
@@ -340,15 +358,7 @@
   }
   let reportTypeHeading: string = "";
 
-  onMount(() => {
-    const data = localStorage.getItem("employeeData");
-    if (data) {
-      employeeList = JSON.parse(data); // [{id:..., name:...}]
-    }
-    const selectedValue = localStorage.getItem("reportType");
-    reportTypeHeading = `${selectedValue} Report`;
-    // Rest of your onMount code...
-  });
+  // This is now handled in the main onMount above
 
   // DROPDOWN DEVICE CLICK BODY ACTION
   let dropdownOpen = false;
@@ -425,7 +435,10 @@
                 href="/salariedreport"
                 class="px-4 py-2 text-[#02066F] font-semibold rounded-full"
                 on:click={() => {
-                  localStorage.setItem("selectedFrequency", frequency);
+                  // if (typeof window !== 'undefined') {
+                  //   localStorage.setItem("selectedFrequency", frequency);
+                  // }
+                    localStorage.setItem("selectedFrequency", frequency);
                 }}
               >
                 {frequency} Report
@@ -436,10 +449,16 @@
               href="/salariedreport"
               class="px-4 py-2 text-[#02066F] font-semibold rounded-full"
               on:click={() => {
+                // if (typeof window !== 'undefined') {
+                //   localStorage.setItem(
+                //     "selectedFrequency",
+                //     availableFrequencies[0],
+                //   );
+                // }
                 localStorage.setItem(
-                  "selectedFrequency",
-                  availableFrequencies[0],
-                );
+                    "selectedFrequency",
+                    availableFrequencies[0],
+                  );
               }}
             >
               {availableFrequencies[0]} Report

@@ -35,9 +35,7 @@
     let emailSettings: ReportSetting[] = [];
     let allEmailSettings: ReportSetting[] = []; // Store all settings
     let filteredEmailSettings: ReportSetting[] = []; // Filtered by device
-    let viewSetting: ReportFrequency = localStorage.getItem(
-        "reportType",
-    ) as ReportFrequency; // Default to 'Daily' if not set
+    let viewSetting: ReportFrequency = "Daily"; // Default to 'Daily' if not set
     let showAddModal = false;
     let showEditModal = false;
     let showViewEditModal = false;
@@ -55,14 +53,19 @@
     let devices: Device[] = [];
     let selectedDevice: Device | null = null;
     let showDeviceDropdown = false;
-    let storedDeviceID: string | null = localStorage.getItem("DeviceID");
-    const adminType = localStorage.getItem("adminType");
+    let storedDeviceID: string | null = null;
+    let adminType = "";
 
     let viewFrequencies: ReportFrequency[] = [];
     let showViewFrequencyDropdown = false;
     let maxViewSelections = 2; //
 
     onMount(async () => {
+        // Initialize browser-specific data
+        storedDeviceID = localStorage.getItem("DeviceID");
+        adminType = localStorage.getItem("adminType") || "";
+        viewSetting = localStorage.getItem("reportType") as ReportFrequency || "Daily";
+        
         await loadReportSettings();
         await loadDevices();
         loadViewSetting();
@@ -70,6 +73,7 @@
 
     async function loadReportSettings() {
         isLoading = true;
+        if (typeof window === 'undefined') return;
         const company_id = localStorage.getItem("companyID") || "";
 
         try {
@@ -90,6 +94,7 @@
 
     async function loadDevices() {
         try {
+            if (typeof window === 'undefined') return;
             const companyId = localStorage.getItem("companyID");
             const response = await fetch(
                 `https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/device/getAll/${companyId}`,
@@ -172,6 +177,7 @@
     // }
 
     function loadViewSetting() {
+        if (typeof window === 'undefined') return;
         const savedSetting = localStorage.getItem("reportType");
 
         // if (savedSetting && ['Daily', 'Weekly', 'Biweekly', 'Monthly', 'Bimonthly'].includes(savedSetting)) {
@@ -342,6 +348,7 @@
         if (!validateEmail(newEmail)) return;
         if (!validateFrequencies(newFrequencies)) return;
 
+        if (typeof window === 'undefined') return;
         const company_id = localStorage.getItem("companyID") || "";
         if (!company_id) {
             console.error("Missing company ID in localStorage");
@@ -394,6 +401,7 @@
         if (!validateEmail(currentEmail)) return;
         if (!validateFrequencies(currentFrequencies)) return;
 
+        if (typeof window === 'undefined') return;
         const company_id = localStorage.getItem("companyID") || "";
         const setting: ReportSetting = {
             CompanyReporterEmail: currentEmail,
@@ -462,6 +470,7 @@
             return;
         }
 
+        if (typeof window === 'undefined') return;
         const company_id = localStorage.getItem("companyID") || "";
         const setting = {
             CID: company_id,
@@ -491,6 +500,7 @@
     }
 
     async function deleteReportSetting() {
+        if (typeof window === 'undefined') return;
         const company_id = localStorage.getItem("companyID") || "";
 
         isLoading = true;

@@ -31,6 +31,7 @@ onMount(() => {
 	currentPath = get(page).url.pathname;
 	userType = localStorage.getItem('adminType') as 'Owner' | 'Admin' | 'SuperAdmin' || 'Owner';
 	getEmail = localStorage.getItem('adminMail') || '';
+	// userName = localStorage.getItem('userName') || '';
 	console.log('getEmail', getEmail);
 	const userPictureUrl = localStorage.getItem('userPicture');
 	
@@ -51,9 +52,9 @@ onMount(() => {
 	// userType = localStorage.getItem('adminType') || '';
 });
 
- $: {
+ $: if (typeof window !== 'undefined') {
     const email = localStorage.getItem('adminMail') || '';
-    userProfile.fallback = email.charAt(0).toUpperCase();
+    // userProfile.fallback = email.charAt(0).toUpperCase();
   }
 
 
@@ -96,15 +97,6 @@ function HomePage() {
 }
 
 
-
-
-// function handleLogout() {
-//   localStorage.removeItem("username");
-//   localStorage.removeItem("companyID");
-//   localStorage.removeItem("customId");
-//   localStorage.removeItem("password");
-
-
 function handleLogout() {
   localStorage.removeItem("username");
   localStorage.removeItem("companyID");
@@ -113,8 +105,6 @@ function handleLogout() {
   localStorage.removeItem("adminType");
 
    localStorage.clear();
-
-
 
   setTimeout(() => {
 	window.location.href = "/login"; // or use routing if needed
@@ -137,12 +127,6 @@ onMount(() => {
 });
 
 
-// function handleLogout() {
-//     localStorage.clear();
-//     window.location.href = "/login";
-// }
-
-
 
 let showProfileSidebar = false;
 
@@ -153,12 +137,12 @@ let showProfileSidebar = false;
   }
 
   
-const userName = localStorage.getItem('userName');
+// let userName = '';
 // const userProfile = localStorage.getItem('userPicture');
 
 // let userProfile = localStorage.getItem('userPicture');
 
-console.log('Profile URL:', localStorage.getItem('userPicture'));
+// console.log('Profile URL:', localStorage.getItem('userPicture'));
 
 
 

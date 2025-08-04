@@ -20,15 +20,16 @@
     let devices: any[] = [];
     let selectedDevice: any = null;
 
-    const adminType = localStorage.getItem('adminType');
-    const deviceID = localStorage.getItem('DeviceID');
+    let adminType = '';
+    let deviceID = '';
     
     // Report frequency state - Load immediately, not async
-    let availableFrequencies: string[] = loadFrequenciesSync();
-    let selectedFrequency: string = availableFrequencies[0] || '';
+    let availableFrequencies: string[] = [];
+    let selectedFrequency: string = '';
     
     // Synchronous function to load frequencies immediately
     function loadFrequenciesSync(): string[] {
+        if (typeof window === 'undefined') return [];
         const savedFrequencies = localStorage.getItem('reportType');
         if (savedFrequencies) {
             return savedFrequencies.split(',').filter(f => f.trim() !== '');
@@ -38,8 +39,8 @@
 
     const apiUrlBase = 'https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/dailyreport/getdatebasedata';
     const deviceApiUrl = 'https://1wwsjsc00f.execute-api.ap-south-1.amazonaws.com/test/device';
-    const cid: string | null = localStorage.getItem('companyID');
-    let reportName: string = localStorage.getItem('reportType') || 'Salaried';
+    let cid: string | null = '';
+    let reportName: string = 'Salaried';
 
     const convertToAmPm = (dateString: string) => {
         const date = new Date(dateString);
@@ -233,6 +234,13 @@
     };
 
     onMount(async () => {
+        // Initialize browser-specific data
+        adminType = localStorage.getItem('adminType') || '';
+        deviceID = localStorage.getItem('DeviceID') || '';
+        cid = localStorage.getItem('companyID');
+        availableFrequencies = loadFrequenciesSync();
+        selectedFrequency = availableFrequencies[0] || '';
+        
         const today = new Date();
         const formattedDate = today.toISOString().split('T')[0];
         selectedDate = formattedDate;
@@ -297,11 +305,12 @@
   }
 
   // Close dropdown when clicking outside
+  //@ts-ignore
   function handleClickOutside(event) {
     const dropdown = document.getElementById("device-dropdown-summary");
     const button = document.getElementById("device-menu-button-summary");
 
-    if (dropdown && !dropdown.contains(event.target) && !button.contains(event.target)) {
+    if (dropdown && !dropdown.contains(event.target) && !button?.contains(event.target)) {
       dropdownOpen = false;
     }
   }
@@ -313,6 +322,7 @@
     };
   });
 
+  //@ts-ignore
   function selectDevice(device) {
     handleDeviceSelection(device);
     dropdownOpen = false;
