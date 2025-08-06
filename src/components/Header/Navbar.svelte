@@ -251,7 +251,7 @@ let showProfileSidebar = false;
     <!-- Header -->
     <div class="flex justify-between items-center px-4 py-4 border-b border-white">
       <h2 class="text-lg font-bold">Profile</h2>
-      <button on:click={toggleProfileSidebar} class="text-white text-3xl cursor-pointer hover:text-gray-300">&times;</button>
+      <button on:click={toggleProfileSidebar} class="text-white text-xl cursor-pointer hover:text-gray-300">&times;</button>
     </div>
 
     <!-- User Info -->
@@ -260,7 +260,7 @@ let showProfileSidebar = false;
       <img 
         src={userProfile.picture} 
         alt="Profile" 
-        class="w-20 h-20 rounded-full object-cover border-3 border-yellow-600"
+        class="w-20 h-20 rounded-full object-cover border-3 border-white"
         on:error={() => userProfile.picture = ''}
       />
     {:else}
@@ -275,7 +275,7 @@ let showProfileSidebar = false;
     <!-- Actions -->
     <div class="px-4 py-4 flex flex-col gap-2 justify-center text-center">
 
-		<div class="flex flex-row bg-[red] text-white rounded hover:opacity-90 font-semibold cursor-pointer mt-4 px-20 py-2 items-center text-center gap-2"
+		<div class="flex flex-row bg-red-500 text-white rounded hover:opacity-90 font-semibold cursor-pointer mt-4 px-20 py-2 items-center text-center gap-2"
 		on:click={() => {
 				logOutAction();
 				toggleProfileSidebar();

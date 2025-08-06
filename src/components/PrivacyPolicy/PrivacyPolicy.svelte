@@ -2,7 +2,7 @@
 
 </script>
 <!-- Privacy policy  -->
-<div id="privacyPolicy" class="mb-4 px-2 sm:px-6 md:px-12 lg:px-24 xl:px-56 pt-2">
+<div id="privacyPolicy" class="mb-4 px-2 sm:px-6 md:px-12 lg:px-24 xl:px-56 pt-4">
     <h1 class="text-4xl sm:text-4xl font-semibold text-center pt-16 pb-1">Privacy Policy</h1>
     <div class="border-2 border-[#02066F] p-4 rounded-[20px] space-y-4 mt-2"><br>
         <p>Last updated:  October 1, 2024

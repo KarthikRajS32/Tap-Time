@@ -47,26 +47,30 @@
       <div class="address text-sm sm:text-base w-full md:w-auto text-center md:text-left space-y-8">
         <h4 class="text-lg sm:text-[18px] font-semibold mb-4">Address</h4>
   
-        <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start mb-6 gap-2">
-          <img src="/location-pin.png" alt="Location" class="w-5 mt-1" />
-          <p class="text-gray-400">
-            Arjava Technologies,<br />
-            2135 204th PL NE,<br />
-            Sammamish,<br />
-            WA - 98074.
-          </p>
+        <a href="https://maps.google.com/?q=2135+204th+PL+NE,+Sammamish,+WA+98074" target="_blank" class="text-gray-400 hover:text-white">
+        <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start mb-3 gap-2">
+        <img src="/location-pin.png" alt="Location" class="w-5 mt-1" />
+          Arjava Technologies,<br />
+          2135 204th PL NE,<br />
+          Sammamish,<br />
+          WA - 98074.
         </div>
+      </a>
   
+      <a href="tel:+14258181900" class=" text-gray-400 hover:text-white">
         <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start mb-6 gap-2">
           <img src="/phone-call.png" alt="Phone" class="w-4 h-4" />
-          <a href="tel:+14258181900" class=" text-gray-400 hover:text-white">(541) 371-2950</a>
-        </div>
+            (541) 371-2950
+          </div>
+        </a>
   
-        <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-2">
-          <img src="/paper-plane.png" alt="Email" class="w-4 h-4" />
-          <a href="mailto:contact@tap-time.com" class="text-gray-400 hover:text-white">contact@tap-time.com</a>
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=contact@tap-time.com" class="text-gray-400 hover:text-white">
+          <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-2">
+            <img src="/paper-plane.png" alt="Email" class="w-4 h-4" />
+              contact@tap-time.com
+          </div>
+        </a>
         </div>
-      </div>
     </div>
   </footer>
   

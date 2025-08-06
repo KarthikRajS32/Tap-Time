@@ -180,6 +180,7 @@
         month = new Date().getMonth() + 1;
         week = 1;
         half = "first";
+        selectedRangeIndex = 0;
 
         // Regenerate date ranges
         dateRanges = generateDateRanges();
@@ -774,6 +775,7 @@
             const response = await fetch(
                 `${apiUrlBase}/${cid}/${startVal}/${endVal}`,
             );
+            console.log(cid);
             const data = await response.json();
 
             if (Array.isArray(data)) {
@@ -1179,7 +1181,9 @@
                             class="bg-white border border-[#02066F] rounded px-3 py-1 text-[#02066F] font-medium focus:outline-none"
                             on:change={() => {
                                 selectedRangeIndex = half === "first" ? 0 : 1;
-                                viewDateRangewiseReport();
+                                if (dateRanges.length > selectedRangeIndex) {
+                                    loadReportTable(dateRanges[selectedRangeIndex].startRange, dateRanges[selectedRangeIndex].endRange);
+                                }
                                 updateDates();
                             }}
                         >

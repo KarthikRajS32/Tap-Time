@@ -91,7 +91,7 @@ const adminDetails = storedAdmin ? JSON.parse(storedAdmin) : null;
     logo: localStorage.getItem('companyLogo') || '',
 };
 
-console.log('Company Data:', adminDetails);
+// console.log('Company Data:', adminDetails);
 
   if(adminDetails){
     formData = {
@@ -296,6 +296,9 @@ phone: adminDetails.PhoneNumber || ''
         }
     }
 
+    console.log("Company Logo:",formData.logo === "");
+    
+
     async function callCustomerAPI() {
         if (!companyId || !customerId) return;
         const customerData = {
@@ -454,6 +457,9 @@ phone: adminDetails.PhoneNumber || ''
         // Placeholder for actual profile data fetch logic
         isLoading = false;
     }
+
+    console.log("logo:",formData.logo === '');
+    
 </script>
 
 
@@ -507,29 +513,29 @@ phone: adminDetails.PhoneNumber || ''
         <!-- Company Section -->
         {#if activeSection === 'company'}
             <!-- Logo Section -->
-          <div class="flex justify-center mb-8">
-        <div 
-    class="relative w-24 h-24 rounded-full border-2 border-[#02066F] overflow-hidden 
-           {companyEditMode ? 'cursor-pointer bg-white' : 'bg-gray-200 cursor-not-allowed'}"
-    on:click={() => companyEditMode && triggerFileUpload()}
->
-    {#if formData.logo}
-        <img src={formData.logo} alt="Company Logo" class="w-full h-full object-cover" />
-    {:else}
-        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
-            <i class="fas fa-building text-3xl text-gray-500"></i>
-        </div>
-    {/if}
+            <div class="flex justify-center mb-8">
+                <div 
+                    class="relative w-24 h-24 rounded-full border-2 border-[#02066F] overflow-hidden 
+                        {companyEditMode ? 'cursor-pointer bg-white' : 'bg-gray-200 cursor-not-allowed'}"
+                    on:click={() => companyEditMode && triggerFileUpload()}
+                >
+                    {#if typeof(formData.logo) === 'string'}
+                        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <i class="fas fa-building text-3xl text-gray-500"></i>
+                        </div>
+                    {:else}
+                        <img src={formData.logo} alt="Company Logo" class="w-full h-full object-cover" />
+                    {/if}
 
-    <input
-        bind:this={fileInput}
-        type="file"
-        accept="image/*"
-        on:change={handleLogoUpload}
-        class="hidden"
-    />
-</div>
-</div>
+                    <input
+                        bind:this={fileInput}
+                        type="file"
+                        accept="image/*"
+                        on:change={handleLogoUpload}
+                        class="hidden"
+                    />
+                </div>
+            </div>
 
             <div class="bg-white rounded-xl shadow-lg overflow-hidden p-6 pb-10 mb-8">
                 <!-- Company Form -->

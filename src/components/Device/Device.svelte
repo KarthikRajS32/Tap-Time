@@ -28,6 +28,8 @@
   let copiedAccessKey = "";
   let errorMessage = "";
   let maxDevices = 0;
+  let editingDevice = "";
+  let centerNativeValues: { [key: string]: string } = {};
 
   // Type Definitions
   type Device = {
@@ -47,6 +49,12 @@
     // Initialize maxDevices from localStorage
     const limitStr = localStorage.getItem("NoOfDevices") || "";
     maxDevices = parseInt(limitStr, 10) || 0;
+    
+    // Load center native values from localStorage
+    const savedValues = localStorage.getItem("centerNativeValues");
+    if (savedValues) {
+      centerNativeValues = JSON.parse(savedValues);
+    }
 
     // Handles clicks outside of modals or sidebars (currently a placeholder)
     function handleOutsideClick(event: MouseEvent) {
@@ -75,6 +83,23 @@
     if (!input) return "";
     visibleChars = Math.min(Math.max(visibleChars, 0), input.length);
     return "*".repeat(input.length - visibleChars) + input.slice(-visibleChars);
+  };
+
+  const saveCenterNativeValues = () => {
+    if (browser) {
+      localStorage.setItem("centerNativeValues", JSON.stringify(centerNativeValues));
+    }
+  };
+
+  const handleCenterNativeEdit = (accessKey: string) => {
+    editingDevice = accessKey;
+  };
+
+  const handleCenterNativeKeydown = (event: KeyboardEvent, accessKey: string) => {
+    if (event.key === 'Enter') {
+      editingDevice = "";
+      saveCenterNativeValues();
+    }
   };
 
   const copyAccessKey = async (accessKey: string) => {
@@ -283,24 +308,10 @@
           Add device
         </button>
 
-        {#if devices.length >= maxDevices}
-          <div
-            class="absolute -top-10 right-0 bg-gray-800 text-white text-sm rounded py-1 px-3 shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-          >
-            <p>
-              You have reached the device registration limit. If you need to add
-              more devices, please <a
-                href="/contact"
-                class="text-[yellow] hover:underline">contact!</a
-              >
-            </p>
-          </div>
-        {/if}
+        
       </div>
 
-      <div
-        class="max-w-5xl mx-auto bg-white rounded-xl overflow-hidden mb-8 border-1 border-gray-300"
-      >
+      <div class="max-w-5xl mx-auto bg-white rounded-xl overflow-hidden mb-8 border-1 border-gray-300">
         <div class="overflow-x-auto">
           <table class="w-full divide-y divide-gray-200">
             <thead>
@@ -325,6 +336,10 @@
                   class="px-6 py-3 text-center text-base font-bold tracking-wider"
                   >Device Name</th
                 >
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-center text-base font-bold tracking-wider
+                  ">Center Native</th>
                 <th
                   scope="col"
                   class="px-6 py-3 text-center text-base font-bold tracking-wider"
@@ -360,6 +375,29 @@
                   >
                   <td
                     class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center"
+                    on:click={() => handleCenterNativeEdit(device.AccessKey)}
+                  >
+                    {#if editingDevice === device.AccessKey}
+                      <input 
+                        type="text" 
+                        bind:value={centerNativeValues[device.AccessKey]} 
+                        on:keydown={(e) => handleCenterNativeKeydown(e, device.AccessKey)}
+                        on:blur={() => editingDevice = ''}
+                        class="w-full text-center border-1 border-gray-400 focus:outline-none" 
+                        autofocus
+                      />
+                    {:else}
+                      <span class="cursor-pointer">
+                        {#if centerNativeValues[device.AccessKey]}
+                          {centerNativeValues[device.AccessKey]}
+                        {:else}
+                          <i class="fas fa-pencil-alt"></i>
+                        {/if}
+                      </span>
+                    {/if}
+                  </td>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center"
                   >
                     <button
                       class="text-[#02066F] p-1 cursor-pointer"
@@ -374,6 +412,21 @@
           </table>
         </div>
       </div>
+
+      {#if devices.length >= maxDevices}
+          <div>
+            <p class="text-center text-[#02066F] font-semibold">
+              You have reached the device registration limit. If you need to add
+              more devices, please <a
+                href="/contact"
+                class="text-yellow-700 hover:underline">contact!</a
+              >
+            </p>
+          </div>
+          {:else}
+          <p class="text-center text-[#02066F] font-semibold">You can add up to {maxDevices} devices.</p>
+        {/if}
+      
     {/if}
 
     <!-- No Devices Message -->

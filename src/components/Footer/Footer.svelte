@@ -45,25 +45,29 @@
     <div class="address text-sm sm:text-base w-full md:w-auto text-center md:text-left">
       <h4 class="text-lg sm:text-[16px] font-semibold mb-4">CONTACT INFORMATION</h4>
 
+      <a href="https://maps.google.com/?q=2135+204th+PL+NE,+Sammamish,+WA+98074" target="_blank" class="hover:underline text-white">
       <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start mb-3 gap-2">
         <img src="/location-pin.png" alt="Location" class="w-5 mt-1" />
-        <p>
           Arjava Technologies,<br />
           2135 204th PL NE,<br />
           Sammamish,<br />
           WA - 98074.
-        </p>
-      </div>
+        </div>
+      </a>
 
+      <a href="tel:+14258181900" class="hover:underline text-white">
       <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start mb-2 gap-2">
         <img src="/phone-call.png" alt="Phone" class="w-4 h-4" />
-        <a href="tel:+14258181900" class="hover:underline text-white">(541) 371-2950</a>
-      </div>
+          (541) 371-2950
+        </div>
+      </a>
 
-      <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-2">
-        <img src="/paper-plane.png" alt="Email" class="w-4 h-4" />
-        <a href="mailto:contact@tap-time.com" class="hover:underline text-white">contact@tap-time.com</a>
-      </div>
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=contact@tap-time.com" class="hover:underline text-white">
+        <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-2">
+          <img src="/paper-plane.png" alt="Email" class="w-4 h-4" />
+            contact@tap-time.com
+        </div>
+      </a>
     </div>
   </div>
 </footer>

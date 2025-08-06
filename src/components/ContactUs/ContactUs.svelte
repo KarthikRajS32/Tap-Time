@@ -252,14 +252,11 @@
       
       <!-- Email Link -->
       <div class="flex flex-col md:flex md:flex-row items-center justify-center text-sm sm:text-base gap-2">
-        <span class="font-bold text-gray-800 mr-2">Write to us at : </span>
-        <a 
-          href="mailto:contact@tap-time.com" 
+        <span class="font-bold text-gray-800 mr-2">Write to us at : <a href="https://mail.google.com/mail/?view=cm&fs=1&to=contact@tap-time.com" 
           target="_blank"
           class="text-blue-600 hover:underline"
-        >
-          contact@tap-time.com
-        </a>
+        >contact@tap-time.com
+        </a></span>
       </div>
       
       <!-- Submit Button -->

@@ -72,7 +72,7 @@
       google.accounts.id.initialize({
         client_id: "1070255023214-gc25jf1quuc0bgu7vut9e2g4nghlhtbs.apps.googleusercontent.com",
         callback: handleCredentialResponse,
-        auto_select: true,
+        auto_select: false,
       });
 
       // Render the button with customized appearance
@@ -81,18 +81,19 @@
         google.accounts.id.renderButton(buttonDiv, {
           theme: 'outline',
           size: 'large',
-          width: 300, // Fixed width for consistency
-          text: 'continue_with', // Matches your screenshot
+          //@ts-ignore
+          width: 'auto', // Fixed width for consistency
+          // text: 'continue_with', // Matches your screenshot
           shape: 'rectangular',
           logo_alignment: 'left'
         });
         
         // Optional: Show the one-tap prompt
-        google.accounts.id.prompt(notification => {
-          if (notification.isNotDisplayed || notification.isSkipped) {
-            // Fallback to button if prompt isn't shown
-          }
-        });
+        // google.accounts.id.prompt(notification => {
+        //   if (notification.isNotDisplayed || notification.isSkipped) {
+        //     // Fallback to button if prompt isn't shown
+        //   }
+        // });
       }
     } catch (error) {
       console.error('Google Sign-In initialization failed:', error);
@@ -119,11 +120,12 @@
       }
 
       const data = await res.json();
-
+      let getRegisterEmail = localStorage.getItem('email');
+      let isValidEmailValue = data['Email'] === email || getRegisterEmail === email;
       if ("error" in data) {
         errorMsg = "Invalid Gmail login";
         loading = false;
-        return;
+        // return;
       }
       if (data["AdminType"] === "Admin" || data["AdminType"] === "SuperAdmin" || data["AdminType"] === "Owner") {
         const companyID = data["CID"];
@@ -139,6 +141,8 @@
 
          localStorage.setItem('userName', userObject.name); // or userObject.given_name if you prefer just the first name
         localStorage.setItem('userPicture', userObject.picture);
+        console.log(companyID);
+        
 
         if("DeviceID" in data)
         {
@@ -149,6 +153,9 @@
           getCustomerData(companyID)
         ]);
 
+      }
+
+      if(isValidEmailValue){
         window.location.href = '/employeelist';
       }
     } catch (error) {
@@ -342,19 +349,53 @@
         ></div>
       </div>
 
-        <div class="relative my-6">
+      {#if errorMsg}
+        <div
+      class="fixed inset-0 flex items-center justify-center z-50"
+      style="background: rgba(0, 0, 0, 0.5)">
+      <div
+        class="bg-white rounded-lg w-full max-w-xs mx-4"
+        on:click|stopPropagation>
+        <div
+          class="flex w-full bg-[#02066F] justify-between p-3 pl-4 pr-4 items-center rounded-t-md text-center"
+        >
+          <h3 class="text-xl font-bold text-white">{errorMsg}</h3>
+          <button
+            class="text-gray-400 hover:text-white cursor-pointer text-3xl"
+           on:click={() => (errorMsg = '')}
+          >
+            &times;
+          </button>
+        </div>
+        <div class="px-4 py-4 flex flex-col justify-center items-center gap-2">
+          <img src="/image 4.png" alt="image 4" class="text-center items-center justify-center w-10">
+          <p class="text-gray-800 text-base font-semibold">You are currently not registered. Please sign up to continue. <a href="/register" class=" text-yellow-700 hover:underline">register</a></p>
+        </div>
+      </div>
+    </div>
+      {/if}
+
+      <!-- {#if errorMsg}
+        <div
+          class="fixed top-4 right-4 z-50 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg"
+        >
+          {errorMsg}
+        </div>
+      {/if} -->
+
+      <div class="relative my-6">
         <div class="absolute inset-0 flex items-center">
           <div class="w-full border-t border-gray-300"></div>
         </div>
-        <div class="relative flex justify-center">
+        <div class="relative flex justify-center ">
           <span class="px-2 bg-white font-bold text-gray-800">or</span>
         </div>
       </div>
 
 
-      <div>
-        <span class="text-base sm:text-xl font-bold text-gray-800">Don't have an account?</span>
-        <a href="/register" class="ml-2 text-[#02066F] text-base sm:text-xl font-bold hover:underline">Signup</a>
+      <div class="w-full flex flex-row justify-center">
+        <span class="text-xl sm:text-xl md:text-base xl:text-xl font-bold text-gray-800">Don't have an account?<a href="/register" class="ml-2 text-[#02066F] text-xl sm:text-xl md:text-base xl:text-xl font-bold hover:underline">Signup</a>
+        </span>
       </div>
 
       
