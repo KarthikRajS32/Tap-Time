@@ -86,6 +86,7 @@
 
   onMount(async () => {
     // Initialize browser-specific data
+    isLoading = true;
     availableFrequencies = loadFrequenciesSync();
     selectedFrequency = availableFrequencies[0] || "";
     adminType = localStorage.getItem("adminType") || "";
@@ -104,7 +105,7 @@
       employeeList = JSON.parse(data);
     }
     const selectedValue = localStorage.getItem("reportType");
-    reportTypeHeading = `${selectedValue} Report`;
+    reportTypeHeading = selectedValue ? `${selectedValue} Report` : "Report";
     
     console.log("available frequency", availableFrequencies);
     const today = new Date().toISOString().substring(0, 10);
@@ -120,9 +121,17 @@
       },
     });
 
-    await fetchDevices();
-    await fetchEmployeeData();
-    await viewCurrentDateReport();
+    // await fetchDevices();
+    // await fetchEmployeeData();
+    // await viewCurrentDateReport();
+
+    await Promise.all([
+      fetchDevices(),
+      fetchEmployeeData(),
+      viewCurrentDateReport()
+    ]);
+
+   isLoading = false;
   });
 
   const convertToAmPm = formatToAmPm;
@@ -190,7 +199,7 @@
 
   // View report
   async function viewCurrentDateReport() {
-    isLoading = true;
+    // isLoading = true;
     try {
       const res = await fetch(
         `${BASE}/dailyreport/getdatebasedata/${cid}/${formData.date}`,

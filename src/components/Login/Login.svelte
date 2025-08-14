@@ -29,12 +29,15 @@
 
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
 
   let username = '';
   let password = '';
   let errorMsg = '';
   let loading = false;
   let logoSrc = '';
+  let isFreeTrail = '';
+  let freeTrailEndDate = '';
 
   const key1 = new Uint8Array([
     16, 147, 220, 113, 166, 142, 22, 93,
@@ -42,6 +45,10 @@
   ]);
 
   onMount(() => {
+    // Initialize localStorage-dependent variables
+    isFreeTrail = localStorage.getItem('trial');
+    freeTrailEndDate = localStorage.getItem('expiryDate');
+    
     // Load company logo if exists
     const storedLogo = localStorage.getItem('companyLogo');
     if (storedLogo) {
@@ -53,18 +60,23 @@
   });
  
   function loadGoogleSignIn() {
-    // @ts-ignore
-    if (window.google) {
-      initializeGoogleSignIn();
-      return;
-    }
+    try {
+      // @ts-ignore
+      if (window.google) {
+        initializeGoogleSignIn();
+        return;
+      }
 
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    script.onload = () => initializeGoogleSignIn();
-    document.head.appendChild(script);
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = () => initializeGoogleSignIn();
+      script.onerror = () => console.error('Failed to load Google Sign-In script');
+      document.head.appendChild(script);
+    } catch (error) {
+      console.error('Error loading Google Sign-In:', error);
+    }
   }
 
   function initializeGoogleSignIn() {
@@ -109,6 +121,13 @@
       const userObject = decodeJwtResponse(response.credential);
       const email = userObject.email;
       
+      if (freeTrailEndDate && new Date(freeTrailEndDate) <= new Date()) {
+        localStorage.removeItem('trial');
+        localStorage.removeItem('expiryDate');
+        errorMsg = 'Your free trial has expired. Please sign up to continue.';
+        loading = false;
+        return;
+      }
 
       console.log("Google Sign-In user object:", userObject);
       
@@ -120,13 +139,15 @@
       }
 
       const data = await res.json();
-      let getRegisterEmail = localStorage.getItem('email');
-      let isValidEmailValue = data['Email'] === email || getRegisterEmail === email;
+      
       if ("error" in data) {
         errorMsg = "Invalid Gmail login";
         loading = false;
-        // return;
+        return;
       }
+      
+      let getRegisterEmail = localStorage.getItem('email');
+      let isValidEmailValue = data['Email'] === email || getRegisterEmail === email;
       if (data["AdminType"] === "Admin" || data["AdminType"] === "SuperAdmin" || data["AdminType"] === "Owner") {
         const companyID = data["CID"];
         localStorage.setItem('companyID', companyID);
@@ -156,7 +177,10 @@
       }
 
       if(isValidEmailValue){
-        window.location.href = '/employeelist';
+        goto('/employeelist');
+      } else {
+        errorMsg = 'Invalid email or user not found';
+        loading = false;
       }
     } catch (error) {
       console.error("Google Sign-In error:", error);
@@ -276,17 +300,26 @@
         logoSrc = data.CLogo;
       }
 
-      await Promise.all([
-        getCustomerData(data.CID),
-        getTimeZone(data.CID)
-      ]);
-      window.location.href = '/employeelist';
+      try {
+        await Promise.all([
+          getCustomerData(data.CID),
+          getTimeZone(data.CID)
+        ]);
+      } catch (error) {
+        console.error('Error loading additional data:', error);
+      }
+      goto('/employeelist');
     } catch (err) {
       console.error("Login error:", err);
       errorMsg = 'An error occurred during login';
     } finally {
       loading = false;
     }
+  }
+
+  function startTrial () {
+    localStorage.setItem('trial', 'true');
+    goto('/register');
   }
 </script>
 
@@ -348,6 +381,10 @@
           style="width: 300px; height: 44px;"
         ></div>
       </div>
+      <div class="w-full flex flex-row justify-center pt-6">
+        <span class="text-xl sm:text-xl md:text-base xl:text-xl font-bold text-gray-800">Don't have an account?<a href="/register" class="ml-2 text-[#02066F] text-xl sm:text-xl md:text-base xl:text-xl font-bold hover:underline">Signup</a>
+        </span>
+      </div>
 
       {#if errorMsg}
         <div
@@ -392,11 +429,16 @@
         </div>
       </div>
 
+    <!-- {#if !isFreeTrail} -->
+      <div>
+        <button type="button" on:click={startTrial} class="w-full bg-green-500 text-white text-lg font-bold cursor-pointer sm:text-xl py-4 rounded-lg transition duration-300 mb-4 disabled:opacity-50 disabled:cursor-not-allowed">Start free trial now!</button>
+      </div>
+    <!-- {/if} -->
 
-      <div class="w-full flex flex-row justify-center">
+      <!-- <div class="w-full flex flex-row justify-center">
         <span class="text-xl sm:text-xl md:text-base xl:text-xl font-bold text-gray-800">Don't have an account?<a href="/register" class="ml-2 text-[#02066F] text-xl sm:text-xl md:text-base xl:text-xl font-bold hover:underline">Signup</a>
         </span>
-      </div>
+      </div> -->
 
       
 
@@ -413,4 +455,3 @@
     </div>
   {/if}
 </div>
-

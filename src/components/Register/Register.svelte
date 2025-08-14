@@ -2,7 +2,9 @@
   // @ts-nocheck
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation'; // Use this if you're using SvelteKit
+  import { readonly } from 'svelte/store';
   
+  let isFreeTrail = false;
   let companyName = '';
   let companyLogo = '';
   let companyStreet = '';
@@ -10,13 +12,26 @@
   let companyState = '';
   let companyZip = '';
   let NoOfDevices = '';
+   
   let NoOfEmployees = '';
+  
+  //  let employeeCount = isFreeTrail ? 10 : NoOfEmployees;
+
+  onMount(() => {
+    isFreeTrail = localStorage.getItem('trial') === 'true';
+    console.log("isFreeTrail", isFreeTrail);
+    NoOfDevices = isFreeTrail ? 1 : '';
+    NoOfEmployees = isFreeTrail ? 10 : '';
+  });
   
   let errorCompanyName = '';
   let totalError = '';
   let overlayVisible = false;
   let fileName = '';
   let fileInput: File | null = null;
+
+ 
+  
   
   const isAlpha = /^[a-zA-Z\s]+$/;
   
@@ -219,9 +234,9 @@
             <input
               type="number"
               bind:value={NoOfDevices}
-              placeholder="No Of Devices"
+              placeholder={isFreeTrail ? '1' : "No Of Devices" }
               class="w-full outline-none font-bold p-2 xl:p-6 md:p-3"
-              required
+              readonly={isFreeTrail} required={!isFreeTrail}
             />
           </div>
       
@@ -230,9 +245,9 @@
             <input
               type="number"
               bind:value={NoOfEmployees}
-              placeholder="No Of Employees"
+              placeholder={isFreeTrail ? '10' : "No Of Employees"}
               class="w-full outline-none font-bold p-2 xl:p-6 md:p-3"
-              required
+              readonly={isFreeTrail} required={!isFreeTrail}
             />
           </div>
       

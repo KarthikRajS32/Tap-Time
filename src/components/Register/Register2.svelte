@@ -262,8 +262,14 @@
             localStorage.setItem('address', `${companyStreet}--${companyCity}--${companyState}--${companyZip}`);
             localStorage.setItem('phone', phoneNumber);
             localStorage.setItem('email', email);
+            let isFreeTrail = localStorage.getItem('trial') === 'true';
 
-            await createCheckoutSession();
+            if (isFreeTrail) {
+                window.location.href = '/login';
+                localStorage.setItem('expiryDate', new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString())
+            }else{
+                await createCheckoutSession();
+            }
         } else {
             totalError = 'Please fix the errors';
             showOverlay = false;

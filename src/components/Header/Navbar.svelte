@@ -4,6 +4,7 @@ import { page } from '$app/stores';
 import { onMount } from 'svelte';
 import { get } from 'svelte/store';
 import { createEventDispatcher } from 'svelte';
+import { goto } from '$app/navigation';
 
 let sidebarOpen = false;
 let dropdownOpen = false;
@@ -82,10 +83,8 @@ const dispatch = createEventDispatcher();
 
 
 function logOutAction() {
-	if (showModal=true) {
-		sidebarOpen=false
-	}
-//   showModal = true;
+	showModal = true;
+	sidebarOpen = false;
 }
 
 function close() {
@@ -97,7 +96,7 @@ function HomePage() {
 }
 
 
-function handleLogout() {
+async function handleLogout() {
   localStorage.removeItem("username");
   localStorage.removeItem("companyID");
   localStorage.removeItem("customId");
@@ -106,9 +105,17 @@ function handleLogout() {
 
    localStorage.clear();
 
-  setTimeout(() => {
-	window.location.href = "/login"; // or use routing if needed
-  }, 10);
+  try {
+	await goto('/login', { replaceState: true });
+  } catch (error) {
+	console.error('Navigation error:', error);
+	try {
+		await goto('/', { replaceState: true });
+	} catch (fallbackError) {
+		console.error('Fallback navigation error:', fallbackError);
+		window.location.href = "/";
+	}
+  }
 }
 
 let avatarDropdown = false;
@@ -270,10 +277,10 @@ let showProfileSidebar = false;
     {/if}
 	  <p class="text-base text-white font-bold">{userProfile.name}</p>
       <p class="text-base text-gray-200">{userProfile.email}</p>
-    </div>
+    	</div>
 
-    <!-- Actions -->
-    <div class="px-4 py-4 flex flex-col gap-2 justify-center text-center">
+    	<!-- Actions -->
+    	<div class="px-4 py-4 flex flex-col gap-2 justify-center text-center">
 
 		<div class="flex flex-row bg-red-500 text-white rounded hover:opacity-90 font-semibold cursor-pointer mt-4 px-20 py-2 items-center text-center gap-2"
 		on:click={() => {
@@ -290,41 +297,41 @@ let showProfileSidebar = false;
 			</button>
 	  	</div>
 
-    </div>
-	<div class="pt-6 flex justify-center items-center text-center">
-		<span class="text-base flex gap-2">
-			<p class="text-gray-100">Need help?</p> 
-			<a href="/contact"><p class="text-[yellow] hover:underline">Contact Support</p></a>
-		</span>
-  	</div>
-  </div>
-{/if}
+				</div>
+				<div class="pt-6 flex justify-center items-center text-center">
+					<span class="text-base flex gap-2">
+						<p class="text-gray-100">Need help?</p> 
+						<a href="/contact"><p class="text-[yellow] hover:underline">Contact Support</p></a>
+					</span>
+				</div>
+			</div>
+			{/if}
 
 
 
   
-  <!-- Logout Modal -->
-  {#if showModal}
-	<div class="fixed inset-0 z-50 flex items-center justify-center px-4"
-	style="background: rgba(0, 0, 0, 0.5)">
-	  <div class="bg-white rounded-lg w-auto max-w-md shadow-lg overflow-hidden">
-		<!-- Header -->
-		<div class="bg-[#02066F] text-white p-1 flex justify-between text-center items-center">
-		  <h2 class="text-xl font-semibold w-full text-center">Logout</h2>
-		  <button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2" on:click={close}>&times;</button>
-		</div>
-  
-		<!-- Body -->
-		<div class="p-6 text-center">
-		  <h5 class="text-xl font-bold mb-4 text-gray-800">Are you sure you want to logout?</h5>
-		  <div class="flex justify-center space-x-2">
-			<button class="bg-[#02066F] opacity-80 hover:opacity-70 text-white px-6 py-2 rounded-md cursor-pointer" on:click={handleLogout}>Yes</button>
-			<button class="bg-white text-black px-6 py-2 rounded-md cursor-pointer border-1 border-[#02066F]" on:click={close}>No</button>
-		  </div>
-		</div>
-	  </div>
-	</div>
-  {/if}
+  		<!-- Logout Modal -->
+			{#if showModal}
+				<div class="fixed inset-0 z-50 flex items-center justify-center px-4"
+				style="background: rgba(0, 0, 0, 0.5)">
+				<div class="bg-white rounded-lg w-auto max-w-md shadow-lg overflow-hidden">
+					<!-- Header -->
+					<div class="bg-[#02066F] text-white p-1 flex justify-between text-center items-center">
+					<h2 class="text-xl font-semibold w-full text-center">Logout</h2>
+					<button class="text-gray-400 hover:text-white text-4xl cursor-pointer p-2" on:click={close}>&times;</button>
+					</div>
+			
+					<!-- Body -->
+					<div class="p-6 text-center">
+					<h5 class="text-xl font-bold mb-4 text-gray-800">Are you sure you want to logout?</h5>
+					<div class="flex justify-center space-x-2">
+						<button class="bg-[#02066F] opacity-80 hover:opacity-70 text-white px-6 py-2 rounded-md cursor-pointer" on:click={handleLogout}>Yes</button>
+						<button class="bg-white text-black px-6 py-2 rounded-md cursor-pointer border-1 border-[#02066F]" on:click={close}>No</button>
+					</div>
+					</div>
+				</div>
+				</div>
+			{/if}
 
 		</nav>
 

@@ -35,7 +35,7 @@
     let emailSettings: ReportSetting[] = [];
     let allEmailSettings: ReportSetting[] = []; // Store all settings
     let filteredEmailSettings: ReportSetting[] = []; // Filtered by device
-    let viewSetting: ReportFrequency = "Daily"; // Default to 'Daily' if not set
+    let viewSetting: ReportFrequency = "Weekly";
     let showAddModal = false;
     let showEditModal = false;
     let showViewEditModal = false;
@@ -64,7 +64,14 @@
         // Initialize browser-specific data
         storedDeviceID = localStorage.getItem("DeviceID");
         adminType = localStorage.getItem("adminType") || "";
-        viewSetting = localStorage.getItem("reportType") as ReportFrequency || "Daily";
+        
+        // Clear any "Basic" frequency from localStorage
+        const savedReportType = localStorage.getItem("reportType");
+        if (savedReportType && savedReportType.toLowerCase().includes('basic')) {
+            localStorage.removeItem("reportType");
+        } else if (savedReportType) {
+            viewSetting = savedReportType as ReportFrequency;
+        }
         
         await loadReportSettings();
         await loadDevices();
@@ -180,25 +187,21 @@
         if (typeof window === 'undefined') return;
         const savedSetting = localStorage.getItem("reportType");
 
-        // if (savedSetting && ['Daily', 'Weekly', 'Biweekly', 'Monthly', 'Bimonthly'].includes(savedSetting)) {
-        //     viewSetting = savedSetting as ReportFrequency;
-        //     // Initialize viewFrequencies with the current setting
-        //     viewFrequencies = [viewSetting];
-        // }
         if (savedSetting) {
-            // Split the saved frequencies by comma and filter out any empty values
-
+            // Split the saved frequencies by comma and filter out any empty values and "Basic"
             viewFrequencies = savedSetting
                 .split(",")
-                .filter((f) => f.trim() !== "") as ReportFrequency[];
-
-            viewFrequencies = savedSetting
-                .split(",")
-                .filter((f) => f.trim() !== "") as ReportFrequency[];
+                .filter((f) => f.trim() !== "" && f.trim().toLowerCase() !== "basic")
+                .filter((f) => ['Daily', 'Weekly', 'Biweekly', 'Monthly', 'Bimonthly'].includes(f.trim())) as ReportFrequency[];
 
             // Update viewSetting with the first frequency (for backward compatibility)
             if (viewFrequencies.length > 0) {
                 viewSetting = viewFrequencies[0] as ReportFrequency;
+            }
+            
+            // If "Basic" was removed and no valid frequencies remain, clear localStorage
+            if (viewFrequencies.length === 0 && savedSetting.toLowerCase().includes('basic')) {
+                localStorage.removeItem("reportType");
             }
         }
     }
@@ -821,7 +824,7 @@
                             <td
                                 class="px-6 py-3 whitespace-nowrap text-sm font-semibold text-gray-900"
                             >
-                                {viewFrequencies.join(", ") || viewSetting}
+                                {viewFrequencies.length > 0 ? viewFrequencies.join(", ") : (viewSetting || "No frequency selected")}
                             </td>
                             <td
                                 class="px-6 py-3 whitespace-nowrap text-sm font-semibold text-gray-900"

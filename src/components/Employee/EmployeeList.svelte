@@ -56,7 +56,7 @@
     FName: "",
     LName: "",
     PhoneNumber: "",
-    Email: "",
+    Email: "" ,
     IsAdmin: 0,
     IsActive: true,
     LastModifiedBy: "Admin",
@@ -105,6 +105,7 @@
     try {
       loading = true;
       const companyId = localStorage.getItem("companyID");
+      console.log("Fetching employees for companyId:", companyId);
       const response = await fetch(`${apiUrlBase}/getall/${companyId}`);
 
       if (!response.ok) {
@@ -112,7 +113,9 @@
       }
 
       const data = await response.json();
+      console.log("Raw API response:", data);
       employees = Array.isArray(data) ? data : [];
+      console.log("Processed employees array:", employees);
       employeesCount = employees.length;
       filterEmployees();
     } catch (error) {
@@ -177,6 +180,8 @@
     let deviceFilteredEmployees = Array.isArray(employees) ? employees : [];
 
     if (selectedDevice && selectedDevice.DeviceID) {
+      console.log("All employees before filtering:", employees.map(emp => ({EmpID: emp.EmpID, DeviceID: emp.DeviceID, FName: emp.FName, IsAdmin: emp.IsAdmin})));
+      console.log("Filtering by DeviceID:", selectedDevice.DeviceID);
       deviceFilteredEmployees = deviceFilteredEmployees.filter(
         (emp) => emp.DeviceID === selectedDevice.DeviceID,
       );
@@ -184,17 +189,23 @@
         `Filtered employees by DeviceID ${selectedDevice.DeviceID}:`,
         deviceFilteredEmployees.length,
       );
+      console.log("Filtered employees:", deviceFilteredEmployees.map(emp => ({EmpID: emp.EmpID, DeviceID: emp.DeviceID, FName: emp.FName, IsAdmin: emp.IsAdmin})));
     }
 
     // Filter by employee type from device-filtered employees
     filteredEmployees = deviceFilteredEmployees.filter(
       (emp) => emp.IsAdmin === 0,
     );
+    console.log("employee data",filteredEmployees)
     admins = deviceFilteredEmployees.filter((emp) => emp.IsAdmin === 1);
     superAdmins = deviceFilteredEmployees.filter((emp) => emp.IsAdmin === 2);
-
+    console.log(
+      `Filtered employees: ${filteredEmployees.length}, Admins: ${admins.length}, SuperAdmins: ${superAdmins.length}`,
+    );
     adminCount = admins.length;
     superAdminCount = superAdmins.length;
+    // Force update pagination to reflect new data
+    currentPage = 1; // Reset to first page
     updatePagination();
     loading = false;
 
@@ -203,7 +214,6 @@
     let matchedEmployee = null;
     const cleanEmail = getEmail.trim().toLowerCase();
 
-    console.log("okay", admins);
 
     if (adminType === "Admin") {
       for (const emp of admins) {
@@ -455,7 +465,8 @@
       FName: "",
       LName: "",
       PhoneNumber: "",
-      Email: "",
+      //@ts-ignore
+      Email: null,
       IsAdmin: 0,
       IsActive: true,
       LastModifiedBy: "Admin",
@@ -465,7 +476,11 @@
     errorMessage = "";
     isEditing = false;
     showEmployeeModal = true;
-    console.log("Employee modal opened, isEditing:", isEditing);
+    console.log("Employee modal opened, IsAdmin set to:", formData.IsAdmin);
+    console.log("isEditing:", isEditing);
+    console.log("showEmployeeModal:", showEmployeeModal);
+    console.log("showAdminModal:", showAdminModal);
+    console.log("showSuperAdminModal:", showSuperAdminModal);
   }
 
   function openAddAdmin() {
@@ -547,6 +562,8 @@
 
   // Form submission
   async function submitForm() {
+    console.log("submitForm called, formData.IsAdmin:", formData.IsAdmin);
+    
     if (!validateForm()) return;
 
     // Validate device selection
@@ -559,6 +576,9 @@
     try {
       loading = true;
       const companyId = localStorage.getItem("companyID");
+      
+      console.log("Before creating employeeData, formData.IsAdmin:", formData.IsAdmin);
+      
       const employeeData = {
         ...formData,
         CID: companyId,
@@ -569,6 +589,8 @@
               ? selectedDevice.DeviceID
               : null,
       };
+      
+      console.log("After creating employeeData, employeeData.IsAdmin:", employeeData.IsAdmin);
 
       // Generate UUID for new employee creation
       if (!isEditing) {
@@ -581,7 +603,13 @@
         employeeData.Email = "";
       }
 
-      console.log("Submitting employee data with DeviceID:", employeeData);
+      console.log("Submitting employee data:", employeeData);
+      console.log("IsAdmin value being sent:", employeeData.IsAdmin);
+      console.log("Form data IsAdmin:", formData.IsAdmin);
+      console.log("adminType:", adminType);
+      console.log("deviceID from localStorage:", deviceID);
+      console.log("selectedDevice:", selectedDevice);
+      console.log("Final DeviceID being sent:", employeeData.DeviceID);
 
       const apiUrl = isEditing
         ? `${apiUrlBase}/update/${formData.EmpID}`
@@ -608,7 +636,15 @@
           ? "Employee updated successfully"
           : "Employee added successfully";
         console.log("Success! Refreshing employee data...");
-        fetchEmployeeData();
+        // Add delay to ensure database is updated
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await fetchEmployeeData();
+        // If still no data, try one more time after additional delay
+        if (employees.length === 0) {
+          console.log("No employees found, trying again after additional delay...");
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          await fetchEmployeeData();
+        }
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -624,6 +660,18 @@
         showEmployeeModal = false;
         showAdminModal = false;
         showSuperAdminModal = false;
+        // Reset form data
+        formData = {
+          EmpID: "",
+          Pin: "",
+          FName: "",
+          LName: "",
+          PhoneNumber: "",
+          Email: "",
+          IsAdmin: 0,
+          IsActive: true,
+          LastModifiedBy: "Admin",
+        };
       }
     }
   }
@@ -634,23 +682,62 @@
 
     try {
       loading = true;
-      const response = await fetch(
-        `${apiUrlBase}/delete/${currentEmployee.EmpID}/Admin`,
-        {
-          method: "PUT",
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (data.error) {
-        errorMessage = data.error;
+      
+      // For admins, set email/pin to null and store original values in IsActive as JSON
+      if (currentEmployee.IsAdmin > 0) {
+        const updateData = {
+          Email: null,
+          Pin: null,
+          IsActive: JSON.stringify({
+            email: currentEmployee.Email,
+            pin: currentEmployee.Pin
+          }),
+          LastModifiedBy: "Admin"
+        };
+        
+        const response = await fetch(
+          `${apiUrlBase}/update/${currentEmployee.EmpID}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updateData),
+          },
+        );
+        
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (data.error) {
+          errorMessage = data.error;
+        } else {
+          successMessage = "Admin deleted successfully";
+          fetchEmployeeData();
+        }
       } else {
-        successMessage = "Employee deleted successfully";
-        fetchEmployeeData();
+        // Regular delete for employees
+        const response = await fetch(
+          `${apiUrlBase}/delete/${currentEmployee.EmpID}/Admin`,
+          {
+            method: "PUT",
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.error) {
+          errorMessage = data.error;
+        } else {
+          successMessage = "Employee deleted successfully";
+          fetchEmployeeData();
+        }
       }
     } catch (error) {
       console.error("Error deleting employee:", error);
@@ -701,7 +788,7 @@
   //END DROPDOWN DEVICE CLICK BODY ACTION
 </script>
 
-<div class="min-h-screen bg-gray-100 pt-30 pb-10 px-4 sm:px-6">
+<div class="overflow-x-hidden min-h-screen bg-gray-100 pt-30 pb-10 px-4 sm:px-6">
   <!-- Loading Overlay -->
   {#if loading}
     <div
@@ -1157,14 +1244,14 @@
     <button
       class="px-2 py-1 md:px-2 md:py-1 w-26 h-10 md:w-26 text-center items-center bg-white text-base md:text-lg border border-[#02066F] text-[#02066F] rounded-md cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       on:click={openAddSuperAdmin}
-      disabled={employees.length >= maxEmployees || !selectedDevice}
+      disabled={employees.length >= maxEmployees || superAdminCount >= 1 || !selectedDevice}
     >
       Add Entry
     </button>
 
     {#if superAdminCount >= 1 || employees.length >= maxEmployees}
       <div
-        class="absolute -top-16 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm rounded py-2 px-3 shadow-lg w-64 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 pointer-events-none"
+        class="absolute -top-16 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-sm rounded py-2 px-3 shadow-lg w-64 opacity-0 group-hover:opacity-100 transition-opacity duration-800 z-20 pointer-events-none"
       >
         <p>
           You have reached the SuperAdmin registration limit. Please

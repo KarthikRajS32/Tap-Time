@@ -103,7 +103,7 @@
         return;
     }
 
-    loading = true;
+    // loading = true;
     try {
         const res = await fetch(`${apiUrlBase}/${cid}/${dateValue}`);
         if (!res.ok) throw new Error(`Error: ${res.status}`);
@@ -235,6 +235,7 @@
 
     onMount(async () => {
         // Initialize browser-specific data
+        loading = true;
         adminType = localStorage.getItem('adminType') || '';
         deviceID = localStorage.getItem('DeviceID') || '';
         cid = localStorage.getItem('companyID');
@@ -245,8 +246,15 @@
         const formattedDate = today.toISOString().split('T')[0];
         selectedDate = formattedDate;
         
-        await fetchDevices();
-        viewDatewiseReport(formattedDate);
+        // await fetchDevices();
+        // viewDatewiseReport(formattedDate);
+
+        await Promise.all([
+                fetchDevices(),
+                viewDatewiseReport(formattedDate)
+            ]);
+
+            loading = false;
 
         const selectedValue = localStorage.getItem('reportType') || 'Salaried';
         reportName = `${selectedValue} Report`;
@@ -354,18 +362,42 @@
                         <a href="/reportsummary" class="px-4 py-2 text-[#02066F]  font-semibold rounded-full">Today's Report</a>
                         <a href="/daywisereport" class="px-4 py-2 bg-[#02066F] text-white font-semibold rounded-full">Day Wise Report</a>
                         
-                        <!-- Show separate frequency tabs -->
-                        {#if availableFrequencies.length > 1}
-                          {#each availableFrequencies as frequency}
-                            <a href="/salariedreport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full">
-                              {frequency} Report
-                            </a>
-                          {/each}
-                        {:else if availableFrequencies.length === 1}
-                          <a href="/salariedreport" class="px-4 py-2 text-[#02066F] font-semibold rounded-full">
-                            {availableFrequencies[0]} Report
-                          </a>
-                        {/if}
+                         <!-- Frequency Tabs -->
+          {#if availableFrequencies.length > 1}
+            {#each availableFrequencies as frequency}
+              <a
+                href="/salariedreport"
+                class="px-4 py-2 text-[#02066F] font-semibold rounded-full"
+                on:click={() => {
+                  // if (typeof window !== 'undefined') {
+                  //   localStorage.setItem("selectedFrequency", frequency);
+                  // }
+                    localStorage.setItem("selectedFrequency", frequency);
+                }}
+              >
+                {frequency} Report
+              </a>
+            {/each}
+          {:else if availableFrequencies.length === 1}
+            <a
+              href="/salariedreport"
+              class="px-4 py-2 text-[#02066F] font-semibold rounded-full"
+              on:click={() => {
+                // if (typeof window !== 'undefined') {
+                //   localStorage.setItem(
+                //     "selectedFrequency",
+                //     availableFrequencies[0],
+                //   );
+                // }
+                localStorage.setItem(
+                    "selectedFrequency",
+                    availableFrequencies[0],
+                  );
+              }}
+            >
+              {availableFrequencies[0]} Report
+            </a>
+          {/if}
                     </div>
                 </div>
             </div>

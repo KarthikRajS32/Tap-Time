@@ -108,6 +108,7 @@
       await navigator.clipboard.writeText(accessKey);
       copiedAccessKey = accessKey;
       showCopyTooltip = true;
+      
       setTimeout(() => (showCopyTooltip = false), 2000);
     } catch (err) {
       console.error("Failed to copy:", err);
@@ -355,16 +356,27 @@
                     >{device.TimeZone}</td
                   >
                   <td
-                    class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center"
-                  >
-                    {maskString(device.AccessKey, 4)}
-                    <button
-                      class="ml-2 text-[#02066F] hover:text-black cursor-pointer"
-                      on:click={() => copyAccessKey(device.AccessKey)}
-                    >
-                      <i class="far fa-copy"></i>
-                    </button>
-                  </td>
+  class="relative px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center"
+>
+  {maskString(device.AccessKey, 4)}
+
+  <button
+    class="ml-2 text-[#02066F] hover:text-black cursor-pointer relative"
+    on:click={() => copyAccessKey(device.AccessKey)}
+  >
+    <i class="far fa-copy"></i>
+  </button>
+
+  {#if showCopyTooltip && copiedAccessKey === device.AccessKey}
+    <span
+      class="absolute -top-3 left-32 transform -translate-x-1/2 
+      bg-gray-300 text-black text-xs font-bold px-2 py-1 rounded shadow-md whitespace-nowrap"
+    >
+      Copied!
+    </span>
+  {/if}
+</td>
+
                   <td
                     class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 text-center"
                     >{device.DeviceID}</td
