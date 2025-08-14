@@ -684,40 +684,40 @@
       loading = true;
       
       // For admins, set email/pin to null and store original values in IsActive as JSON
-      if (currentEmployee.IsAdmin > 0) {
-        const updateData = {
-          Email: null,
-          Pin: null,
-          IsActive: JSON.stringify({
-            email: currentEmployee.Email,
-            pin: currentEmployee.Pin
-          }),
-          LastModifiedBy: "Admin"
-        };
+      // if (currentEmployee.IsAdmin > 0) {
+      //   const updateData = {
+      //     Email: null,
+      //     Pin: null,
+      //     IsActive: JSON.stringify({
+      //       email: currentEmployee.Email,
+      //       pin: currentEmployee.Pin
+      //     }),
+      //     LastModifiedBy: "Admin"
+      //   };
         
-        const response = await fetch(
-          `${apiUrlBase}/update/${currentEmployee.EmpID}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(updateData),
-          },
-        );
+      //   const response = await fetch(
+      //     `${apiUrlBase}/update/${currentEmployee.EmpID}`,
+      //     {
+      //       method: "PUT",
+      //       headers: {
+      //         "Content-Type": "application/json",
+      //       },
+      //       body: JSON.stringify(updateData),
+      //     },
+      //   );
         
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
+      //   if (!response.ok) {
+      //     throw new Error(`Error: ${response.status}`);
+      //   }
         
-        const data = await response.json();
-        if (data.error) {
-          errorMessage = data.error;
-        } else {
-          successMessage = "Admin deleted successfully";
-          fetchEmployeeData();
-        }
-      } else {
+      //   const data = await response.json();
+      //   if (data.error) {
+      //     errorMessage = data.error;
+      //   } else {
+      //     successMessage = "Admin deleted successfully";
+      //     fetchEmployeeData();
+      //   }
+      // } else {
         // Regular delete for employees
         const response = await fetch(
           `${apiUrlBase}/delete/${currentEmployee.EmpID}/Admin`,
@@ -738,7 +738,7 @@
           successMessage = "Employee deleted successfully";
           fetchEmployeeData();
         }
-      }
+      // }
     } catch (error) {
       console.error("Error deleting employee:", error);
       errorMessage = "An error occurred while deleting the employee";
